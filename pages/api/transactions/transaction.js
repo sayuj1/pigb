@@ -286,10 +286,10 @@ export default async function handler(req, res) {
         if (!deletedTransaction) {
           return res.status(404).json({ message: "Transaction not found" });
         }
-        // // ✅ If the transaction was an expense, remove it from the budget
-        // if (deletedTransaction.type === "expense") {
-        //   await Budget.removeExpense(deletedTransaction._id);
-        // }
+        // ✅ If the transaction was an expense, remove it from the budget
+        if (deletedTransaction.type === "expense") {
+          await Budget.removeExpense(deletedTransaction._id);
+        }
         res.status(200).json({ message: "Transaction deleted successfully" });
       } catch (error) {
         console.error("Error deleting transaction:", error);

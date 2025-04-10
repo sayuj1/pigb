@@ -1,12 +1,19 @@
 import ProtectedRoute from "@/context/ProtectRoute";
 import dynamic from "next/dynamic";
-const SidebarLayout = dynamic(()=>import("@/components/Layout"), {ssr:false})
+const SidebarLayout = dynamic(() => import("@/components/Layout"), {
+  ssr: false,
+});
+const CategoryComp = dynamic(
+  () => import("@/components/categories/CategoryList"),
+  {
+    ssr: false,
+  }
+);
 
- function Category() {
+function Category() {
   return (
     <SidebarLayout>
-     <h1 className="text-2xl font-bold">Category</h1>
-     <p>Welcome to your finance management Category.</p>
+      <CategoryComp />
     </SidebarLayout>
   );
 }
