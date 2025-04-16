@@ -1,4 +1,4 @@
-import Budget from "../../models/Budget"; // Adjust the path as needed
+import Budget from "@/models/BudgetSchema"; // Adjust the path as needed
 import connectDB from "../../../lib/mongodb"; // A utility function to connect to your database (see below)
 import { authenticate } from "@/utils/backend/authMiddleware";
 import Transaction from "@/models/TransactionSchema";
@@ -40,22 +40,31 @@ export default async function handler(req, res) {
       }
       break;
 
-    // ✅ Get all budgets for a user with pagination, sorting, and searching
     case "GET":
       try {
         // Pagination
-        const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
-        const pageSize = parseInt(req.query.pageSize) || 10; // Default to 10 items per page if not provided
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = parseInt(req.query.pageSize) || 10;
         const skip = (page - 1) * pageSize;
 
         // Sorting
-        const sortBy = req.query.sortBy || "createdAt"; // Default sort by createdAt
-        const sortOrder = req.query.sortOrder === "desc" ? -1 : 1; // Default ascending order
+        const sortBy = req.query.sortBy || "createdAt";
+        const sortOrder = req.query.sortOrder === "desc" ? -1 : 1;
 
-        // Searching (Simple search by category)
+        // Searching
         const searchQuery = req.query.search || "";
 
-        // Build search filter
+        // Date filtering
+        const { startDate, endDate } = req.query;
+        const dateFilter =
+          startDate && endDate
+            ? {
+                startDate: { $lte: new Date(endDate) },
+                endDate: { $gte: new Date(startDate) },
+              }
+            : {};
+
+        // Search filter
         const searchFilter = searchQuery
           ? {
               $or: [
@@ -65,17 +74,19 @@ export default async function handler(req, res) {
             }
           : {};
 
-        // Find budgets with filters, pagination, and sorting
-        const budgets = await Budget.find({ userId, ...searchFilter })
+        // Combined filters
+        const filters = {
+          userId,
+          ...dateFilter,
+          ...searchFilter,
+        };
+
+        const budgets = await Budget.find(filters)
           .skip(skip)
           .limit(pageSize)
           .sort({ [sortBy]: sortOrder });
 
-        // Count total budgets for pagination metadata
-        const totalBudgets = await Budget.countDocuments({
-          userId,
-          ...searchFilter,
-        });
+        const totalBudgets = await Budget.countDocuments(filters);
 
         res.status(200).json({
           budgets,
@@ -114,14 +125,9 @@ export default async function handler(req, res) {
 
     case "PUT":
       try {
-        const {
-          _id: id,
-          category,
-          limitAmount,
-          startDate,
-          endDate,
-          budgetName,
-        } = req.body;
+        const { id } = req.query;
+        const { category, limitAmount, startDate, endDate, budgetName } =
+          req.body;
 
         if (!category || !limitAmount || !startDate || !endDate || !userId) {
           return res.status(400).json({ message: "Missing required fields" });

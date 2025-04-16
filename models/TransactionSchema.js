@@ -4,7 +4,11 @@ import Budget from "./BudgetSchema.js";
 
 const TransactionSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  accountId: { type: mongoose.Schema.Types.ObjectId, ref: "Account", required: true },
+  accountId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Account",
+    required: true,
+  },
   type: { type: String, enum: ["income", "expense"], required: true },
   category: { type: String, required: true }, // Example: Salary, Food, Rent
   amount: { type: Number, required: true },
@@ -17,26 +21,6 @@ TransactionSchema.post("save", async function (doc) {
   try {
     const account = await Account.findById(doc.accountId);
     if (!account) return;
-
-    if (doc.type === "expense") {
-      const budget = await Budget.findOne({
-        userId: doc.userId,
-        category: doc.category,
-        startDate: { $lte: doc.date },
-        endDate: { $gte: doc.date },
-      });
-
-      if (budget) {
-        budget.transactions.push({
-          transactionId: doc._id, // Store the transaction ID
-          date: doc.date,
-          amount: doc.amount,
-          description: doc.description || "",
-        });
-
-        await budget.save();
-      }
-    }
 
     if (account.type === "credit card") {
       // If it's a credit card, check for credit usage
@@ -85,7 +69,8 @@ TransactionSchema.post("findOneAndDelete", async function (doc) {
       if (budget) {
         // Remove transaction using transactionId
         budget.transactions = budget.transactions.filter(
-          (transaction) => transaction.transactionId.toString() !== doc._id.toString()
+          (transaction) =>
+            transaction.transactionId.toString() !== doc._id.toString()
         );
 
         await budget.save();
@@ -114,5 +99,5 @@ TransactionSchema.post("findOneAndDelete", async function (doc) {
   }
 });
 
-
-export default mongoose.models.Transaction || mongoose.model("Transaction", TransactionSchema);
+export default mongoose.models.Transaction ||
+  mongoose.model("Transaction", TransactionSchema);
