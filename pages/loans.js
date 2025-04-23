@@ -1,12 +1,16 @@
 import ProtectedRoute from "@/context/ProtectRoute";
 import dynamic from "next/dynamic";
-const SidebarLayout = dynamic(()=>import("@/components/Layout"), {ssr:false})
+const SidebarLayout = dynamic(() => import("@/components/Layout"), {
+  ssr: false,
+});
+const LoanComp = dynamic(() => import("@/components/loans/LoanManagement"), {
+  ssr: false,
+});
 
- function Loans() {
+function Loans() {
   return (
     <SidebarLayout>
-     <h1 className="text-2xl font-bold">Loans</h1>
-     <p>Welcome to your finance management Loans.</p>
+      <LoanComp />
     </SidebarLayout>
   );
 }
