@@ -28,6 +28,7 @@ import DeleteBudgetModal from "./DeleteBudgetModal"; // adjust the path as neces
 
 const Budget = () => {
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState(search); // State for debounced search value
   const [dateRange, setDateRange] = useState([
     dayjs().startOf("month"),
     dayjs().endOf("month"),
@@ -41,11 +42,21 @@ const Budget = () => {
   const [budgetToDelete, setBudgetToDelete] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Debouncing search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500); // Delay for 500ms
+
+    // Cleanup timer on component unmount or when `search` changes
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const fetchBudgets = async () => {
     setLoading(true);
     try {
       const res = await fetch(
-        `/api/budgets/budget?search=${search}&startDate=${dateRange[0].toISOString()}&endDate=${dateRange[1].toISOString()}`
+        `/api/budgets/budget?search=${debouncedSearch}&startDate=${dateRange[0].toISOString()}&endDate=${dateRange[1].toISOString()}`
       );
       const data = await res.json();
       setBudgets(data.budgets || []);
@@ -58,7 +69,7 @@ const Budget = () => {
 
   useEffect(() => {
     fetchBudgets();
-  }, [search, dateRange]);
+  }, [debouncedSearch, dateRange]); // Fetch budgets when debouncedSearch or dateRange changes
 
   const handleDeleteBudget = async (budgetId) => {
     try {
