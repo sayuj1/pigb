@@ -24,11 +24,21 @@ export default function AddTransactionModal({
   visible,
   onClose,
   onAddTransaction,
+  initialValues = {},
 }) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [accounts, setAccounts] = useState([]);
+
+  useEffect(() => {
+    if (visible) {
+      form.setFieldsValue({
+        billDate: dayjs(),
+        ...initialValues,
+      });
+    }
+  }, [visible, initialValues]);
 
   // Fetch Categories & Accounts
   useEffect(() => {
@@ -63,9 +73,9 @@ export default function AddTransactionModal({
       ...values,
       category: `${selectedCategory.icon} ${values.category}`,
       billDate: dayjs(values.billDate)
-      .startOf("day") // Ensures time is at the start of the day (00:00:00)
-      .utc() // Converts to UTC
-      .format(), // Formats it to ISO string (YYYY-MM-DDTHH:mm:ssZ)
+        .startOf("day") // Ensures time is at the start of the day (00:00:00)
+        .utc() // Converts to UTC
+        .format(), // Formats it to ISO string (YYYY-MM-DDTHH:mm:ssZ)
     };
 
     setLoading(true);
