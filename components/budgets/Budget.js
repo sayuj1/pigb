@@ -39,8 +39,10 @@ const Budget = () => {
   const [editingBudget, setEditingBudget] = useState(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [budgetToDelete, setBudgetToDelete] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const fetchBudgets = async () => {
+    setLoading(true);
     try {
       const res = await fetch(
         `/api/budgets/budget?search=${search}&startDate=${dateRange[0].toISOString()}&endDate=${dateRange[1].toISOString()}`
@@ -49,6 +51,8 @@ const Budget = () => {
       setBudgets(data.budgets || []);
     } catch (err) {
       message.error("Failed to fetch budgets");
+    } finally {
+      setLoading(false); // Set loading to false after fetch is complete
     }
   };
 
@@ -112,6 +116,7 @@ const Budget = () => {
 
       <div className="mt-6">
         <Table
+          loading={loading}
           rowKey="_id"
           dataSource={budgets}
           columns={[
