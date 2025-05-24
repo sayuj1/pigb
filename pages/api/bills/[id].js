@@ -1,28 +1,29 @@
-import connectDB from '../../../lib/mongodb';
-import Bill from '@/models/BillsSchema';
+import connectDB from "../../../lib/mongodb";
+import Bill from "@/models/BillsSchema";
 import Transaction from "../../../models/TransactionSchema";
 import { authenticate } from "@/utils/backend/authMiddleware";
 
 export default async function handler(req, res) {
-    await connectDB();
+  await connectDB();
 
-    const userId = authenticate(req);
+  const userId = authenticate(req);
 
-    if (!userId) {
-        return res.status(401).json({ message: "Unauthorized" });
-    }
+  if (!userId) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
   switch (req.method) {
     case "GET":
       // Fetch Transactions for a Particular Bill
       try {
-        const { billId } = req.query;  // Bill ID passed in query parameters
+        const { id } = req.query; // Bill ID passed in query parameters
+        console.log("id ", id);
 
-        if (!billId) {
+        if (!id) {
           return res.status(400).json({ message: "Bill ID is required" });
         }
 
-        // Fetch the bill based on billId
-        const bill = await Bill.findById(billId);
+        // Fetch the bill based on id
+        const bill = await Bill.findById({ _id: id, userId });
         if (!bill) {
           return res.status(404).json({ message: "Bill not found" });
         }
