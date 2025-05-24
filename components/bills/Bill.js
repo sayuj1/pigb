@@ -84,10 +84,25 @@ const Bill = () => {
     fetchBills(searchText, key);
   };
 
-  const handleSearch = (value) => {
-    setSearchText(value);
-    fetchBills(value);
+  // const handleSearch = (value) => {
+  //   setSearchText(value);
+  //   fetchBills(value);
+  // };
+  // Update on input change immediately
+  const handleSearchChange = (e) => {
+    setSearchText(e.target.value);
   };
+
+  // Debounce search effect
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      fetchBills(searchText, activeTab);
+    }, 500); // 500ms debounce delay
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchText, activeTab]);
 
   const handleAddBill = async () => {
     try {
@@ -368,11 +383,13 @@ const Bill = () => {
       <div className="flex justify-between items-center mb-4">
         <Search
           placeholder="Search bills by name"
-          onSearch={handleSearch}
-          enterButton
+          onChange={handleSearchChange}
+          value={searchText}
           allowClear
+          enterButton
           style={{ maxWidth: 300 }}
         />
+
         <Button
           type="primary"
           icon={<PlusOutlined />}
