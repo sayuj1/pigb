@@ -211,16 +211,18 @@ const ShoppingListManager = () => {
         </Button>
       </Space>
 
-      <Pagination
-        current={pagination.currentPage}
-        total={pagination.totalLists}
-        pageSize={10}
-        onChange={(page) =>
-          setPagination((prev) => ({ ...prev, currentPage: page }))
-        }
-        // showTotal={(total) => `Total ${total} items`}
-        style={{ marginTop: "10px", marginBottom: "10px" }}
-      />
+      {pagination.totalLists > 0 && (
+        <Pagination
+          current={pagination.currentPage}
+          total={pagination.totalLists}
+          pageSize={10}
+          onChange={(page) =>
+            setPagination((prev) => ({ ...prev, currentPage: page }))
+          }
+          // showTotal={(total) => `Total ${total} items`}
+          style={{ marginTop: "10px", marginBottom: "10px" }}
+        />
+      )}
 
       {loading ? (
         <div
@@ -355,16 +357,18 @@ const ShoppingListManager = () => {
         </Row>
       )}
 
-      <Pagination
-        current={pagination.currentPage}
-        total={pagination.totalLists}
-        pageSize={10}
-        onChange={(page) =>
-          setPagination((prev) => ({ ...prev, currentPage: page }))
-        }
-        // showTotal={(total) => `Total ${total} items`}
-        style={{ marginTop: "20px" }}
-      />
+      {pagination.totalLists > 0 && (
+        <Pagination
+          current={pagination.currentPage}
+          total={pagination.totalLists}
+          pageSize={10}
+          onChange={(page) =>
+            setPagination((prev) => ({ ...prev, currentPage: page }))
+          }
+          // showTotal={(total) => `Total ${total} items`}
+          style={{ marginTop: "20px" }}
+        />
+      )}
 
       {editingList && (
         <ShoppingListModal
