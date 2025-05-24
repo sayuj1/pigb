@@ -43,6 +43,9 @@ const Bill = () => {
   const [activeTab, setActiveTab] = useState("unpaid");
   const [showExpensesModal, setShowExpensesModal] = useState(false);
   const [selectedBill, setSelectedBill] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalBills, setTotalBills] = useState(0);
 
   const fetchAccounts = async () => {
     try {
@@ -53,10 +56,15 @@ const Bill = () => {
     }
   };
 
-  const fetchBills = async (search = "", status = activeTab) => {
+  const fetchBills = async (
+    search = "",
+    status = activeTab,
+    page = currentPage,
+    limit = pageSize
+  ) => {
     setLoading(true);
     try {
-      const params = { search };
+      const params = { search, page, limit };
       if (status !== "all") {
         params.status = status;
       }
@@ -64,10 +72,9 @@ const Bill = () => {
         params.sortBy = "dueDate";
         params.sortOrder = "desc";
       }
-      const res = await axios.get(`/api/bills/bill`, {
-        params,
-      });
+      const res = await axios.get(`/api/bills/bill`, { params });
       setBills(res.data.bills);
+      setTotalBills(res.data.pagination.totalBills); // total count from backend
     } catch (err) {
       console.error("Failed to fetch bills:", err);
     }
@@ -75,19 +82,29 @@ const Bill = () => {
   };
 
   useEffect(() => {
-    fetchBills(searchText, activeTab);
     fetchAccounts();
-  }, [activeTab]);
+  }, []);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      fetchBills(searchText, activeTab, currentPage, pageSize);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchText, activeTab, currentPage, pageSize]);
 
   const handleTabChange = (key) => {
     setActiveTab(key);
-    fetchBills(searchText, key);
+    setCurrentPage(1);
   };
 
-  // const handleSearch = (value) => {
-  //   setSearchText(value);
-  //   fetchBills(value);
-  // };
+  const handleTableChange = (pagination) => {
+    setCurrentPage(pagination.current);
+    setPageSize(pagination.pageSize);
+  };
+
   // Update on input change immediately
   const handleSearchChange = (e) => {
     setSearchText(e.target.value);
@@ -413,7 +430,14 @@ const Bill = () => {
         columns={columns}
         dataSource={bills}
         loading={loading}
-        pagination={false}
+        pagination={{
+          current: currentPage,
+          pageSize: pageSize,
+          total: totalBills,
+          showSizeChanger: true,
+          pageSizeOptions: ["10", "20", "50", "100"],
+        }}
+        onChange={handleTableChange}
       />
 
       <AddBillModal
