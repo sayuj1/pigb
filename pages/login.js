@@ -62,12 +62,14 @@ export default function Login() {
         </Form>
         <div className="text-center my-4">or</div>
 
-        <GoogleLogin
-          onSuccess={handleGoogleSuccess}
-          onError={handleGoogleFailure}
-          size="large"
-          className="flex justify-center"
-        />
+        <div className="flex justify-center mt-4">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleFailure}
+            size="large"
+          />
+        </div>
+
         <div className="text-center mt-4">
           <Text>Don't have an account? </Text>
           <Link href="/signup">
