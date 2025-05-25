@@ -9,6 +9,7 @@ import {
   CartesianGrid,
   Legend,
 } from "recharts";
+import { PiChartLineLight } from "react-icons/pi";
 
 const COLORS = [
   "#3b82f6", // blue
@@ -34,8 +35,19 @@ export default function SavingsAccountsTrendChart() {
 
   if (!trends.length) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 flex items-center justify-center h-72 text-gray-500">
-        No data available
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-medium mb-4">
+          Savings Account Balances Over Time
+        </h2>
+        <div className="flex flex-col items-center justify-center h-60 text-center text-gray-500 space-y-3">
+          <div className="text-5xl text-sky-400">
+            <PiChartLineLight />
+          </div>
+          <h3 className="text-base font-medium">No savings trend data found</h3>
+          <p className="text-sm text-gray-400">
+            Add savings transactions to visualize account trends over time.
+          </p>
+        </div>
       </div>
     );
   }

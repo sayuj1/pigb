@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Progress, Tooltip } from "antd";
+import { Progress, Tooltip, Typography } from "antd";
 import { PieChartOutlined } from "@ant-design/icons";
+import { PiWalletLight } from "react-icons/pi";
 
 export default function BudgetUtilization() {
   const [budgets, setBudgets] = useState([]);
@@ -23,7 +24,17 @@ export default function BudgetUtilization() {
         Budget Utilization
       </h2>
       {budgets.length === 0 && (
-        <p className="text-gray-500">No budgets available</p>
+        <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500 space-y-3">
+          <div className="text-5xl text-green-400">
+            <PiWalletLight />
+          </div>
+          <Typography.Title level={5} className="!mb-0">
+            No budgets available
+          </Typography.Title>
+          <Typography.Text type="secondary">
+            Start by creating a new budget to track your expenses.
+          </Typography.Text>
+        </div>
       )}
       <div className="space-y-6">
         {budgets.map((b) => {

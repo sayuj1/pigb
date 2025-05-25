@@ -128,7 +128,7 @@ export default function LoanManagement() {
       cancelText: "Cancel",
       onOk: async () => {
         try {
-          await axios.delete(`/api/loans?id=${id}`);
+          await axios.delete(`/api/loans/loan?id=${id}`);
           message.success("Loan deleted");
           fetchLoans();
         } catch (err) {

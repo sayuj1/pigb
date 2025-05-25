@@ -232,14 +232,21 @@ const ShoppingListManager = () => {
             left: 0,
             width: "100%",
             height: "100%",
-            backgroundColor: "rgba(255, 255, 255, 0.7)", // Semi-transparent overlay
+            backgroundColor: "rgba(255, 255, 255, 0.7)",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            zIndex: 1000, // Ensures the loader is above all content
+            zIndex: 1000,
           }}
         >
           <Spin tip="Loading..." />
+        </div>
+      ) : shoppingLists.length === 0 ? (
+        <div className="text-center mt-10 text-gray-500 border-dashed border-1 p-5">
+          <Typography.Title level={4}>
+            🛒 No Shopping Lists Found
+          </Typography.Title>
+          <p>Create a new shopping list to get started.</p>
         </div>
       ) : (
         <Row gutter={[16, 16]}>

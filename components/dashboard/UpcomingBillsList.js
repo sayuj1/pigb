@@ -39,12 +39,43 @@ export default function UpcomingBillsList() {
 
   return (
     <Card
-      title={<Title level={4}>📅 Upcoming Bills</Title>}
+      title={
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+          <Title level={4} className="!mb-0 flex items-center gap-2">
+            📅 Upcoming Bills
+          </Title>
+          <span className="text-sm text-gray-500 font-medium bg-gray-100 px-2 py-0.5 rounded-md">
+            In the Next 7 Days
+          </span>
+        </div>
+      }
       bordered={false}
       className="rounded-2xl shadow-md"
     >
       {bills.length === 0 ? (
-        <Text type="secondary">No upcoming bills</Text>
+        <div className="flex flex-col items-center justify-center py-12 text-gray-400 text-center select-none">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-16 w-16 mb-4 text-gray-300"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.5}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M8 7V3m8 4V3m-9 8h10m-9 4h5m-3 4h6a2 2 0 002-2v-9a2 2 0 00-2-2H6a2 2 0 00-2 2v9a2 2 0 002 2z"
+            />
+          </svg>
+          <h3 className="text-base font-semibold text-gray-500 mb-1">
+            No Upcoming Bills
+          </h3>
+          <p className="text-sm max-w-xs">
+            You have no bills due soon. New bills will show up here
+            automatically as their due dates approach.
+          </p>
+        </div>
       ) : (
         <List
           dataSource={bills}
