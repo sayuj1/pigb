@@ -1,8 +1,8 @@
-import {serialize} from "cookie";
+import { serialize } from "cookie";
 
 export default function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(200).setHeader(
+  if (req.method === "GET" || req.method === "POST") {
+    res.setHeader(
       "Set-Cookie",
       serialize("token", "", {
         httpOnly: true,
@@ -11,8 +11,9 @@ export default function handler(req, res) {
         expires: new Date(0),
         path: "/",
       })
-    ).json({ message: "Logged out successfully" });
+    );
+    return res.status(200).json({ message: "Logged out successfully" });
   } else {
-    res.status(405).json({ message: "Method not allowed" });
+    return res.status(405).json({ message: "Method not allowed" });
   }
 }

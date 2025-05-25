@@ -11,7 +11,9 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     async function fetchUser() {
       try {
-        const res = await axios.get("/api/auth/checkAuth", {withCredentials: true});
+        const res = await axios.get("/api/auth/checkAuth", {
+          withCredentials: true,
+        });
         setUser(res.data.user);
       } catch (err) {
         setUser(null);
@@ -51,7 +53,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.get("/api/auth/logout");
+      await axios.post("/api/auth/logout");
       setUser(null);
       router.push("/login");
     } catch (error) {
