@@ -1,27 +1,25 @@
 import { useState, useContext, useEffect } from "react";
 import AuthContext from "../context/AuthContext";
-import { Form, Input, Button, Typography, Card } from "antd";
+import { Form, Input, Button, Typography, Card, Divider } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { GoogleLogin } from "@react-oauth/google";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
 export default function Signup() {
   const { user, signup, googleSignIn } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
-
   const router = useRouter();
 
-  // Redirect if user is already logged in
   useEffect(() => {
     if (user) {
-      router.push("/");
+      router.push("/dashboard");
     }
   }, [user, router]);
 
   const handleGoogleSuccess = async (response) => {
-    console.log(response);
     googleSignIn(response.credential);
   };
 
@@ -36,50 +34,88 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-full max-w-md p-6 shadow-lg bg-white">
-        <Title level={3} className="text-center">
-          Expensify Signup
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-100 px-4">
+      <Card
+        className="w-full max-w-md shadow-xl"
+        style={{ borderRadius: "1rem", padding: "2rem" }}
+      >
+        {/* Back Button */}
+        <div className="mb-4">
+          <Link href="/" passHref>
+            <Button
+              type="link"
+              icon={<ArrowLeftOutlined />}
+              className="text-blue-600 p-0"
+              style={{
+                fontSize: "14px",
+                fontWeight: "500",
+              }}
+            >
+              Back to Home
+            </Button>
+          </Link>
+        </div>
+
+        <Title level={3} className="text-center mb-6">
+          Join Expensify
         </Title>
+
         <Form layout="vertical" onFinish={handleSubmit}>
           <Form.Item
             name="name"
             label="Name"
             rules={[{ required: true, message: "Please enter your name" }]}
           >
-            <Input placeholder="Enter your name" />
+            <Input placeholder="Enter your name" size="large" />
           </Form.Item>
+
           <Form.Item
             name="email"
             label="Email"
             rules={[{ required: true, message: "Please enter your email" }]}
           >
-            <Input type="email" placeholder="Enter your email" />
+            <Input type="email" placeholder="Enter your email" size="large" />
           </Form.Item>
+
           <Form.Item
             name="password"
             label="Password"
             rules={[{ required: true, message: "Please enter your password" }]}
           >
-            <Input.Password placeholder="Enter your password" />
+            <Input.Password placeholder="Enter your password" size="large" />
           </Form.Item>
-          <Button type="primary" htmlType="submit" block loading={loading}>
+
+          <Button
+            type="primary"
+            htmlType="submit"
+            block
+            loading={loading}
+            size="large"
+            className="mt-2"
+          >
             Sign Up
           </Button>
         </Form>
-        <div className="text-center my-4">or</div>
 
-        <div className="flex justify-center mt-4">
+        <Divider plain className="text-gray-500">
+          or sign up with
+        </Divider>
+
+        <div className="flex justify-center">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={handleGoogleFailure}
             text="signup_with"
+            size="large"
           />
         </div>
-        <div className="text-center mt-4">
-          <Text>Have an account? </Text>
+
+        <div className="text-center mt-6">
+          <Text>Already have an account? </Text>
           <Link href="/login">
-            <span className="text-blue-500 hover:underline">Login</span>
+            <span className="text-blue-600 font-medium hover:underline">
+              Login
+            </span>
           </Link>
         </div>
       </Card>
