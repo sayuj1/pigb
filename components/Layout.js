@@ -36,7 +36,7 @@ export default function SidebarLayout({ children }) {
   const { token } = theme.useToken();
 
   return (
-    <Layout className="h-screen ">
+    <Layout className="h-screen">
       {/* Sidebar */}
       <Sider
         collapsible
@@ -64,12 +64,15 @@ export default function SidebarLayout({ children }) {
       </Sider>
 
       {/* Content Area */}
-      <Layout className="w-full">
-        <Content className="bg-gray-100">
-          <Navbar />
+      <Layout className="flex-1 h-screen">
+        <Navbar />
+        <Content className="bg-gray-100 h-full">
           <div
-            className="p-4 m-1 rounded-md"
-            style={{ backgroundColor: token.colorBgContainer }}
+            className="p-4 m-1 rounded-md overflow-y-auto"
+            style={{
+              backgroundColor: token.colorBgContainer,
+              maxHeight: "calc(100vh - 64px)", // 64px for Navbar height
+            }}
           >
             {children}
           </div>

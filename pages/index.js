@@ -1,20 +1,32 @@
 import ProtectedRoute from "@/context/ProtectRoute";
-import { useTheme } from "@/context/ThemeContext";
-import { Button } from "antd";
 import dynamic from "next/dynamic";
-const SidebarLayout = dynamic(() => import("@/components/Layout"), { ssr: false })
+import SummaryCards from "@/components/dashboard/SummaryCards";
+import ExpensesIncomeChart from "@/components/dashboard/ExpensesIncomeChart";
+import CategorySpendingChart from "@/components/dashboard/CategorySpendingChart";
+import BudgetUtilization from "@/components/dashboard/BudgetUtilization";
+import SavingsTrendChart from "@/components/dashboard/SavingsTrendChart";
+import LoanRepaymentChart from "@/components/dashboard/LoanRepaymentChart";
+import UpcomingBillsList from "@/components/dashboard/UpcomingBillsList";
+const SidebarLayout = dynamic(() => import("@/components/Layout"), {
+  ssr: false,
+});
 
 function Home() {
-  const { isDarkMode, toggleTheme } = useTheme();
   return (
     <SidebarLayout>
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-      <p>Welcome to your finance management dashboard.</p>
-      <Button onClick={toggleTheme}>
-        Switch to {isDarkMode ? "Light" : "Dark"} Mode
-      </Button>
+      <div className="p-4 space-y-6">
+        <SummaryCards />
+        <ExpensesIncomeChart />
+        <CategorySpendingChart />
+        <BudgetUtilization />
+        <SavingsTrendChart />
+        <LoanRepaymentChart />
+        <UpcomingBillsList />
+      </div>
     </SidebarLayout>
   );
 }
 
 export default ProtectedRoute(Home);
+
+// pages/dashboard.jsx or app/dashboard/page.jsx

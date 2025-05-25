@@ -1,0 +1,62 @@
+import { useEffect, useState } from "react";
+import { Progress, Tooltip } from "antd";
+import { PieChartOutlined } from "@ant-design/icons";
+
+export default function BudgetUtilization() {
+  const [budgets, setBudgets] = useState([]);
+
+  useEffect(() => {
+    fetch(`/api/dashboard/budget-utilization`)
+      .then((r) => r.json())
+      .then((json) => setBudgets(json.budgets || []));
+  }, []);
+
+  const getStrokeColor = (percent) => {
+    if (percent < 70) return "#faad14"; // green
+    if (percent < 90) return "#52c41a"; // orange
+    return "#ff4d4f"; // red
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow p-6 mt-6  mx-auto w-[100%]">
+      <h2 className="text-xl font-semibold mb-4 text-gray-800">
+        Budget Utilization
+      </h2>
+      {budgets.length === 0 && (
+        <p className="text-gray-500">No budgets available</p>
+      )}
+      <div className="space-y-6">
+        {budgets.map((b) => {
+          const percent = Math.min(100, Math.round((b.spent / b.limit) * 100));
+          return (
+            <div
+              key={b.id}
+              className="flex items-center gap-4 p-3 rounded-md hover:bg-gray-50 transition"
+            >
+              <Tooltip title="Budget">
+                <PieChartOutlined className="text-blue-500 text-2xl flex-shrink-0" />
+              </Tooltip>
+
+              <div className="flex-1">
+                <p className="text-md font-medium text-gray-900 mb-1">
+                  {b.name}
+                </p>
+                <Progress
+                  percent={percent}
+                  strokeColor={getStrokeColor(percent)}
+                  strokeWidth={12}
+                  showInfo={false}
+                  strokeLinecap="round"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  ₹{b.spent.toLocaleString()} / ₹{b.limit.toLocaleString()} (
+                  {percent}%)
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
