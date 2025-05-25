@@ -21,7 +21,7 @@ export default function Signup() {
   }, [user, router]);
 
   const handleGoogleSuccess = async (response) => {
-    console.log(response)
+    console.log(response);
     googleSignIn(response.credential);
   };
 
@@ -42,13 +42,25 @@ export default function Signup() {
           Expensify Signup
         </Title>
         <Form layout="vertical" onFinish={handleSubmit}>
-          <Form.Item name="name" label="Name" rules={[{ required: true, message: "Please enter your name" }]}>
+          <Form.Item
+            name="name"
+            label="Name"
+            rules={[{ required: true, message: "Please enter your name" }]}
+          >
             <Input placeholder="Enter your name" />
           </Form.Item>
-          <Form.Item name="email" label="Email" rules={[{ required: true, message: "Please enter your email" }]}>
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[{ required: true, message: "Please enter your email" }]}
+          >
             <Input type="email" placeholder="Enter your email" />
           </Form.Item>
-          <Form.Item name="password" label="Password" rules={[{ required: true, message: "Please enter your password" }]}>
+          <Form.Item
+            name="password"
+            label="Password"
+            rules={[{ required: true, message: "Please enter your password" }]}
+          >
             <Input.Password placeholder="Enter your password" />
           </Form.Item>
           <Button type="primary" htmlType="submit" block loading={loading}>
@@ -57,11 +69,13 @@ export default function Signup() {
         </Form>
         <div className="text-center my-4">or</div>
 
-        <GoogleLogin
-          onSuccess={handleGoogleSuccess}
-          onError={handleGoogleFailure}
-          text="signup_with"
-        />
+        <div className="flex justify-center mt-4">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleFailure}
+            text="signup_with"
+          />
+        </div>
         <div className="text-center mt-4">
           <Text>Have an account? </Text>
           <Link href="/login">
