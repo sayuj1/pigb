@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { GoogleLogin } from "@react-oauth/google";
 import { ArrowLeftOutlined } from "@ant-design/icons";
+import ROUTES from "@/lib/routes";
 
 const { Title, Text } = Typography;
 
@@ -15,7 +16,7 @@ export default function Signup() {
 
   useEffect(() => {
     if (user) {
-      router.push("/dashboard");
+      router.push(ROUTES.DASHBOARD);
     }
   }, [user, router]);
 

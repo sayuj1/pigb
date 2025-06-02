@@ -17,6 +17,7 @@ import {
   PiListDashesDuotone,
   PiSquaresFourDuotone,
 } from "react-icons/pi";
+import ROUTES from "@/lib/routes";
 
 export default function Home() {
   const { user, logout } = useContext(AuthContext);
@@ -54,16 +55,19 @@ export default function Home() {
               <Button
                 type="primary"
                 size="large"
-                onClick={() => router.push("/dashboard")}
+                onClick={() => router.push(ROUTES.DASHBOARD)}
               >
                 View Dashboard
               </Button>
             ) : (
               <div className="flex justify-center gap-4">
-                <Button type="primary" onClick={() => router.push("/signup")}>
+                <Button
+                  type="primary"
+                  onClick={() => router.push(ROUTES.SIGNUP)}
+                >
                   Get Started
                 </Button>
-                <Button onClick={() => router.push("/login")}>Login</Button>
+                <Button onClick={() => router.push(ROUTES.LOGIN)}>Login</Button>
               </div>
             )}
           </div>

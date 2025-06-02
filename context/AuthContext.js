@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
+import ROUTES from "@/lib/routes";
 
 const AuthContext = createContext();
 
@@ -26,7 +27,8 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await axios.post("/api/auth/login", { email, password });
       setUser(res.data.user);
-      router.push("/");
+      // router.push("/dashboard");
+      router.push(ROUTES.DASHBOARD);
     } catch (error) {
       console.error(error.response.data.message);
     }
@@ -35,7 +37,7 @@ export const AuthProvider = ({ children }) => {
   const signup = async (name, email, password) => {
     try {
       await axios.post("/api/auth/signup", { name, email, password });
-      router.push("/login");
+      router.push(ROUTES.LOGIN);
     } catch (error) {
       console.error(error.response.data.message);
     }
@@ -45,7 +47,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await axios.post("/api/auth/google", { tokenId });
       setUser(res.data.user);
-      router.push("/");
+      router.push(ROUTES.HOME);
     } catch (error) {
       console.error(error.response.data.message);
     }
@@ -55,7 +57,8 @@ export const AuthProvider = ({ children }) => {
     try {
       await axios.post("/api/auth/logout");
       setUser(null);
-      router.push("/login");
+      // router.push("/");
+      router.push(ROUTES.HOME);
     } catch (error) {
       console.error(error);
     }

@@ -5,6 +5,7 @@ import { Form, Input, Button, Typography, Card, Divider } from "antd";
 import { GoogleLogin } from "@react-oauth/google";
 import Link from "next/link";
 import { ArrowLeftOutlined } from "@ant-design/icons";
+import ROUTES from "@/lib/routes";
 
 const { Title, Text } = Typography;
 
@@ -15,7 +16,7 @@ export default function Login() {
 
   useEffect(() => {
     if (user) {
-      router.push("/dashboard");
+      router.push(ROUTES.DASHBOARD);
     }
   }, [user, router]);
 

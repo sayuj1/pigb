@@ -14,11 +14,13 @@ import {
 import { useRouter } from "next/router";
 import Navbar from "./Navbar";
 import { useTheme } from "@/context/ThemeContext";
+import Link from "next/link";
+import ROUTES from "@/lib/routes";
 
 const { Sider, Content } = Layout;
 
 const menuItems = [
-  { key: "", icon: <DashboardOutlined />, label: "Dashboard" },
+  { key: "dashboard", icon: <DashboardOutlined />, label: "Dashboard" },
   { key: "accounts", icon: <BankOutlined />, label: "Accounts" },
   { key: "income-expense", icon: <DollarOutlined />, label: "Income/Expense" },
   { key: "loans", icon: <CreditCardOutlined />, label: "Manage Loans" },
@@ -51,14 +53,15 @@ export default function SidebarLayout({ children }) {
             color: token.colorText,
           }}
         >
-          {collapsed ? "🧾" : "Expensify"}
+          <Link href="/">{collapsed ? "🧾" : "Expensify"}</Link>
+
           <Divider />
         </div>
         <Menu
           theme={isDarkMode ? "dark" : "light"}
           mode="inline"
           selectedKeys={[router.pathname.replace("/", "") || ""]}
-          onClick={({ key }) => router.push(`/${key}`)}
+          onClick={({ key }) => router.push(`${key}`)}
           items={menuItems}
         />
       </Sider>

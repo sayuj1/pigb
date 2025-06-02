@@ -1,6 +1,7 @@
 import { useContext, useEffect } from "react";
 import { useRouter } from "next/router";
 import AuthContext from "./AuthContext";
+import ROUTES from "@/lib/routes";
 
 const ProtectedRoute = (WrappedComponent) => {
   return function ProtectedComponent(props) {
@@ -9,7 +10,8 @@ const ProtectedRoute = (WrappedComponent) => {
 
     useEffect(() => {
       if (!loading && !user) {
-        router.push("/login"); // Redirect to login if user is not authenticated
+        // router.push("/"); // Redirect to login if user is not authenticated
+        router.push(ROUTES.HOME);
       }
     }, [user, loading, router]);
 
