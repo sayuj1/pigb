@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Account from "./AccountSchema.js";
 import Budget from "./BudgetSchema.js";
+import { updateAccountBalance } from "@/utils/backend/updateAccountBalance";
 
 const TransactionSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -18,37 +19,7 @@ const TransactionSchema = new mongoose.Schema({
 
 // Middleware to update account balance when a transaction is created
 TransactionSchema.post("save", async function (doc) {
-  try {
-    const account = await Account.findById(doc.accountId);
-    if (!account) return;
-
-    if (account.type === "credit card") {
-      // If it's a credit card, check for credit usage
-      if (doc.type === "expense") {
-        // Ensure the credit card usage does not exceed the credit limit
-        if (account.creditUsed + doc.amount > account.creditLimit) {
-          console.error("Credit limit exceeded for account:", account.name);
-          return; // If the credit limit is exceeded, don't allow the transaction
-        }
-        // Update credit usage
-        account.creditUsed += doc.amount;
-      } else if (doc.type === "income") {
-        // Reduce credit usage on income
-        account.creditUsed = Math.max(0, account.creditUsed - doc.amount);
-      }
-    } else {
-      // If it's a regular account, update balance
-      if (doc.type === "income") {
-        account.balance += doc.amount;
-      } else if (doc.type === "expense") {
-        account.balance -= doc.amount;
-      }
-    }
-
-    await account.save();
-  } catch (error) {
-    console.error("Error updating account balance:", error);
-  }
+  await updateAccountBalance(doc);
 });
 
 TransactionSchema.post("findOneAndDelete", async function (doc) {
