@@ -9,6 +9,7 @@ import {
   Row,
   Col,
   message,
+  DatePicker,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import ColorPresetSelector from "../CustomColorPicker";
@@ -163,7 +164,7 @@ export default function AddAccountModal({ onAdd }) {
 
           {accountType === "credit card" && (
             <Row gutter={16}>
-              <Col span={12}>
+              <Col span={8}>
                 <Form.Item
                   name="creditLimit"
                   label="Credit Limit"
@@ -176,7 +177,7 @@ export default function AddAccountModal({ onAdd }) {
                   />
                 </Form.Item>
               </Col>
-              <Col span={12}>
+              <Col span={8}>
                 <Form.Item
                   name="creditUsed"
                   label="Credit Used"
@@ -187,6 +188,17 @@ export default function AddAccountModal({ onAdd }) {
                     min={0}
                     placeholder="0.00"
                   />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item
+                  name="dueDate"
+                  label="Due Date"
+                  rules={[
+                    { required: true, message: "Please select a due date" },
+                  ]}
+                >
+                  <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
                 </Form.Item>
               </Col>
             </Row>

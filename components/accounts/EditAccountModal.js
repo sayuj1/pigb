@@ -9,9 +9,11 @@ import {
   Row,
   Col,
   message,
+  DatePicker,
 } from "antd";
 import ColorPresetSelector from "../CustomColorPicker";
 import CustomIconPicker from "../CustomIconPicker";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -38,9 +40,20 @@ export default function EditAccountModal({ account, onUpdate, onClose }) {
   const [icon, setIcon] = useState(account?.icon || "PiMoneyWavyDuotone");
   const [accountType, setAccountType] = useState(account?.type || "");
 
+  // useEffect(() => {
+  //   if (account) {
+  //     form.setFieldsValue(account);
+  //     setIconColor(account.color);
+  //     setIcon(account.icon);
+  //     setAccountType(account.type);
+  //   }
+  // }, [account, form]);
   useEffect(() => {
     if (account) {
-      form.setFieldsValue(account);
+      form.setFieldsValue({
+        ...account,
+        dueDate: account.dueDate ? dayjs(account.dueDate) : null,
+      });
       setIconColor(account.color);
       setIcon(account.icon);
       setAccountType(account.type);
@@ -123,7 +136,7 @@ export default function EditAccountModal({ account, onUpdate, onClose }) {
 
         {accountType === "credit card" && (
           <Row gutter={16}>
-            <Col span={12}>
+            <Col span={8}>
               <Form.Item
                 name="creditLimit"
                 label="Credit Limit (INR)"
@@ -132,13 +145,24 @@ export default function EditAccountModal({ account, onUpdate, onClose }) {
                 <InputNumber style={{ width: "100%" }} min={0} />
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={8}>
               <Form.Item
                 name="creditUsed"
                 label="Credit Used (INR)"
                 rules={[{ required: true }]}
               >
                 <InputNumber style={{ width: "100%" }} min={0} />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="dueDate"
+                label="Due Date"
+                rules={[
+                  { required: true, message: "Please select a due date" },
+                ]}
+              >
+                <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
               </Form.Item>
             </Col>
           </Row>
