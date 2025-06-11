@@ -3,7 +3,7 @@ import Transaction from "../../../models/TransactionSchema";
 import Account from "@/models/AccountSchema";
 import Budget from "@/models/BudgetSchema";
 import { authenticate } from "@/utils/backend/authMiddleware";
-import { updateAccountBalance } from "@/utils/backend/updateAccountBalance";
+import { updateAccountBalance } from "@/utils/backend/accountHelper";
 
 export default async function handler(req, res) {
   await connectDB();

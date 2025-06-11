@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Account from "./AccountSchema.js";
 import Budget from "./BudgetSchema.js";
-import { updateAccountBalance } from "@/utils/backend/updateAccountBalance";
+import { updateAccountBalance } from "@/utils/backend/accountHelper.js";
 
 const TransactionSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
