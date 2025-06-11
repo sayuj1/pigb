@@ -23,7 +23,7 @@ const ACCOUNT_TYPES = [
   "savings",
   "current",
   "wallet",
-  "credit card",
+  // "credit card",
   "investment",
   "loan",
   "general",
