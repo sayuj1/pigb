@@ -13,6 +13,7 @@ import { Card, Typography } from "antd";
 import { format } from "date-fns";
 import { Empty } from "antd";
 import { PiChartBarLight } from "react-icons/pi";
+import { formatYAxis } from "@/utils/chartUtils";
 
 const COLORS = [
   "#8884d8",
@@ -65,13 +66,13 @@ export default function CategorySpendingBarChart() {
           </Typography.Text>
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={350}>
+        <ResponsiveContainer width="100%" height={350} className="p-1">
           <BarChart
             data={data}
             layout="vertical"
             margin={{ top: 20, right: 20, left: 40, bottom: 10 }}
           >
-            <XAxis type="number" tickFormatter={(v) => `₹${v}`} />
+            <XAxis type="number" tickFormatter={(v) => `₹${formatYAxis(v)}`} />
             <YAxis dataKey="category" type="category" width={120} />
             <Tooltip formatter={(v) => `₹${v}`} />
             <Legend />
