@@ -17,6 +17,7 @@ import {
   EditOutlined,
   DeleteOutlined,
   ExclamationCircleFilled,
+  FileSearchOutlined,
 } from "@ant-design/icons";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import AddAccountModal from "./AddAccountModal";
@@ -163,78 +164,81 @@ export default function Accounts() {
         </div>
       ) : error ? (
         <Alert message="Error" description={error} type="error" showIcon />
+      ) : // <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      filteredAndSortedAccounts().length === 0 ? (
+        <div className="flex flex-col items-center justify-center text-gray-500 min-h-[60vh]">
+          <FileSearchOutlined className="text-4xl mb-2 text-gray-400" />
+          <p className="text-base text-center mb-4">No accounts found.</p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredAndSortedAccounts().length === 0 ? (
-            <p className="text-center text-gray-500">No accounts found.</p>
-          ) : (
-            filteredAndSortedAccounts().map((account) => {
-              const IconComponent = getIconComponent(account.icon);
+          {filteredAndSortedAccounts().map((account) => {
+            const IconComponent = getIconComponent(account.icon);
 
-              return (
-                <Card
-                  key={account._id}
-                  className="relative flex items-center gap-4 p-4 "
-                  style={{ borderLeft: `6px solid ${account.color}` }}
-                >
-                  <div className="absolute flex gap-2 justify-end w-full pr-8">
-                    <Button
-                      size="small"
-                      icon={<EditOutlined />}
-                      onClick={() => setEditAccount(account)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      size="small"
-                      icon={<DeleteOutlined />}
-                      danger
-                      onClick={() => {
-                        setDeleteAccount(account);
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    {/* Account Icon */}
-                    <div
-                      className="flex items-center justify-center rounded-lg"
-                      style={{
-                        width: 50,
-                        height: 50,
-                        backgroundColor: `${account.color}20`,
-                        borderRadius: "8px",
-                      }}
-                    >
-                      <IconComponent size={32} color={account.color} />
-                    </div>
-                  </div>
+            return (
+              <Card
+                key={account._id}
+                className="relative flex items-center gap-4 p-4"
+                style={{ borderLeft: `6px solid ${account.color}` }}
+              >
+                <div className="absolute flex gap-2 justify-end w-full pr-8">
+                  <Button
+                    size="small"
+                    icon={<EditOutlined />}
+                    onClick={() => setEditAccount(account)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    size="small"
+                    icon={<DeleteOutlined />}
+                    danger
+                    onClick={() => setDeleteAccount(account)}
+                  >
+                    Delete
+                  </Button>
+                </div>
 
-                  {/* Account Details */}
-                  <div className="flex-1 mt-1">
-                    <Title level={5} className="mb-0">
-                      {account.name}
-                    </Title>
-                    <Text type="secondary" className="mt-0">
-                      {account.type}
-                    </Text>
+                {/* Icon */}
+                <div className="flex justify-between items-center">
+                  <div
+                    className="flex items-center justify-center rounded-lg"
+                    style={{
+                      width: 50,
+                      height: 50,
+                      backgroundColor: `${account.color}20`,
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <IconComponent size={32} color={account.color} />
                   </div>
+                </div>
 
-                  {/* Account Balance */}
-                  <Title level={5} style={{ margin: 0 }}>
-                    ₹
-                    {account.balance.toLocaleString("en-IN", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
+                {/* Details */}
+                <div className="flex-1 mt-1">
+                  <Title level={5} className="mb-0">
+                    {account.name}
                   </Title>
-                </Card>
-              );
-            })
-          )}
+                  <Text type="secondary" className="mt-0">
+                    {account.type}
+                  </Text>
+                </div>
+
+                {/* Balance */}
+                <Title level={5} style={{ margin: 0 }}>
+                  ₹
+                  {account.balance.toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </Title>
+              </Card>
+            );
+          })}
         </div>
-      )}
+      )
+      // </div>
+      }
       {editAccount && (
         <EditAccountModal
           account={editAccount}
