@@ -1,7 +1,5 @@
+import { updateAccountBalance } from "@/utils/backend/transactionUtils";
 import mongoose from "mongoose";
-import Account from "./AccountSchema.js";
-import Budget from "./BudgetSchema.js";
-import { updateAccountBalance } from "@/utils/backend/accountHelper.js";
 
 const TransactionSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -26,6 +24,10 @@ TransactionSchema.post("findOneAndDelete", async function (doc) {
   if (!doc) return;
 
   try {
+    // Lazy get Account model by name to avoid circular import
+    const Account = mongoose.model("Account");
+    const Budget = mongoose.model("Budget");
+
     const account = await Account.findById(doc.accountId);
     if (!account) return;
 
@@ -38,7 +40,6 @@ TransactionSchema.post("findOneAndDelete", async function (doc) {
       });
 
       if (budget) {
-        // Remove transaction using transactionId
         budget.transactions = budget.transactions.filter(
           (transaction) =>
             transaction.transactionId.toString() !== doc._id.toString()
@@ -49,14 +50,12 @@ TransactionSchema.post("findOneAndDelete", async function (doc) {
     }
 
     if (account.type === "credit card") {
-      // Reverse the impact of the transaction on credit usage
       if (doc.type === "expense") {
         account.creditUsed -= doc.amount;
       } else if (doc.type === "income") {
         account.creditUsed = Math.max(0, account.creditUsed - doc.amount);
       }
     } else {
-      // Reverse the impact of the transaction on balance
       if (doc.type === "income") {
         account.balance -= doc.amount;
       } else if (doc.type === "expense") {
@@ -70,5 +69,8 @@ TransactionSchema.post("findOneAndDelete", async function (doc) {
   }
 });
 
-export default mongoose.models.Transaction ||
+const Transaction =
+  mongoose.models.Transaction ||
   mongoose.model("Transaction", TransactionSchema);
+
+export default Transaction;

@@ -1,9 +1,8 @@
 import connectDB from "../../../lib/mongodb";
 import Transaction from "../../../models/TransactionSchema";
-import Account from "@/models/AccountSchema";
 import Budget from "@/models/BudgetSchema";
+import { updateAccountBalance } from "@/utils/backend/transactionUtils";
 import { authenticate } from "@/utils/backend/authMiddleware";
-import { updateAccountBalance } from "@/utils/backend/accountHelper";
 
 export default async function handler(req, res) {
   await connectDB();

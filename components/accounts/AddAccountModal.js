@@ -66,7 +66,9 @@ export default function AddAccountModal({ onAdd }) {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to add account");
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData?.message || "Failed to add account";
+        throw new Error(errorMessage);
       }
 
       const newAccount = await response.json();
