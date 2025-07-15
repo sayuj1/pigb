@@ -2,7 +2,9 @@ import { authenticate } from "@/utils/backend/authMiddleware";
 import connectDB from "@/lib/mongodb";
 import Transaction from "@/models/TransactionSchema";
 import mongoose from "mongoose";
-import { startOfMonth, endOfMonth } from "date-fns";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 export default async function handler(req, res) {
   await connectDB();
@@ -20,16 +22,16 @@ export default async function handler(req, res) {
   }
 
   try {
-    const now = new Date();
-    const from = startOfMonth(now);
-    const to = endOfMonth(now);
+    // Get start and end of current month in UTC
+    const from = dayjs().startOf("month").toISOString();
+    const to = dayjs().utc().endOf("month").toISOString()
 
     const expenses = await Transaction.aggregate([
       {
         $match: {
-          userId: new mongoose.Types.ObjectId(userId), // Cast correctly
+          userId: new mongoose.Types.ObjectId(userId),
           type: "expense",
-          date: { $gte: from, $lte: to },
+          date: { $gte: new Date(from), $lte: new Date(to) },
         },
       },
       {
