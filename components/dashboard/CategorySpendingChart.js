@@ -14,6 +14,7 @@ import { format } from "date-fns";
 import { Empty } from "antd";
 import { PiChartBarLight } from "react-icons/pi";
 import { formatYAxis } from "@/utils/chartUtils";
+import dayjs from "dayjs";
 
 const COLORS = [
   "#8884d8",
@@ -31,8 +32,13 @@ export default function CategorySpendingBarChart() {
   const [data, setData] = useState([]);
   const currentMonth = format(new Date(), "MMMM yyyy");
 
+  const query = new URLSearchParams({
+    startDate: dayjs().startOf("month").toISOString(),
+    endDate: dayjs().endOf("month").toISOString(),
+  }).toString();
+
   useEffect(() => {
-    fetch(`/api/dashboard/category-spending`)
+    fetch(`/api/dashboard/category-spending?${query}`)
       .then((r) => r.json())
       .then((json) => {
         setData(

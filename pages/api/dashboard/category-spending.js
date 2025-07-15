@@ -18,16 +18,17 @@ export default async function handler(req, res) {
   switch (req.method) {
     case "GET":
       try {
-        const now = new Date();
-        const from = startOfMonth(now);
-        const to = endOfMonth(now);
+        let { startDate, endDate } = req.query;
+        // const now = new Date();
+        // const from = startOfMonth(now);
+        // const to = endOfMonth(now);
 
         const agg = await Transaction.aggregate([
           {
             $match: {
               userId: new mongoose.Types.ObjectId(userId),
               type: "expense",
-              date: { $gte: from, $lte: to },
+              date: { $gte: new Date(startDate), $lte: new Date(endDate) },
             },
           },
           { $group: { _id: "$category", total: { $sum: "$amount" } } },
