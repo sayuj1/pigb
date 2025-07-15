@@ -22,9 +22,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Get start and end of current month in UTC
-    const from = dayjs().startOf("month").toISOString();
-    const to = dayjs().utc().endOf("month").toISOString()
+    // ✅ Ensure both are in UTC
+    const from = dayjs().utc().startOf("month").toISOString();
+    const to = dayjs().utc().endOf("month").toISOString();
+
+    console.log("From:", from);
+    console.log("To:", to);
 
     const expenses = await Transaction.aggregate([
       {
