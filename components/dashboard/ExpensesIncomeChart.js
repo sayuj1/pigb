@@ -25,7 +25,7 @@ export default function ExpensesIncomeChart() {
   const [data, setData] = useState([]);
 
   const query = new URLSearchParams({
-    startDate: dayjs().startOf("month").toISOString(),
+    startDate: dayjs().subtract(11, "month").startOf("month").toISOString(),
     endDate: dayjs().endOf("month").toISOString(),
   }).toString();
 
