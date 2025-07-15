@@ -7,6 +7,7 @@ import {
   FundOutlined,
 } from "@ant-design/icons";
 import { format } from "date-fns";
+import dayjs from "dayjs";
 
 // Card styling
 const cardStyles = {
@@ -59,11 +60,16 @@ export default function SummaryCards() {
   // const month = new Date().toLocaleString("default", { month: "long" });
   const currentMonth = format(new Date(), "MMMM yyyy");
 
+  const query = new URLSearchParams({
+    startDate: dayjs().startOf("month").toISOString(),
+    endDate: dayjs().endOf("month").toISOString(),
+
+  }).toString();
   useEffect(() => {
     Promise.all([
       fetch(`/api/dashboard/total-balance`).then((r) => r.json()),
       fetch(`/api/dashboard/upcoming-bills`).then((r) => r.json()),
-      fetch(`/api/dashboard/total-expenses`).then((r) => r.json()),
+      fetch(`/api/dashboard/total-expenses?${query}`).then((r) => r.json()),
       fetch(`/api/dashboard/active-budgets`).then((r) => r.json()),
     ])
       .then(([bal, bills, exp, buds]) => {

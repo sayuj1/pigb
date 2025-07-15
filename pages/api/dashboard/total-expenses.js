@@ -2,7 +2,6 @@ import { authenticate } from "@/utils/backend/authMiddleware";
 import connectDB from "@/lib/mongodb";
 import Transaction from "@/models/TransactionSchema";
 import mongoose from "mongoose";
-import { startOfMonth, endOfMonth } from "date-fns";
 
 export default async function handler(req, res) {
   await connectDB();
@@ -20,16 +19,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    const now = new Date();
-    const from = startOfMonth(now);
-    const to = endOfMonth(now);
+    let { startDate, endDate } = req.query;
 
     const expenses = await Transaction.aggregate([
       {
         $match: {
           userId: new mongoose.Types.ObjectId(userId), // Cast correctly
           type: "expense",
-          date: { $gte: from, $lte: to },
+          date: { $gte: new Date(startDate), $lte: new Date(endDate) },
         },
       },
       {
