@@ -21,8 +21,8 @@ export default async function handler(req, res) {
           return res.status(400).json({ message: "startDate and endDate are required" });
         }
 
-        const start = startOfMonth(parseISO(startDate));
-        const end = endOfMonth(parseISO(endDate));
+        const start = new Date(startDate);
+        const end = new Date(endDate);
 
         if (isAfter(start, end)) {
           return res.status(400).json({ message: "startDate must be before endDate" });

@@ -16,14 +16,21 @@ import {
   getDynamicDx,
   getSecondaryDynamicDx,
 } from "../../utils/chartUtils";
+import dayjs from "dayjs";
+
 
 const { Title, Text } = Typography;
 
 export default function ExpensesIncomeChart() {
   const [data, setData] = useState([]);
 
+  const query = new URLSearchParams({
+    startDate: dayjs().startOf("month").toISOString(),
+    endDate: dayjs().endOf("month").toISOString(),
+  }).toString();
+
   useEffect(() => {
-    fetch(`/api/dashboard/expenses-income-trend?startDate=2025-01-01&endDate=2025-07-31`)
+    fetch(`/api/dashboard/expenses-income-trend?${query}`)
       .then((r) => r.json())
       .then((json) => setData(json.monthly || []));
   }, []);
