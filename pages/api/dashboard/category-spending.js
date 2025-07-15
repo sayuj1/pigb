@@ -2,9 +2,7 @@ import { authenticate } from "@/utils/backend/authMiddleware";
 import connectDB from "../../../lib/mongodb";
 import Transaction from "@/models/TransactionSchema";
 import mongoose from "mongoose";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-dayjs.extend(utc);
+
 
 import { startOfMonth, endOfMonth } from "date-fns";
 
@@ -18,62 +16,21 @@ export default async function handler(req, res) {
   }
 
   switch (req.method) {
-    // case "GET":
-    //   try {
-    //     const now = new Date();
-    //     const from = startOfMonth(now);
-    //     const to = endOfMonth(now);
-
-    //     const agg = await Transaction.aggregate([
-    //       {
-    //         $match: {
-    //           userId: new mongoose.Types.ObjectId(userId),
-    //           type: "expense",
-    //           date: { $gte: from, $lte: to },
-    //         },
-    //       },
-    //       { $group: { _id: "$category", total: { $sum: "$amount" } } },
-    //     ]);
-
-    //     const byCategory = agg.reduce((acc, cur) => {
-    //       acc[cur._id] = cur.total;
-    //       return acc;
-    //     }, {});
-
-    //     res.status(200).json({ byCategory });
-    //   } catch (error) {
-    //     console.error("Error fetching Category Spend:", error);
-    //     res.status(500).json({ message: "Server error", error: error.message });
-    //   }
-    //   break;
     case "GET":
       try {
-        const now = dayjs().utc();
-        const startDate = now.startOf("month").toDate(); // UTC start
-        const endDate = now.endOf("month").toDate();     // UTC end
-
-        const query = {
-          userId: new mongoose.Types.ObjectId(userId),
-          type: "expense",
-        };
-
-        if (startDate) {
-          query.date = { ...query.date, $gte: startDate };
-        }
-        if (endDate) {
-          query.date = { ...query.date, $lte: endDate };
-        }
+        const now = new Date();
+        const from = startOfMonth(now);
+        const to = endOfMonth(now);
 
         const agg = await Transaction.aggregate([
           {
-            $match: query,
-          },
-          {
-            $group: {
-              _id: "$category",
-              total: { $sum: "$amount" },
+            $match: {
+              userId: new mongoose.Types.ObjectId(userId),
+              type: "expense",
+              date: { $gte: from, $lte: to },
             },
           },
+          { $group: { _id: "$category", total: { $sum: "$amount" } } },
         ]);
 
         const byCategory = agg.reduce((acc, cur) => {
