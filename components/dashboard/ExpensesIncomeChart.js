@@ -23,7 +23,7 @@ export default function ExpensesIncomeChart() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch(`/api/dashboard/expenses-income-trend?startDate=2025-02-01&endDate=2025-07-31`)
+    fetch(`/api/dashboard/expenses-income-trend?startDate=2025-01-01&endDate=2025-07-31`)
       .then((r) => r.json())
       .then((json) => setData(json.monthly || []));
   }, []);
