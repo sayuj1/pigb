@@ -2,6 +2,7 @@ import { authenticate } from "@/utils/backend/authMiddleware";
 import connectDB from "@/lib/mongodb";
 import Transaction from "@/models/TransactionSchema";
 import mongoose from "mongoose";
+import { getCache } from "@/lib/useCache";
 
 export default async function handler(req, res) {
   await connectDB();
@@ -19,25 +20,36 @@ export default async function handler(req, res) {
   }
 
   try {
-    let { startDate, endDate } = req.query;
+    const { startDate, endDate } = req.query;
 
-    const expenses = await Transaction.aggregate([
-      {
-        $match: {
-          userId: new mongoose.Types.ObjectId(userId), // Cast correctly
-          type: "expense",
-          date: { $gte: new Date(startDate), $lte: new Date(endDate) },
-        },
+    const total = await getCache({
+      key: userId,
+      prefix: "total-expense",
+      ttl: 60 * 60 * 24 * 4, // 4 days = 345600 seconds
+      fetchFn: async () => {
+        const expenses = await Transaction.aggregate([
+          {
+            $match: {
+              userId: new mongoose.Types.ObjectId(userId),
+              type: "expense",
+              date: {
+                $gte: new Date(startDate),
+                $lte: new Date(endDate),
+              },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              total: { $sum: "$amount" },
+            },
+          },
+        ]);
+        return { totalExpenses: expenses[0]?.total || 0 };
       },
-      {
-        $group: {
-          _id: null,
-          total: { $sum: "$amount" },
-        },
-      },
-    ]);
+    });
 
-    res.status(200).json({ totalExpenses: expenses[0]?.total || 0 });
+    return res.status(200).json(total);
   } catch (error) {
     console.error("Error fetching total expenses:", error);
     res.status(500).json({ message: "Server error", error: error.message });

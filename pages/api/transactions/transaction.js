@@ -3,6 +3,7 @@ import Transaction from "../../../models/TransactionSchema";
 import Account from "@/models/AccountSchema";
 import Budget from "@/models/BudgetSchema";
 import { authenticate } from "@/utils/backend/authMiddleware";
+import { delCache, delAllWithPrefix } from "@/lib/useCache";
 
 export default async function handler(req, res) {
   await connectDB();
@@ -113,6 +114,19 @@ export default async function handler(req, res) {
         });
 
         await transaction.save();
+        // invalidate cache 
+        await delCache({ key: userId, prefix: "accounts" });
+        await delCache({
+          key: userId,
+          prefix: "total-expense",
+        });
+        await delCache({
+          key: userId,
+          prefix: "total-balance",
+        });
+        await delAllWithPrefix("expenses-income-trend");
+        await delAllWithPrefix("category-spend");
+
 
         // ✅ If transaction is an expense, add it to the budget
         if (type === "expense") {
@@ -257,6 +271,19 @@ export default async function handler(req, res) {
 
         await account.save();
 
+        // invalidate cache 
+        await delCache({ key: userId, prefix: "accounts" });
+        await delCache({
+          key: userId,
+          prefix: "total-expense",
+        });
+        await delCache({
+          key: userId,
+          prefix: "total-balance",
+        });
+        await delAllWithPrefix("expenses-income-trend");
+        await delAllWithPrefix("category-spend");
+
         res
           .status(200)
           .json({ message: "Transaction updated successfully", transaction });
@@ -290,6 +317,19 @@ export default async function handler(req, res) {
         if (deletedTransaction.type === "expense") {
           await Budget.removeExpense(deletedTransaction._id);
         }
+
+        // invalidate cache 
+        await delCache({ key: userId, prefix: "accounts" });
+        await delCache({
+          key: userId,
+          prefix: "total-expense",
+        });
+        await delCache({
+          key: userId,
+          prefix: "total-balance",
+        });
+        await delAllWithPrefix("expenses-income-trend");
+        await delAllWithPrefix("category-spend");
         res.status(200).json({ message: "Transaction deleted successfully" });
       } catch (error) {
         console.error("Error deleting transaction:", error);

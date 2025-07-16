@@ -2,6 +2,7 @@ import connectDB from "../../../lib/mongodb";
 import Bill from "@/models/BillsSchema";
 import Transaction from "../../../models/TransactionSchema";
 import { authenticate } from "@/utils/backend/authMiddleware";
+import { delCache, delAllWithPrefix } from "@/lib/useCache";
 
 export default async function handler(req, res) {
   await connectDB();
@@ -38,8 +39,7 @@ export default async function handler(req, res) {
         let transactionId = null;
         if (status === "paid") {
           const transactionRes = await fetch(
-            `${
-              process.env.API_BASE_URL || "http://localhost:3000"
+            `${process.env.API_BASE_URL || "http://localhost:3000"
             }/api/transactions/transaction`,
             {
               method: "POST",
@@ -205,8 +205,7 @@ export default async function handler(req, res) {
 
         if (status === "paid") {
           const transactionRes = await fetch(
-            `${
-              process.env.API_BASE_URL || "http://localhost:3000"
+            `${process.env.API_BASE_URL || "http://localhost:3000"
             }/api/transactions/transaction`,
             {
               method: "POST",
@@ -311,6 +310,19 @@ export default async function handler(req, res) {
 
         // Remove the bill
         await Bill.findByIdAndDelete(id);
+
+        // invalidate cache 
+        await delCache({ key: userId, prefix: "accounts" });
+        await delCache({
+          key: userId,
+          prefix: "total-expense",
+        });
+        await delCache({
+          key: userId,
+          prefix: "total-balance",
+        });
+        await delAllWithPrefix("expenses-income-trend");
+        await delAllWithPrefix("category-spend");
 
         res.status(200).json({ message: "Bill deleted successfully" });
       } catch (error) {

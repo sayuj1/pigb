@@ -6,6 +6,7 @@ import {
   updateAccount,
 } from "@/services/accountService";
 import { authenticate } from "@/utils/backend/authMiddleware";
+import { getCache, delCache } from "@/lib/useCache";
 
 export default async function handler(req, res) {
   await connectDB();
@@ -19,7 +20,12 @@ export default async function handler(req, res) {
   switch (req.method) {
     case "GET":
       try {
-        const accounts = await fetchAccountsByUserId(userId);
+        const accounts = await getCache({
+          key: userId,
+          prefix: "accounts",
+          ttl: 60 * 60 * 24 * 4, // 4 days
+          fetchFn: () => fetchAccountsByUserId(userId),
+        });
 
         res
           .status(200)
@@ -32,6 +38,12 @@ export default async function handler(req, res) {
     case "POST":
       try {
         const newAccount = await createAccount(userId, req.body);
+        // Invalidate cached accounts for this user
+        await delCache({ key: userId, prefix: "accounts" });
+        await delCache({
+          key: userId,
+          prefix: "total-balance",
+        });
         res.status(201).json({
           message: "Account created successfully.",
           account: newAccount,
@@ -46,6 +58,16 @@ export default async function handler(req, res) {
         const { id: accountId } = req.query;
 
         const result = await deleteAccountById(accountId, userId);
+        // Invalidate cached accounts for this user
+        await delCache({ key: userId, prefix: "accounts" });
+        await delCache({
+          key: userId,
+          prefix: "total-expense",
+        });
+        await delCache({
+          key: userId,
+          prefix: "total-balance",
+        });
 
         res.status(200).json(result);
       } catch (error) {
@@ -58,6 +80,12 @@ export default async function handler(req, res) {
       try {
         const { id } = req.query;
         const updatedAccount = await updateAccount(id, userId, req.body);
+        // Invalidate cached accounts for this user
+        await delCache({ key: userId, prefix: "accounts" });
+        await delCache({
+          key: userId,
+          prefix: "total-balance",
+        });
 
         res.status(200).json({
           message: "Account updated successfully.",
