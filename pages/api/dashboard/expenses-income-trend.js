@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { authenticate } from "@/utils/backend/authMiddleware";
 import connectDB from "@/lib/mongodb";
 import Transaction from "@/models/TransactionSchema";
+import dayjs from "dayjs";
 
 export default async function handler(req, res) {
   await connectDB();
@@ -33,12 +34,12 @@ export default async function handler(req, res) {
           },
         ]);
 
-        // Step 2: Process into monthly map
+        //Step 2: Process into monthly map
         const monthlyMap = {};
 
         transactions.forEach((tx) => {
-          const date = new Date(tx.date);
-          const monthKey = date.toLocaleString("default", { month: "short" }) + " " + date.getFullYear(); // e.g., "Jun 2025"
+
+          const monthKey = dayjs(tx.date).format("MMM YYYY"); //date.toLocaleString("default", { month: "short" }) + " " + date.
 
           if (!monthlyMap[monthKey]) {
             monthlyMap[monthKey] = { income: 0, expense: 0 };
