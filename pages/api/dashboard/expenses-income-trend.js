@@ -45,12 +45,9 @@ export default async function handler(req, res) {
 
         transactions.forEach((tx) => {
 
-          const monthKey = new Date(tx.date).toLocaleDateString("en-GB", {
-            // day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })//dayjs(tx.date).format("MMM YYYY"); //date.toLocaleString("default", { month: "short" }) + " " + date.
-
+          const monthKey = dayjs.utc(tx.date).tz("Asia/Kolkata").format("MMM YYYY");
+          //dayjs(tx.date).format("MMM YYYY"); //date.toLocaleString("default", { month: "short" }) + " " + date.
+          console.log("monthKey", tx.date, tx.amount, tx.type);
           if (!monthlyMap[monthKey]) {
             monthlyMap[monthKey] = { income: 0, expense: 0 };
           }
