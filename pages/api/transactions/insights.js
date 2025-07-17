@@ -2,9 +2,6 @@ import connectDB from "../../../lib/mongodb";
 import Transaction from "@/models/TransactionSchema";
 import Account from "@/models/AccountSchema";
 import { authenticate } from "@/utils/backend/authMiddleware";
-import { color } from "framer-motion";
-
-
 
 export default async function handler(req, res) {
     await connectDB();
