@@ -48,6 +48,29 @@ export default function Transactions() {
   const debouncedMinAmount = useDebounce(filters.minAmount, 500);
   const debouncedMaxAmount = useDebounce(filters.maxAmount, 500);
   const [accountOptions, setAccountOptions] = useState([]);
+  const [insights, setInsights] = useState({
+    totalExpense: 0,
+    expenseByAccounts: [],
+    topCategories: [],
+  });
+
+  const fetchInsights = async () => {
+    try {
+      const query = new URLSearchParams({
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+        ...(filters.accountId.length && {
+          accountId: filters.accountId.join(","),
+        }),
+      }).toString();
+
+      const res = await fetch(`/api/transactions/insights?${query}`);
+      const data = await res.json();
+      setInsights(data);
+    } catch (err) {
+      console.error("Failed to load insights", err);
+    }
+  };
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -129,6 +152,7 @@ export default function Transactions() {
       message.success("Transaction deleted successfully!");
       setDeleteTransaction(null);
       fetchTransactions();
+      fetchInsights();
     } catch (error) {
       message.error(error.message);
     } finally {
@@ -138,6 +162,7 @@ export default function Transactions() {
 
   useEffect(() => {
     fetchTransactions();
+    fetchInsights();
   }, [
     pagination.current,
     pagination.pageSize,
@@ -158,7 +183,52 @@ export default function Transactions() {
   }, [debouncedSearch]);
 
   return (
-    <div className="p-4 bg-white shadow rounded-lg">
+    <>
+
+      {/* Quick Insights */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        {/* Summary Card */}
+        <div className="p-4 bg-white rounded-xl shadow w-full md:col-span-1">
+          <h2 className="text-lg font-semibold mb-3">Summary ({dayjs(filters.startDate).format("DD-MMM-YYYY")} to {dayjs(filters.endDate).format("DD-MMM-YYYY")})</h2>
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-gray-600">Total Income</span>
+            <span className="text-green-600 font-medium">₹{insights?.totalIncome ?? 0}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600">Total Expense</span>
+            <span className="text-red-600 font-medium">₹{insights?.totalExpense ?? 0}</span>
+          </div>
+        </div>
+        <div className="p-4 bg-white rounded-lg shadow">
+          <h2 className="text-lg font-semibold mb-3">Accounts Expenses </h2>
+          <ul className="mt-1 space-y-1 text-sm text-gray-800">
+            {insights.expenseByAccounts.map((acc) => (
+              <li key={acc.accountId} className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  {getIconComponent(acc.icon)({
+                    size: 20,
+                    color: acc.color,
+                  })}
+                  <span className="font-semibold">{acc.accountName}</span>
+                </div>
+                <span className="text-red-600 font-medium">₹{acc.total.toFixed(2)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="p-4 bg-white rounded-lg shadow">
+          <h2 className="text-lg font-semibold mb-3">Top 3 Categories (Most Spent)</h2>
+          <ul className="mt-1 space-y-1 text-sm text-gray-800">
+            {insights.topCategories.map((cat) => (
+              <li key={cat.category} className="flex justify-between items-center">
+                <span className="font-semibold">{cat.category}</span>
+                <span className="text-red-600 font-medium">₹{cat.total.toFixed(2)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
       {/* Filters & Search */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
         <Input
@@ -342,13 +412,19 @@ export default function Transactions() {
       <AddTransactionModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        onAddTransaction={fetchTransactions}
+        onAddTransaction={() => {
+          fetchTransactions();
+          fetchInsights();
+        }}
       />
       <EditTransactionModal
         visible={editModalVisible}
         transaction={selectedTransaction}
         onClose={() => setEditModalVisible(false)}
-        onUpdate={fetchTransactions}
+        onUpdate={() => {
+          fetchTransactions();
+          fetchInsights();
+        }}
       />
       {/* Delete Confirmation Modal */}
       <DeleteTransactionModal
@@ -358,6 +434,6 @@ export default function Transactions() {
         onCancel={() => setDeleteTransaction(null)}
         onConfirm={handleDelete}
       />
-    </div>
+    </>
   );
 }
