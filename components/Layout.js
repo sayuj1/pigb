@@ -61,7 +61,7 @@ export default function SidebarLayout({ children }) {
           theme={isDarkMode ? "dark" : "light"}
           mode="inline"
           selectedKeys={[router.pathname.replace("/", "") || ""]}
-          onClick={({ key }) => router.push(`${key}`)}
+          onClick={({ key }) => router.push("/" + key)}
           items={menuItems}
         />
       </Sider>
