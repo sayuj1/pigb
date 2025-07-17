@@ -58,6 +58,12 @@ export default async function handler(req, res) {
         if (startDate)
           query.date = { ...query.date, $gte: new Date(startDate) }; // Start date filter
         if (endDate) query.date = { ...query.date, $lte: new Date(endDate) }; // End date filter
+        if (req.query.accountId) {
+          const accountIds = Array.isArray(req.query.accountId)
+            ? req.query.accountId
+            : req.query.accountId.split(",");
+          query.accountId = { $in: accountIds };
+        }
 
         // Fetch transactions
         const transactions = await Transaction.find(query)

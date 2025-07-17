@@ -7,6 +7,7 @@ import {
   InputNumber,
   message,
   DatePicker,
+  Select
 } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import AddTransactionModal from "./AddTransactionModal";
@@ -35,6 +36,7 @@ export default function Transactions() {
     startDate: dayjs().startOf("month").toISOString(),
     endDate: dayjs().endOf("month").toISOString(),
     type: "",
+    accountId: [], // array of selected account IDs
   });
   const [modalVisible, setModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -45,6 +47,20 @@ export default function Transactions() {
   const debouncedSearch = useDebounce(searchInput, 500);
   const debouncedMinAmount = useDebounce(filters.minAmount, 500);
   const debouncedMaxAmount = useDebounce(filters.maxAmount, 500);
+  const [accountOptions, setAccountOptions] = useState([]);
+
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      try {
+        const res = await fetch("/api/accounts/account"); // adjust endpoint if needed
+        const data = await res.json();
+        setAccountOptions(data.accounts || []);
+      } catch (err) {
+        message.error("Failed to load accounts");
+      }
+    };
+    fetchAccounts();
+  }, []);
 
   // Fetch Transactions
   const fetchTransactions = async (params = {}) => {
@@ -61,6 +77,9 @@ export default function Transactions() {
         startDate: filters.startDate,
         endDate: filters.endDate,
         type: filters.type || "",
+        ...(filters.accountId.length && {
+          accountId: filters.accountId.join(","),
+        }),
       }).toString();
 
       const res = await fetch(`/api/transactions/transaction?${query}`);
@@ -130,6 +149,7 @@ export default function Transactions() {
     debouncedMinAmount,
     debouncedMaxAmount,
     filters.type,
+    filters.accountId
   ]);
 
   useEffect(() => {
@@ -177,7 +197,29 @@ export default function Transactions() {
           }}
         />
 
-        <InputNumber
+        <Select
+          mode="multiple"
+          placeholder="Filter by Account"
+          allowClear
+          style={{ width: 400 }}
+          value={filters.accountId}
+          onChange={(value) => {
+            setFilters((prev) => ({ ...prev, accountId: value }));
+            setPagination((prev) => ({ ...prev, current: 1 }));
+          }}
+          options={accountOptions.map((acc) => ({
+            label: <Space>
+              {getIconComponent(acc.icon)({
+                size: 20,
+                color: acc.color,
+              })}
+              <span className="font-semibold">{acc?.name || "N/A"}</span>
+            </Space>,
+            value: acc._id,
+          }))}
+        />
+
+        {/* <InputNumber
           placeholder="Min Amount"
           onChange={(value) => handleFilterChange("minAmount", value)}
           style={{ width: 120 }}
@@ -186,7 +228,7 @@ export default function Transactions() {
           placeholder="Max Amount"
           onChange={(value) => handleFilterChange("maxAmount", value)}
           style={{ width: 120 }}
-        />
+        /> */}
         <Button
           type="primary"
           icon={<PlusOutlined />}
