@@ -165,7 +165,7 @@ export default function LoanFormModal({
                 >
                   {() => {
                     const type = form.getFieldValue("loanType");
-                    return type === "taken" ? (
+                    return type === "given" ? (
                       <Form.Item
                         name="borrowerName"
                         label="Borrower Name"

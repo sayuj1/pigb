@@ -38,16 +38,16 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "Invalid loan category" });
       }
 
-      if (loanType === "taken" && !borrowerName) {
+      if (loanType === "taken" && !lenderName) {
         return res
           .status(400)
-          .json({ error: "Borrower name is required for taken loans" });
+          .json({ error: "Lender name is required for taken loans" });
       }
 
-      if (loanType === "given" && !lenderName) {
+      if (loanType === "given" && !borrowerName) {
         return res
           .status(400)
-          .json({ error: "Lender name is required for given loans" });
+          .json({ error: "Borrower name is required for given loans" });
       }
 
       try {
@@ -67,6 +67,7 @@ export default async function handler(req, res) {
         await newLoan.save();
         res.status(201).json(newLoan);
       } catch (error) {
+        console.error("Error creating loan:", error);
         res.status(500).json({ error: "Failed to create loan" });
       }
       break;

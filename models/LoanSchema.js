@@ -6,13 +6,13 @@ const LoanSchema = new mongoose.Schema({
   borrowerName: {
     type: String,
     required: function () {
-      return this.loanType === "taken";
+      return this.loanType === "given";
     },
   },
   lenderName: {
     type: String,
     required: function () {
-      return this.loanType === "given";
+      return this.loanType === "taken";
     },
   },
   loanCategory: { type: String, required: true },

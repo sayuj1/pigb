@@ -100,7 +100,7 @@ export default function LoanManagement() {
             {loan.loanType === "taken" ? "Taken" : "Given"}
           </Descriptions.Item>
           <Descriptions.Item label="Name">
-            {loan.loanType === "taken" ? loan.borrowerName : loan.lenderName}
+            {loan.loanType === "taken" ? loan.lenderName : loan.borrowerName}
           </Descriptions.Item>
           <Descriptions.Item label="Category">
             {loan.loanCategory}
