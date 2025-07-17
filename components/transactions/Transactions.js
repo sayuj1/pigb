@@ -201,7 +201,7 @@ export default function Transactions() {
           mode="multiple"
           placeholder="Filter by Account"
           allowClear
-          style={{ width: 400 }}
+          style={{ minWidth: 250, maxWidth: 400 }}
           value={filters.accountId}
           onChange={(value) => {
             setFilters((prev) => ({ ...prev, accountId: value }));
