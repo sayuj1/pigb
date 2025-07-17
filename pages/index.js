@@ -120,14 +120,14 @@ export default function Home() {
                 <PiBankDuotone className="text-indigo-600 w-12 h-12 mb-4" />
               ),
             },
-            {
-              title: "Bills",
-              link: "/bills",
-              desc: "Keep tabs on upcoming bill due dates, payment history, and reminders.",
-              icon: (
-                <PiReceiptDuotone className="text-indigo-600 w-12 h-12 mb-4" />
-              ),
-            },
+            // {
+            //   title: "Bills",
+            //   link: "/bills",
+            //   desc: "Keep tabs on upcoming bill due dates, payment history, and reminders.",
+            //   icon: (
+            //     <PiReceiptDuotone className="text-indigo-600 w-12 h-12 mb-4" />
+            //   ),
+            // },
             {
               title: "Income & Expense",
               link: "/income-expense",
