@@ -79,7 +79,7 @@ export default async function handler(req, res) {
             .slice(0, 3);
 
         res.status(200).json({
-            totalExpense,
+            totalExpense: totalExpense.toFixed(2) || 0,
             totalIncome: totalIncome.toFixed(2) || 0,
             expenseByAccounts: Object.values(expenseByAccountsMap),
             topCategories,

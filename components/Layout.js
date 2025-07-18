@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Divider, Layout, Menu, theme } from "antd";
 import {
   DashboardOutlined,
@@ -15,7 +15,6 @@ import { useRouter } from "next/router";
 import Navbar from "./Navbar";
 import { useTheme } from "@/context/ThemeContext";
 import Link from "next/link";
-import ROUTES from "@/lib/routes";
 
 const { Sider, Content } = Layout;
 
