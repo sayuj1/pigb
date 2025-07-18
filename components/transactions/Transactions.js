@@ -18,6 +18,7 @@ import DeleteTransactionModal from "./DeleteTransacationModal";
 import dayjs from "dayjs";
 import rangePresets from "@/utils/rangePresets";
 import useDebounce from "@/hooks/useDebounce";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 const { RangePicker } = DatePicker;
 
@@ -194,11 +195,11 @@ export default function Transactions() {
           </h2>
           <div className="flex justify-between items-center mb-2">
             <span className="text-gray-600 font-medium">Total Income</span>
-            <span className="text-green-700 font-semibold">₹{insights?.totalIncome ?? 0}</span>
+            <span className="text-green-700 font-semibold">{formatCurrency(insights?.totalIncome)}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-gray-600 font-medium">Total Expense</span>
-            <span className="text-red-600 font-semibold">₹{insights?.totalExpense ?? 0}</span>
+            <span className="text-red-600 font-semibold">{formatCurrency(insights?.totalExpense)}</span>
           </div>
         </div>
         {/* Account Expense Card */}
@@ -211,7 +212,7 @@ export default function Transactions() {
                   {getIconComponent(acc.icon)({ size: 20, color: acc.color })}
                   <span className="font-semibold text-gray-800">{acc.accountName}</span>
                 </div>
-                <span className="text-red-600 font-semibold">₹{acc.total.toFixed(2)}</span>
+                <span className="text-red-600 font-semibold">{formatCurrency(acc.total)}</span>
               </li>
             ))}
           </ul>
@@ -223,7 +224,7 @@ export default function Transactions() {
             {insights.topCategories.map((cat) => (
               <li key={cat.category} className="flex justify-between items-center">
                 <span className="font-semibold text-gray-800">{cat.category}</span>
-                <span className="text-red-600 font-semibold">₹{cat.total.toFixed(2)}</span>
+                <span className="text-red-600 font-semibold">{formatCurrency(cat.total)}</span>
               </li>
             ))}
           </ul>
@@ -349,7 +350,8 @@ export default function Transactions() {
                   style={{ display: "flex", alignItems: "center", gap: 4 }}
                 >
                   {isIncome ? <PiPlus /> : <PiMinus />}
-                  {isIncome ? `₹${amount.toFixed(2)}` : `₹${amount.toFixed(2)}`}
+                  {/* {isIncome ? `₹${amount.toFixed(2)}` : `₹${amount.toFixed(2)}`} */}
+                  {formatCurrency(amount)}
                 </span>
               );
             },
