@@ -12,11 +12,11 @@ import {
 } from "recharts";
 import { Card, Typography } from "antd";
 import {
-  formatYAxis,
   getDynamicDx,
   getSecondaryDynamicDx,
 } from "../../utils/chartUtils";
 import dayjs from "dayjs";
+import { formatIndiaCurrencyWithSuffix } from "@/utils/formatCurrency";
 
 
 const { Title, Text } = Typography;
@@ -55,16 +55,16 @@ export default function ExpensesIncomeChart() {
           <XAxis dataKey="month" />
           <YAxis
             yAxisId="left"
-            tickFormatter={(v) => `₹${formatYAxis(v)}`}
+            tickFormatter={(v) => `${formatIndiaCurrencyWithSuffix(v)}`}
             label={{
-              value: "Income",
+              value: "Income Vs Expense (₹)",
               angle: -90,
               position: "outsideLeft",
               dx: dynamicDx,
               style: { textAnchor: "middle" },
             }}
           />
-          <YAxis
+          {/* <YAxis
             yAxisId="right"
             orientation="right"
             tickFormatter={(v) => `₹${formatYAxis(v)}`}
@@ -75,7 +75,7 @@ export default function ExpensesIncomeChart() {
               dx: dynamicDxRight,
               style: { textAnchor: "middle" },
             }}
-          />
+          /> */}
           <Tooltip formatter={(v) => `₹${v.toLocaleString()}`} />
           <Legend />
           <Bar
@@ -87,7 +87,7 @@ export default function ExpensesIncomeChart() {
             radius={[4, 4, 0, 0]}
           />
           <Area
-            yAxisId="right"
+            yAxisId="left"
             type="monotone"
             dataKey="expense"
             name="Expense"

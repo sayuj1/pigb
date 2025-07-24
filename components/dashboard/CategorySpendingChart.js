@@ -11,10 +11,9 @@ import {
 } from "recharts";
 import { Card, Typography } from "antd";
 import { format } from "date-fns";
-import { Empty } from "antd";
 import { PiChartBarLight } from "react-icons/pi";
-import { formatYAxis } from "@/utils/chartUtils";
 import dayjs from "dayjs";
+import { formatIndiaCurrencyWithSuffix } from "@/utils/formatCurrency";
 
 const COLORS = [
   "#8884d8",
@@ -78,10 +77,36 @@ export default function CategorySpendingBarChart() {
             layout="vertical"
             margin={{ top: 20, right: 20, left: 40, bottom: 10 }}
           >
-            <XAxis type="number" tickFormatter={(v) => `₹${formatYAxis(v)}`} />
+            <XAxis type="number" tickFormatter={(v) => `${formatIndiaCurrencyWithSuffix(v)}`}
+            />
             <YAxis dataKey="category" type="category" width={120} />
             <Tooltip formatter={(v) => `₹${v}`} />
-            <Legend />
+            <Legend
+              content={() => (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    marginTop: 8,
+                    justifyContent: "center",
+                    fontSize: "14px",
+                    fontWeight: 500,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 12,
+                      height: 12,
+                      backgroundColor: "#e9505dff", // Match your bar color
+                      borderRadius: 2,
+                    }}
+                  ></div>
+                  <span style={{ color: "#e9505dff" }}>Expense (₹)</span>
+                </div>
+              )}
+            />
+
             <Bar dataKey="amount" fill="#1890ff">
               {data.map((entry, index) => (
                 <Cell key={index} fill={COLORS[index % COLORS.length]} />

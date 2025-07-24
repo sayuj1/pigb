@@ -1,23 +1,5 @@
-import { format } from "d3-format";
+import { formatUSCurrencyWithSuffix } from "./formatCurrency";
 
-/**
- * Formats a Y-axis tick value for display on a chart.
- *
- * - If the value is less than 1, it returns the value as a string without formatting.
- * - If the value is 1 or more, it uses D3's `.0s` SI-prefix formatting (e.g., 1,000 becomes "1k").
- *
- * @param {number} val - The numeric value to format.
- * @returns {string} The formatted Y-axis tick label.
- *
- * @example
- * formatYAxis(950);      // "950"
- * formatYAxis(1500);     // "1k"
- * formatYAxis(0.25);     // "0.25"
- */
-export const formatYAxis = (val) => {
-  if (val < 1) return val.toString();
-  return format(".0s")(val);
-};
 
 /**
  * Calculates a negative horizontal offset (`dx`) value for positioning
@@ -36,7 +18,7 @@ export const formatYAxis = (val) => {
 export const getDynamicDx = (data, field) => {
   const maxVal = Math.max(...data.map((item) => item[field] || 0));
 
-  const digitCount = formatYAxis(maxVal).toString().length;
+  const digitCount = formatUSCurrencyWithSuffix(maxVal).toString().length;
   const offset = -12 - digitCount * 5;
   return offset;
 };
@@ -58,7 +40,7 @@ export const getDynamicDx = (data, field) => {
 export const getSecondaryDynamicDx = (data, field) => {
   const maxSecondary = Math.max(...data.map((item) => item[field] || 0));
 
-  const digitCount = formatYAxis(maxSecondary).toString().length;
+  const digitCount = formatUSCurrencyWithSuffix(maxSecondary).toString().length;
   const offset = 12 + digitCount * 4;
   return offset;
 };
