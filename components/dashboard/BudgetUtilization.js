@@ -2,12 +2,17 @@ import { useEffect, useState } from "react";
 import { Progress, Tooltip, Typography } from "antd";
 import { PieChartOutlined } from "@ant-design/icons";
 import { PiWalletLight } from "react-icons/pi";
+import dayjs from "dayjs";
 
 export default function BudgetUtilization() {
   const [budgets, setBudgets] = useState([]);
 
+  const query = new URLSearchParams({
+    todayDate: dayjs().startOf("day").toISOString(),
+  }).toString();
+
   useEffect(() => {
-    fetch(`/api/dashboard/budget-utilization`)
+    fetch(`/api/dashboard/budget-utilization?${query}`)
       .then((r) => r.json())
       .then((json) => setBudgets(json.budgets || []));
   }, []);
