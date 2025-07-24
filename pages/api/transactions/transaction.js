@@ -18,78 +18,92 @@ export default async function handler(req, res) {
     // ✅ Fetch Transactions
     case "GET":
       try {
+        // Extract and sanitize query parameters
         let {
-          page,
-          limit,
-          sortBy,
-          sortOrder,
-          search,
+          page = "1",
+          limit = "10",
+          sortBy = "date",
+          sortOrder = "desc",
+          search = "",
           type,
           category,
           minAmount,
           maxAmount,
           startDate,
           endDate,
+          accountId,
         } = req.query;
 
-        // Pagination Defaults
-        page = parseInt(page) || 1;
-        limit = parseInt(limit) || 10;
-        const skip = (page - 1) * limit;
+        const parsedPage = Math.max(1, parseInt(page));
+        const parsedLimit = Math.max(1, parseInt(limit));
+        const skip = (parsedPage - 1) * parsedLimit;
+        const sortDirection = sortOrder === "asc" ? 1 : -1;
 
-        // Sorting Defaults
-        sortBy = sortBy || "date";
-        sortOrder = sortOrder === "asc" ? 1 : -1;
+        // Base query: only user-specific transactions
+        const query = { userId };
 
-        // Search & Filters
-        let query = { userId }; // Only fetch transactions for the logged-in user
-        if (search) {
-          query.$or = [
-            { category: new RegExp(search, "i") }, // Case-insensitive search in category
-            { description: new RegExp(search, "i") }, // Search in description
-          ];
+        // Text search (description/category)
+        if (search.trim()) {
+          const regex = new RegExp(search.trim(), "i");
+          query.$or = [{ category: regex }, { description: regex }];
         }
-        if (type) query.type = type; // Filter by type (income/expense)
-        if (category) query.category = category; // Filter by category
-        if (minAmount)
-          query.amount = { ...query.amount, $gte: parseFloat(minAmount) }; // Min amount
-        if (maxAmount)
-          query.amount = { ...query.amount, $lte: parseFloat(maxAmount) }; // Max amount
-        if (startDate)
-          query.date = { ...query.date, $gte: new Date(startDate) }; // Start date filter
-        if (endDate) query.date = { ...query.date, $lte: new Date(endDate) }; // End date filter
-        if (req.query.accountId) {
-          const accountIds = Array.isArray(req.query.accountId)
-            ? req.query.accountId
-            : req.query.accountId.split(",");
+
+        // Filters
+        if (type) query.type = type;
+        if (category) query.category = category;
+
+        if (minAmount || maxAmount) {
+          query.amount = {};
+          if (minAmount) query.amount.$gte = parseFloat(minAmount);
+          if (maxAmount) query.amount.$lte = parseFloat(maxAmount);
+        }
+
+        if (startDate || endDate) {
+          query.date = {};
+          if (startDate) query.date.$gte = new Date(startDate);
+          if (endDate) query.date.$lte = new Date(endDate);
+        }
+
+        if (accountId) {
+          const accountIds = Array.isArray(accountId)
+            ? accountId
+            : accountId.split(",").map((id) => id.trim());
           query.accountId = { $in: accountIds };
         }
 
-        // Fetch transactions
-        const transactions = await Transaction.find(query)
-          .populate({
-            path: "accountId",
-            select: "name type icon color balance", // Only fetch necessary fields
-          })
-          .sort({ [sortBy]: sortOrder })
-          .skip(skip)
-          .limit(limit);
+        // Fetch filtered & paginated transactions
+        const [transactions, total] = await Promise.all([
+          Transaction.find(query)
+            .populate({
+              path: "accountId",
+              select: "name type icon color balance",
+            })
+            .sort({ [sortBy]: sortDirection })
+            .skip(skip)
+            .limit(parsedLimit),
+          Transaction.countDocuments(query),
+        ]);
 
-        // Get total count (for pagination)
-        const total = await Transaction.countDocuments(query);
-
+        // Success response
         res.status(200).json({
           message: "Transactions fetched successfully",
           transactions,
           pagination: {
-            currentPage: page,
-            totalPages: Math.ceil(total / limit),
+            currentPage: parsedPage,
+            totalPages: Math.ceil(total / parsedLimit),
             totalItems: total,
           },
         });
       } catch (error) {
-        console.error("Error fetching transactions:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+        console.error("[GET /transactions] Error:", {
+          message: error.message,
+          stack: error.stack,
+        });
+
+        res.status(500).json({
+          message: "An error occurred while fetching transactions.",
+          error: error.message,
+        });
       }
       break;
 
