@@ -27,10 +27,10 @@ export default function BudgetUtilization() {
     <div className="bg-white rounded-lg shadow p-6 mt-6  mx-auto w-[100%]">
       <h2 className="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
         Budget Utilization
-        <span className="inline-flex items-center gap-1 px-2 py-[2px] bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+        {budgets.length > 0 && <span className="inline-flex items-center gap-1 px-2 py-[2px] bg-green-100 text-green-700 text-xs font-semibold rounded-full">
           <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
           Active
-        </span>
+        </span>}
       </h2>
       {budgets.length === 0 && (
         <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500 space-y-3">
