@@ -13,6 +13,7 @@ const TransactionSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
   date: { type: Date, default: Date.now },
   description: { type: String },
+  source: { type: String, default: null },
 });
 
 // Middleware to update account balance when a transaction is created
@@ -32,21 +33,7 @@ TransactionSchema.post("findOneAndDelete", async function (doc) {
     if (!account) return;
 
     if (doc.type === "expense") {
-      const budget = await Budget.findOne({
-        userId: doc.userId,
-        category: doc.category,
-        startDate: { $lte: doc.date },
-        endDate: { $gte: doc.date },
-      });
-
-      if (budget) {
-        budget.transactions = budget.transactions.filter(
-          (transaction) =>
-            transaction.transactionId.toString() !== doc._id.toString()
-        );
-
-        await budget.save();
-      }
+      await Budget.removeExpense(doc._id);
     }
 
     if (account.type === "credit card") {

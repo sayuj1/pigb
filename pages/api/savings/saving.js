@@ -1,6 +1,8 @@
+import { delAllWithPrefix, delCache } from "@/lib/useCache";
 import connectDB from "../../../lib/mongodb";
 import Savings from "@/models/SavingsSchema";
 import SavingsTransaction from "@/models/SavingsTransactionSchema";
+import Transaction from "@/models/TransactionSchema";
 import { authenticate } from "@/utils/backend/authMiddleware";
 
 export default async function handler(req, res) {
@@ -17,7 +19,7 @@ export default async function handler(req, res) {
       try {
         const { accountName, savingsType, amount } = req.body;
 
-        if (!accountName || !savingsType || !amount) {
+        if (!accountName || !savingsType || amount == null || isNaN(amount)) {
           return res.status(400).json({ message: "Missing required fields" });
         }
 
@@ -115,11 +117,39 @@ export default async function handler(req, res) {
             .json({ message: "Forbidden: You cannot modify this record" });
         }
 
+        // Fetch all transactionsIds related to this savings account where type != interest only select transactionId field
+        const transactionIds = await SavingsTransaction.find({ savingsId: id, type: { $ne: "interest" } }).select("transactionId");
+        console.log("Transaction IDs to delete:", transactionIds);
+
+        if (!transactionIds || transactionIds.length === 0) {
+          return res.status(404).json({
+            message: "No transactions found for this savings account",
+          });
+        }
+
+        // Delete associated transactions
+        for (const tx of transactionIds) {
+          await Transaction.findOneAndDelete({ _id: tx.transactionId });
+        }
+
         // Delete all related transactions
         await SavingsTransaction.deleteMany({ savingsId: id });
 
         // Delete the savings account
         await Savings.findByIdAndDelete(id);
+
+        // Invalidate the cache for transactions, accounts, budgets, etc.
+        await delCache({ key: userId, prefix: "accounts" });
+        await delCache({
+          key: userId,
+          prefix: "total-expense",
+        });
+        await delCache({
+          key: userId,
+          prefix: "total-balance",
+        });
+        await delAllWithPrefix("expenses-income-trend");
+        await delAllWithPrefix("category-spend");
 
         res.status(200).json({
           message:

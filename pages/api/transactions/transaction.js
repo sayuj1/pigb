@@ -117,6 +117,7 @@ export default async function handler(req, res) {
           amount,
           billDate: date,
           description,
+          source,
         } = req.body;
 
         if (!accountId || !type || !category || !amount) {
@@ -131,6 +132,7 @@ export default async function handler(req, res) {
           amount,
           date: date || Date.now(),
           description,
+          source: source || null, // Default to null if not provided
         });
 
         await transaction.save();
@@ -173,7 +175,7 @@ export default async function handler(req, res) {
     case "PUT":
       try {
         const { id } = req.query;
-        const { accountId, type, category, amount, date, description } =
+        const { accountId, type, category, amount, date, description, source } =
           req.body;
 
         if (!id) {
@@ -204,6 +206,7 @@ export default async function handler(req, res) {
               amount,
               date,
               description,
+              source: source || null, // Default to null if not provided
             },
           },
           { new: true } // Return the updated transaction document
@@ -332,10 +335,6 @@ export default async function handler(req, res) {
 
         if (!deletedTransaction) {
           return res.status(404).json({ message: "Transaction not found" });
-        }
-        // ✅ If the transaction was an expense, remove it from the budget
-        if (deletedTransaction.type === "expense") {
-          await Budget.removeExpense(deletedTransaction._id);
         }
 
         // invalidate cache 
