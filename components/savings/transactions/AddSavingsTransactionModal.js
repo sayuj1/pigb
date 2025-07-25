@@ -10,6 +10,7 @@ import {
 } from "antd";
 import { useEffect } from "react";
 import dayjs from "dayjs";
+import { getIconComponent } from "@/utils/getIcons";
 
 export default function AddSavingsTransactionModal({
   visible,
@@ -18,9 +19,12 @@ export default function AddSavingsTransactionModal({
   savingsId,
   savingsAccount,
   editingTransaction,
+  accounts,
+  isAccountsLoading,
 }) {
   const [form] = Form.useForm();
   const isEditing = !!editingTransaction;
+  const transactionType = Form.useWatch("type", form);
 
   const handleFinish = async (values) => {
     try {
@@ -28,6 +32,7 @@ export default function AddSavingsTransactionModal({
         ...values,
         savingsId,
         date: values.date.toISOString(),
+        accountId: values.accountId || null, // handle optional
       };
       if (isEditing) {
         payload = {
@@ -67,6 +72,7 @@ export default function AddSavingsTransactionModal({
           type: editingTransaction.type,
           amount: editingTransaction.amount,
           description: editingTransaction.description,
+          accountId: editingTransaction.accountId?._id || null,
         });
       } else {
         form.resetFields();
@@ -118,6 +124,59 @@ export default function AddSavingsTransactionModal({
         initialValues={{ type: "deposit" }}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {(transactionType === "deposit" || transactionType === "withdrawal") && (
+            <Form.Item
+              name="accountId"
+              label={
+                <div>
+                  <div className="font-medium text-gray-800">Linked Account</div>
+                  <div className="text-sm text-gray-500">
+                    {transactionType === "deposit"
+                      ? "Money will be debited from this account."
+                      : "Money will be credited to this account."}
+                  </div>
+                </div>
+              }
+
+              rules={[
+                ({ getFieldValue }) => ({
+                  required:
+                    getFieldValue("type") === "deposit" ||
+                    getFieldValue("type") === "withdrawal",
+                  message: "Please select an account for deposit/withdrawal",
+                }),
+              ]}
+              className="md:col-span-2"
+            >
+              <Select
+                placeholder="Select account"
+                loading={isAccountsLoading}
+                // optionLabelProp="label"
+                disabled={isAccountsLoading || isEditing}
+              >
+                {accounts.map((acc) => (
+                  <Select.Option key={acc._id} value={acc._id} label={acc.name} >
+                    <div className="flex items-center gap-2">
+                      <span>
+                        {getIconComponent(acc.icon)({
+                          size: 18,
+                          color: acc.color,
+                        })}
+                      </span>
+                      <span className="flex-1">
+                        {acc.name}
+                        <span className="text-gray-500 ml-1">
+                          (₹{acc.balance.toFixed(2)})
+                        </span>
+                      </span>
+                    </div>
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          )}
+
+
           <Form.Item
             name="date"
             label="Transaction Date"
@@ -131,15 +190,16 @@ export default function AddSavingsTransactionModal({
             label="Transaction Type"
             rules={[{ required: true }]}
           >
-            <Select>
+            <Select disabled={isEditing}>
               <Select.Option value="deposit">
                 <Tag color="green">Deposit</Tag>
               </Select.Option>
-              <Select.Option value="interest">
-                <Tag color="blue">Interest</Tag>
-              </Select.Option>
+
               <Select.Option value="withdrawal">
                 <Tag color="red">Withdrawal</Tag>
+              </Select.Option>
+              <Select.Option value="interest">
+                <Tag color="blue">Interest</Tag>
               </Select.Option>
             </Select>
           </Form.Item>

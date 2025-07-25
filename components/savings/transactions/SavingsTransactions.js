@@ -9,9 +9,7 @@ import {
   Button,
   DatePicker,
   Input,
-  Statistic,
-  Row,
-  Col,
+  Space
 } from "antd";
 import dayjs from "dayjs";
 import { ArrowLeftOutlined, PlusOutlined } from "@ant-design/icons";
@@ -33,6 +31,7 @@ import {
 } from "react-icons/pi";
 
 import { Modal, Tooltip } from "antd";
+import { getIconComponent } from "@/utils/getIcons";
 
 const { confirm } = Modal;
 
@@ -43,12 +42,30 @@ export default function SavingsTransactions() {
   const { id } = router.query;
 
   const [transactions, setTransactions] = useState([]);
-  const [account, setAccount] = useState(null);
+  const [savingAccount, setSavingAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
   const [sorter, setSorter] = useState({ field: "date", order: "descend" });
   const [editingTransaction, setEditingTransaction] = useState(null);
+  const [accounts, setAccounts] = useState([]);
+  const [isAccountsLoading, setIsAccountsLoading] = useState(true);
+
+  // Fetch accounts from API
+  const fetchAccounts = async () => {
+    try {
+      setIsAccountsLoading(true);
+      const response = await fetch("/api/accounts/account");
+      if (!response.ok) throw new Error("Failed to fetch accounts");
+
+      const data = await response.json();
+      setAccounts(data.accounts);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsAccountsLoading(false);
+    }
+  };
 
   const [filters, setFilters] = useState({
     startDate: dayjs().startOf("month"),
@@ -184,7 +201,7 @@ export default function SavingsTransactions() {
       const data = await res.json();
 
       setTransactions(data.transactions || []);
-      setAccount(data.savings || null);
+      setSavingAccount(data.savings || null);
       setPagination((prev) => ({
         ...prev,
         total: data.pagination?.totalTransactions || 0,
@@ -208,6 +225,7 @@ export default function SavingsTransactions() {
   useEffect(() => {
     if (id) {
       fetchData();
+      fetchAccounts();
     }
   }, [id, fetchData]);
 
@@ -259,6 +277,22 @@ export default function SavingsTransactions() {
       },
     },
     {
+      title: "Account",
+      dataIndex: "accountId",
+      render: (account, record) => (
+        record.type === "interest" ? (
+          <span className="text-gray-500 italic">{savingAccount?.accountName} (From Bank)</span>
+        ) : (<Space>
+          {getIconComponent(account?.icon)({
+            size: 20,
+            color: account?.color,
+          })}
+          <span className="font-semibold">{account?.name || "N/A"}</span>
+        </Space>)
+
+      ),
+    },
+    {
       title: "Remarks",
       dataIndex: "description",
     },
@@ -303,7 +337,7 @@ export default function SavingsTransactions() {
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => setIsModalOpen(true)}
-          disabled={!account}
+          disabled={!savingAccount}
         >
           Add Transaction
         </Button>
@@ -315,7 +349,7 @@ export default function SavingsTransactions() {
           (
             <>
               <span className="font-bold">Account:</span>{" "}
-              <span className="uppercase">{account?.accountName}</span>
+              <span className="uppercase">{savingAccount?.accountName}</span>
             </>
           ) || "Savings Account"
         }
@@ -323,19 +357,19 @@ export default function SavingsTransactions() {
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <strong>Type:</strong> {account?.savingsType}
+            <strong>Type:</strong> {savingAccount?.savingsType}
           </div>
           <div className="flex justify-between md:col-span-2">
             <div>
               <strong>Initial Balance:</strong>{" "}
               <span className="text-blue-600">
-                ₹{account?.amount?.toLocaleString()}
+                ₹{savingAccount?.amount?.toLocaleString()}
               </span>
             </div>
             <div>
               <strong>Current Balance:</strong>{" "}
               <span className="text-green-600">
-                ₹{account?.runningBalance?.toLocaleString()}
+                ₹{savingAccount?.runningBalance?.toLocaleString()}
               </span>
             </div>
           </div>
@@ -414,9 +448,11 @@ export default function SavingsTransactions() {
           fetchData();
           setEditingTransaction(null);
         }}
-        savingsId={account?._id}
-        savingsAccount={account}
+        savingsId={savingAccount?._id}
+        savingsAccount={savingAccount}
         editingTransaction={editingTransaction} // Pass it to the modal
+        accounts={accounts}
+        isAccountsLoading={isAccountsLoading}
       />
     </div>
   );

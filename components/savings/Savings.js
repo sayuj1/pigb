@@ -33,9 +33,28 @@ export default function SavingsAccounts() {
   const [deletingAccount, setDeletingAccount] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [addingTransaction, setAddingTransaction] = useState(null);
+  const [accounts, setAccounts] = useState([]);
+  const [isAccountsLoading, setIsAccountsLoading] = useState(true);
   const router = useRouter();
 
+  // Fetch accounts from API
+  const fetchAccounts = async () => {
+    try {
+      setIsAccountsLoading(true);
+      const response = await fetch("/api/accounts/account");
+      if (!response.ok) throw new Error("Failed to fetch accounts");
+
+      const data = await response.json();
+      setAccounts(data.accounts);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsAccountsLoading(false);
+    }
+  };
+
   useEffect(() => {
+    fetchAccounts();
     fetchSavings();
   }, []);
 
@@ -256,6 +275,8 @@ export default function SavingsAccounts() {
         onSuccess={fetchSavings}
         savingsId={addingTransaction?._id}
         savingsAccount={addingTransaction}
+        accounts={accounts}
+        isAccountsLoading={isAccountsLoading}
       />
     </div>
   );
