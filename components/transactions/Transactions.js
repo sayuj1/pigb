@@ -4,7 +4,7 @@ import {
   Input,
   Button,
   Space,
-  InputNumber,
+  Popover,
   message,
   DatePicker,
   Select
@@ -383,25 +383,46 @@ export default function Transactions() {
           {
             title: "Actions",
             key: "actions",
-            render: (_, record) => (
-              <Space>
-                <Button
-                  type="link"
-                  icon={<EditOutlined />}
-                  onClick={() => {
-                    setSelectedTransaction(record);
-                    setEditModalVisible(true);
-                  }}
-                />
-                <Button
-                  type="link"
-                  icon={<DeleteOutlined />}
-                  danger
-                  onClick={() => setDeleteTransaction(record)} //setDeleteTransaction(record)
-                />
-              </Space>
-            ),
-          },
+            render: (_, record) => {
+              const isSavingsSource = record.source === "savings";
+              const message = (
+                <span>
+                  Please make changes from <b>Savings</b> section
+                </span>
+              );
+
+
+              const actionButtons = (
+                <Space>
+                  <Button
+                    type="link"
+                    icon={<EditOutlined />}
+                    onClick={() => {
+                      setSelectedTransaction(record);
+                      setEditModalVisible(true);
+                    }}
+                    disabled={isSavingsSource}
+                  />
+                  <Button
+                    type="link"
+                    icon={<DeleteOutlined />}
+                    danger
+                    onClick={() => setDeleteTransaction(record)}
+                    disabled={isSavingsSource}
+                  />
+                </Space>
+              );
+
+              return isSavingsSource ? (
+                <Popover content={message} placement="leftTop">
+                  <div className="cursor-not-allowed">{actionButtons}</div>
+                </Popover>
+              ) : (
+                actionButtons
+              );
+            },
+          }
+
         ]}
         dataSource={transactions}
         rowKey="_id"
