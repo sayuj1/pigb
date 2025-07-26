@@ -21,7 +21,7 @@ function Dashboard() {
         <BudgetUtilization />
         <SavingsTrendChart />
         <LoanRepaymentChart />
-        <UpcomingBillsList />
+        {/* <UpcomingBillsList /> */}
       </div>
     </SidebarLayout>
   );
