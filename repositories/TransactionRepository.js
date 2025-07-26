@@ -1,14 +1,15 @@
-import Transaction from "../models/TransactionSchema";
-import { BaseRepository } from "./BaseRepository.js";
+import Transaction from "@/models/TransactionSchema";
+import { BaseRepository } from "./BaseRepository";
 
-class TransactionRepository extends BaseRepository {
-  constructor() {
-    super(Transaction);
-  }
+const transactionRepo = new BaseRepository(Transaction);
 
-  async findByAccountId(accountId) {
-    return this.find({ accountId });
-  }
+export const createTransaction = async (data) => {
+  return transactionRepo.create(data);
+};
+
+export const findTransactionByAccountId = async (accountId) => {
+  return transactionRepo.find({ accountId });
 }
 
-export const transactionRepository = new TransactionRepository();
+export default transactionRepo;
+

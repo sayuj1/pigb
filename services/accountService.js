@@ -2,7 +2,6 @@ import { formatAccountPayload } from "@/utils/backend/dataFormatter";
 import { validateAccountData } from "@/utils/backend/validations";
 import { NotFoundError } from "../utils/backend/error";
 import { accountRepository } from "../repositories/AccountRepository";
-import { transactionRepository } from "../repositories/TransactionRepository";
 import {
   applyAccountUpdates,
   recalculateAccountBalance,

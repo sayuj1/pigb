@@ -4,6 +4,8 @@ import Account from "@/models/AccountSchema";
 import Budget from "@/models/BudgetSchema";
 import { authenticate } from "@/utils/backend/authMiddleware";
 import { delCache, delAllWithPrefix } from "@/lib/useCache";
+import { handleCreateTransaction } from "@/services/transactionService";
+import { handleApiError } from "@/lib/errors";
 
 export default async function handler(req, res) {
   await connectDB();
@@ -110,66 +112,16 @@ export default async function handler(req, res) {
     // ✅ Add New Transaction
     case "POST":
       try {
-        const {
-          accountId,
-          type,
-          category,
-          amount,
-          billDate: date,
-          description,
-          source,
-        } = req.body;
-
-        if (!accountId || !type || !category || !amount) {
-          return res.status(400).json({ message: "Missing required fields" });
-        }
-
-        const transaction = new Transaction({
-          userId,
-          accountId,
-          type,
-          category,
-          amount,
-          date: date || Date.now(),
-          description,
-          source: source || null, // Default to null if not provided
+        const transaction = await handleCreateTransaction(userId, req.body);
+        res.status(201).json({
+          message: "Transaction added successfully",
+          transaction,
         });
-
-        await transaction.save();
-        // invalidate cache 
-        await delCache({ key: userId, prefix: "accounts" });
-        await delCache({
-          key: userId,
-          prefix: "total-expense",
-        });
-        await delCache({
-          key: userId,
-          prefix: "total-balance",
-        });
-        await delAllWithPrefix("expenses-income-trend");
-        await delAllWithPrefix("category-spend");
-
-
-        // ✅ If transaction is an expense, add it to the budget
-        if (type === "expense") {
-          await Budget.addExpense(
-            userId,
-            category,
-            transaction.date,
-            transaction.amount,
-            transaction._id,
-            transaction.description
-          );
-        }
-
-        res
-          .status(201)
-          .json({ message: "Transaction added successfully", transaction });
       } catch (error) {
-        console.error("Error adding transaction:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+        handleApiError(res, error, "Error adding transaction");
       }
       break;
+
 
     // ✅ Edit (Update) Transaction
     case "PUT":
