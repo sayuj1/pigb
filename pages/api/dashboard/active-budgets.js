@@ -14,7 +14,11 @@ export default async function handler(req, res) {
   switch (req.method) {
     case "GET":
       try {
-        const now = new Date();
+        const { todayDate } = req.query;
+        if (!todayDate) {
+          return res.status(400).json({ message: "Missing todayDate parameter" });
+        }
+        const now = new Date(todayDate);
 
         const count = await Budget.countDocuments({
           userId,

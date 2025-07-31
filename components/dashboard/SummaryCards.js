@@ -65,12 +65,17 @@ export default function SummaryCards() {
     endDate: dayjs().endOf("month").toISOString(),
 
   }).toString();
+
+  const active_budget_query = new URLSearchParams({
+    todayDate: dayjs().startOf("day").toISOString(),
+  }).toString();
+
   useEffect(() => {
     Promise.all([
       fetch(`/api/dashboard/total-balance`).then((r) => r.json()),
       fetch(`/api/dashboard/upcoming-bills`).then((r) => r.json()),
       fetch(`/api/dashboard/total-expenses?${query}`).then((r) => r.json()),
-      fetch(`/api/dashboard/active-budgets`).then((r) => r.json()),
+      fetch(`/api/dashboard/active-budgets?${active_budget_query}`).then((r) => r.json()),
     ])
       .then(([bal, bills, exp, buds]) => {
         setStats({
