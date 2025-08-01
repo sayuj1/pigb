@@ -86,13 +86,12 @@ export default function SavingsAccountsDistributionChart() {
         <PiChartBarDuotone className="text-xl text-sky-500" />
         Savings Account Distribution
       </h2>
-      <ResponsiveContainer width="100%" height={50 + 50 * savings.length}>
+      <ResponsiveContainer width="100%" height={50 + 50 * savings.length} className="p-1">
         <BarChart
           layout="vertical"
           data={chartData}
           margin={{ top: 10, right: 30, left: 20, bottom: 10 }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             type="number"
             tickFormatter={formatIndiaCurrencyWithSuffix}
@@ -124,6 +123,6 @@ export default function SavingsAccountsDistributionChart() {
 
       <SavingsPieChart savingsByType={savingsPie} />
 
-    </div>
+    </div >
   );
 }
