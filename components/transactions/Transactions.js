@@ -205,30 +205,72 @@ export default function Transactions() {
         {/* Account Expense Card */}
         <div className="p-4 bg-gradient-to-br from-white via-indigo-50 to-purple-100 rounded-lg shadow">
           <h2 className="text-lg font-bold text-gray-800 tracking-wide mb-3">Accounts Expenses</h2>
-          <ul className="mt-1 space-y-1 text-sm text-gray-700">
-            {insights.expenseByAccounts.map((acc) => (
-              <li key={acc.accountId} className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  {getIconComponent(acc.icon)({ size: 20, color: acc.color })}
-                  <span className="font-semibold text-gray-800">{acc.accountName}</span>
-                </div>
-                <span className="text-red-600 font-semibold">{formatCurrency(acc.total)}</span>
-              </li>
-            ))}
-          </ul>
+          {insights.expenseByAccounts.length === 0 ? (
+            <div className="flex items-center gap-3 text-gray-600 bg-purple-50 px-4 py-3 rounded-md">
+              <svg
+                className="w-5 h-5 text-purple-400"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M20 13V5a2 2 0 00-2-2H6a2 2 0 00-2 2v8m16 0v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6m16 0h-4.586a1 1 0 00-.707.293l-1.414 1.414a1 1 0 01-.707.293H9.414a1 1 0 01-.707-.293L7.293 13.293A1 1 0 006.586 13H2"
+                />
+              </svg>
+              <p className="text-sm italic">No account expenses recorded yet.</p>
+            </div>
+          ) : (
+            <ul className="mt-1 space-y-1 text-sm text-gray-700">
+              {insights.expenseByAccounts.map((acc) => (
+                <li key={acc.accountId} className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    {getIconComponent(acc.icon)({ size: 20, color: acc.color })}
+                    <span className="font-semibold text-gray-800">{acc.accountName}</span>
+                  </div>
+                  <span className="text-red-600 font-semibold">{formatCurrency(acc.total)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
         {/* Top 3 Categories Expenses */}
         <div className="p-4 bg-gradient-to-br from-white via-rose-50 to-yellow-100 rounded-lg shadow">
-          <h2 className="text-lg font-bold text-gray-800 tracking-wide mb-3">Top 3 Categories (Most Spent)</h2>
-          <ul className="mt-1 space-y-1 text-sm text-gray-700">
-            {insights.topCategories.map((cat) => (
-              <li key={cat.category} className="flex justify-between items-center">
-                <span className="font-semibold text-gray-800">{cat.category}</span>
-                <span className="text-red-600 font-semibold">{formatCurrency(cat.total)}</span>
-              </li>
-            ))}
-          </ul>
+          <h2 className="text-lg font-bold text-gray-800 tracking-wide mb-3">
+            Top 3 Categories (Most Spent)
+          </h2>
+
+          {insights.topCategories.length === 0 ? (
+            <div className="flex items-center gap-3 text-gray-600 bg-rose-50 px-4 py-3 rounded-md">
+              <svg
+                className="w-5 h-5 text-rose-400"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M20 13V5a2 2 0 00-2-2H6a2 2 0 00-2 2v8m16 0v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6m16 0h-4.586a1 1 0 00-.707.293l-1.414 1.414a1 1 0 01-.707.293H9.414a1 1 0 01-.707-.293L7.293 13.293A1 1 0 006.586 13H2"
+                />
+              </svg>
+              <p className="text-sm italic">No category expenses available.</p>
+            </div>
+          ) : (
+            <ul className="mt-1 space-y-2 text-sm text-gray-700">
+              {insights.topCategories.map((cat) => (
+                <li key={cat.category} className="flex justify-between items-center bg-rose-50 rounded-md px-3 py-2 shadow-sm">
+                  <span className="font-medium text-gray-800">{cat.category}</span>
+                  <span className="text-red-600 font-semibold">{formatCurrency(cat.total)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
+
       </div>
 
       {/* Filters & Search */}
