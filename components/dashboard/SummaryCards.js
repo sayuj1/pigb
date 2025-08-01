@@ -28,12 +28,12 @@ const cardData = (stats, month) => [
     icon: <WalletOutlined style={{ fontSize: 32 }} />,
     bg: "linear-gradient(135deg, #4ade80, #22c55e)",
   },
-  {
-    label: "Upcoming Bills",
-    value: stats.upcomingBills,
-    icon: <CalendarOutlined style={{ fontSize: 32 }} />,
-    bg: "linear-gradient(135deg, #facc15, #eab308)",
-  },
+  // {
+  //   label: "Upcoming Bills",
+  //   value: stats.upcomingBills,
+  //   icon: <CalendarOutlined style={{ fontSize: 32 }} />,
+  //   bg: "linear-gradient(135deg, #facc15, #eab308)",
+  // },
   {
     label: `Expenses for ${month}`,
     value: `₹${stats.totalExpenses.toLocaleString()}`,
@@ -51,7 +51,7 @@ const cardData = (stats, month) => [
 export default function SummaryCards() {
   const [stats, setStats] = useState({
     totalBalance: 0,
-    upcomingBills: 0,
+    // upcomingBills: 0,
     totalExpenses: 0,
     activeBudgets: 0,
   });
@@ -73,14 +73,14 @@ export default function SummaryCards() {
   useEffect(() => {
     Promise.all([
       fetch(`/api/dashboard/total-balance`).then((r) => r.json()),
-      fetch(`/api/dashboard/upcoming-bills`).then((r) => r.json()),
+      // fetch(`/api/dashboard/upcoming-bills`).then((r) => r.json()),
       fetch(`/api/dashboard/total-expenses?${query}`).then((r) => r.json()),
       fetch(`/api/dashboard/active-budgets?${active_budget_query}`).then((r) => r.json()),
     ])
-      .then(([bal, bills, exp, buds]) => {
+      .then(([bal, exp, buds]) => {
         setStats({
           totalBalance: bal.totalBalance,
-          upcomingBills: bills.count,
+          // upcomingBills: bills.count,
           totalExpenses: exp.totalExpenses,
           activeBudgets: buds.count,
         });
