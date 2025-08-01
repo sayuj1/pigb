@@ -110,9 +110,9 @@ export default function SavingsAccounts() {
     result.sort((a, b) => {
       switch (sortOption) {
         case "a-z":
-          return a.savingsType.localeCompare(b.savingsType);
+          return a.accountName.localeCompare(b.accountName);
         case "z-a":
-          return b.savingsType.localeCompare(a.savingsType);
+          return b.accountName.localeCompare(a.accountName);
         case "lowest":
           return a.runningBalance - b.runningBalance;
         case "highest":
