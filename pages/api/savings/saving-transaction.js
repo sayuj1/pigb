@@ -140,7 +140,12 @@ export default async function handler(req, res) {
           // Interest added to savings (by bank), use same savingsId as accountId
           savingsBalance += amount;
           transactionPayload = null; // No linked account transaction needed
-        } else {
+        } else if (type === "loss") {
+          // loss deducted from savings (market loss/charges), use same savingsId as accountId
+          savingsBalance -= amount;
+          transactionPayload = null; // No linked account transaction needed
+        }
+        else {
           return res.status(400).json({ message: "Invalid transaction type" });
         }
 
@@ -230,14 +235,14 @@ export default async function handler(req, res) {
         // Reverse old effect
         if (transaction.type === "deposit" || transaction.type === "interest") {
           savingsBalance -= transaction.amount;
-        } else if (transaction.type === "withdrawal") {
+        } else if (transaction.type === "withdrawal" || transaction.type === "loss") {
           savingsBalance += transaction.amount;
         }
 
         // Apply new effect
         if (type === "deposit" || type === "interest") {
           savingsBalance += amount;
-        } else if (type === "withdrawal") {
+        } else if (type === "withdrawal" || type === "loss") {
           savingsBalance -= amount;
         }
 
@@ -251,73 +256,13 @@ export default async function handler(req, res) {
         let updatedTransactionId = transaction.transactionId;
 
         const typeChanged = transaction.type !== type;
-        const wasInterest = transaction.type === "interest";
-        const isNowInterest = type === "interest";
+        const isTransactionExists = type === "deposit" || type === "withdrawal";
 
         if (typeChanged) {
-          // --- Handle type transition cases ---
-          if (!wasInterest && isNowInterest) {
-            // From deposit/withdrawal → interest: delete linked transaction
-            if (transaction.transactionId) {
-              await fetch(
-                `${process.env.API_BASE_URL || "http://localhost:3000"}/api/transactions/transaction`,
-                {
-                  method: "DELETE",
-                  headers: {
-                    "Content-Type": "application/json",
-                    cookie: req.headers.cookie || "",
-                  },
-                  body: JSON.stringify({ _id: transaction.transactionId }),
-                }
-              );
-            }
+          return res.status(400).json({ message: "Transaction Type cannot be changed!" });
+        }
 
-            updatedAccountId = null;
-            updatedTransactionId = null;
-
-          } else if (wasInterest && !isNowInterest) {
-            // From interest → deposit/withdrawal: create a new linked transaction
-            if (!accountId) {
-              return res.status(400).json({ message: "accountId is required when switching from interest" });
-            }
-
-            const newPayload = {
-              userId,
-              type: type === "withdrawal" ? "income" : "expense",
-              amount,
-              date,
-              accountId,
-              category: savings.savingsType,
-              description: generatedDescription,
-              source: "savings",
-            };
-
-            const createRes = await fetch(
-              `${process.env.API_BASE_URL || "http://localhost:3000"}/api/transactions/transaction`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  cookie: req.headers.cookie || "",
-                },
-                body: JSON.stringify(newPayload),
-              }
-            );
-
-            const createData = await createRes.json();
-            if (!createRes.ok || !createData.transaction) {
-              return res.status(500).json({
-                message: "Failed to create linked transaction",
-                error: createData.message || "Unknown error",
-              });
-            }
-
-            updatedAccountId = accountId;
-            updatedTransactionId = createData.transaction._id;
-
-          }
-
-        } else if (!isNowInterest && transaction.transactionId) {
+        if (isTransactionExists && transaction.transactionId) {
           // Update existing transaction
           const updatePayload = {
             _id: transaction.transactionId,
@@ -329,6 +274,7 @@ export default async function handler(req, res) {
             source: "savings",
           };
 
+          //TODO: Refactor this to reusue respective service function
           const updateRes = await fetch(
             `${process.env.API_BASE_URL || "http://localhost:3000"}/api/transactions/transaction?id=${transaction.transactionId}`,
             {

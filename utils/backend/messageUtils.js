@@ -13,6 +13,8 @@ export function generateSavingsDescription({ type, savingsName }) {
             return `Deposit to savings (${savingsName})`;
         case "interest":
             return `Interest credited to savings (${savingsName})`;
+        case "loss":
+            return `Loss recorded in savings (${savingsName}) due to market value decrease`;
         default:
             return `Savings transaction (${savingsName})`;
     }

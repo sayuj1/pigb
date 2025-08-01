@@ -255,6 +255,7 @@ export default function SavingsTransactions() {
           deposit: "green",
           withdrawal: "red",
           interest: "blue",
+          loss: "volcano"
         };
         return <Tag color={colorMap[type] || "default"}>{type}</Tag>;
       },

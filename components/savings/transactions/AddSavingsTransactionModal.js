@@ -123,7 +123,45 @@ export default function AddSavingsTransactionModal({
         onFinish={handleFinish}
         initialValues={{ type: "deposit" }}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-2">
+
+          <Form.Item
+            name="type"
+            // label="Transaction Type"
+            label={
+              <div>
+                <div className="font-medium text-gray-800">Transaction Type</div>
+                <div className="text-sm text-gray-500">
+                  {transactionType === "loss" && (
+                    <div className="text-sm text-rose-500 italic">
+                      Select this when your investment has lost value or incurred charges.
+                    </div>
+                  )}
+                </div>
+              </div>
+            }
+            rules={[{ required: true }]}
+            className="md:col-span-2"
+          >
+            <Select disabled={isEditing}>
+              <Select.Option value="deposit">
+                <Tag color="green">Deposit</Tag>
+              </Select.Option>
+
+              <Select.Option value="withdrawal">
+                <Tag color="red">Withdrawal</Tag>
+              </Select.Option>
+              <Select.Option value="interest">
+                <Tag color="blue">Interest</Tag>
+              </Select.Option>
+              <Select.Option value="loss">
+                <Tag color="volcano">Loss</Tag>
+              </Select.Option>
+            </Select>
+
+
+          </Form.Item>
+
           {(transactionType === "deposit" || transactionType === "withdrawal") && (
             <Form.Item
               name="accountId"
@@ -185,24 +223,7 @@ export default function AddSavingsTransactionModal({
             <DatePicker className="w-full" format="DD-MM-YYYY" />
           </Form.Item>
 
-          <Form.Item
-            name="type"
-            label="Transaction Type"
-            rules={[{ required: true }]}
-          >
-            <Select disabled={isEditing}>
-              <Select.Option value="deposit">
-                <Tag color="green">Deposit</Tag>
-              </Select.Option>
 
-              <Select.Option value="withdrawal">
-                <Tag color="red">Withdrawal</Tag>
-              </Select.Option>
-              <Select.Option value="interest">
-                <Tag color="blue">Interest</Tag>
-              </Select.Option>
-            </Select>
-          </Form.Item>
 
           <Form.Item
             name="amount"
