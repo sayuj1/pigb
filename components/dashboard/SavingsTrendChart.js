@@ -111,7 +111,7 @@ export default function SavingsAccountsDistributionChart() {
             fill="#3b82f6"
             barSize={30}
             radius={[0, 4, 4, 0]}
-            label={{ position: "right", formatter: (v) => `${formatCurrency(v)}` }}
+            label={{ position: "right", formatter: (v) => `${formatIndiaCurrencyWithSuffix(v)}` }}
           />
         </BarChart>
       </ResponsiveContainer>
