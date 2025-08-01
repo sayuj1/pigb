@@ -262,7 +262,7 @@ export default function Transactions() {
           ) : (
             <ul className="mt-1 space-y-2 text-sm text-gray-700">
               {insights.topCategories.map((cat) => (
-                <li key={cat.category} className="flex justify-between items-center bg-rose-50 rounded-md px-3 py-2 shadow-sm">
+                <li key={cat.category} className="flex justify-between items-center px-3 py-2 ">
                   <span className="font-medium text-gray-800">{cat.category}</span>
                   <span className="text-red-600 font-semibold">{formatCurrency(cat.total)}</span>
                 </li>
