@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { Card, Row, Col } from "antd";
 import {
   WalletOutlined,
-  CalendarOutlined,
+  BankOutlined,
   ShoppingOutlined,
   FundOutlined,
+
 } from "@ant-design/icons";
 import { format } from "date-fns";
 import dayjs from "dayjs";
+import { formatCurrency, formatIndiaCurrencyWithSuffix } from "@/utils/formatCurrency";
 
 // Card styling
 const cardStyles = {
@@ -24,28 +26,29 @@ const cardStyles = {
 const cardData = (stats, month) => [
   {
     label: "Total Balance",
-    value: `₹${stats.totalBalance.toLocaleString()}`,
+    value: `${formatCurrency(stats.totalBalance)}`,
     icon: <WalletOutlined style={{ fontSize: 32 }} />,
     bg: "linear-gradient(135deg, #4ade80, #22c55e)",
   },
-  // {
-  //   label: "Upcoming Bills",
-  //   value: stats.upcomingBills,
-  //   icon: <CalendarOutlined style={{ fontSize: 32 }} />,
-  //   bg: "linear-gradient(135deg, #facc15, #eab308)",
-  // },
   {
     label: `Expenses for ${month}`,
-    value: `₹${stats.totalExpenses.toLocaleString()}`,
+    value: `${formatCurrency(stats.totalExpenses)}`,
     icon: <ShoppingOutlined style={{ fontSize: 32 }} />,
     bg: "linear-gradient(135deg, #f87171, #ef4444)",
+  },
+  {
+    label: "Total Savings",
+    value: `${formatCurrency(stats.totalSavings)}`,
+    icon: <BankOutlined style={{ fontSize: 32 }} />,
+    bg: "linear-gradient(135deg, #60a5fa, #3b82f6)",
   },
   {
     label: "Active Budgets",
     value: stats.activeBudgets,
     icon: <FundOutlined style={{ fontSize: 32 }} />,
-    bg: "linear-gradient(135deg, #60a5fa, #3b82f6)",
+    bg: "linear-gradient(135deg, #a78bfa, #8b5cf6)", // Violet
   },
+
 ];
 
 export default function SummaryCards() {
@@ -54,6 +57,7 @@ export default function SummaryCards() {
     // upcomingBills: 0,
     totalExpenses: 0,
     activeBudgets: 0,
+    totalSavings: 0,
   });
 
   // Get current month name (e.g., May)
@@ -66,6 +70,8 @@ export default function SummaryCards() {
 
   }).toString();
 
+
+
   const active_budget_query = new URLSearchParams({
     todayDate: dayjs().startOf("day").toISOString(),
   }).toString();
@@ -76,13 +82,15 @@ export default function SummaryCards() {
       // fetch(`/api/dashboard/upcoming-bills`).then((r) => r.json()),
       fetch(`/api/dashboard/total-expenses?${query}`).then((r) => r.json()),
       fetch(`/api/dashboard/active-budgets?${active_budget_query}`).then((r) => r.json()),
+      fetch(`/api/dashboard/total-savings`).then((r) => r.json()),
     ])
-      .then(([bal, exp, buds]) => {
+      .then(([bal, exp, buds, sav]) => {
         setStats({
           totalBalance: bal.totalBalance,
           // upcomingBills: bills.count,
           totalExpenses: exp.totalExpenses,
           activeBudgets: buds.count,
+          totalSavings: sav.totalSavings,
         });
       })
       .catch((err) => console.log("error ", err));

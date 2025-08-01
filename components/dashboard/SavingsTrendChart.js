@@ -1,96 +1,129 @@
 import { useEffect, useState } from "react";
 import {
   ResponsiveContainer,
-  AreaChart,
-  Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   Tooltip,
   CartesianGrid,
   Legend,
+
 } from "recharts";
-import { PiChartLineLight } from "react-icons/pi";
+import { Divider } from "antd";
+import { PiChartBarDuotone } from "react-icons/pi";
+import { formatCurrency, formatIndiaCurrencyWithSuffix } from "@/utils/formatCurrency";
+import SavingsPieChart from "./SavingsPieChart";
 
 const COLORS = [
-  "#3b82f6", // blue
-  "#f59e0b", // amber
-  "#10b981", // green
-  "#8b5cf6", // violet
-  "#ec4899", // pink
-  "#0ea5e9", // sky blue
+  "#818cf8", // Indigo-400
+  "#34d399", // Emerald-400
+  "#fbbf24", // Amber-400
+  "#c084fc", // Purple-400
+  "#fb7185", // Rose-400
+  "#60a5fa", // Blue-400
+  "#4ade80", // Green-400
+  "#38bdf8", // Sky-400
+  "#a78bfa", // Violet-400
+  "#f87171", // Red-400
 ];
 
-export default function SavingsAccountsTrendChart() {
-  const [trends, setTrends] = useState([]);
-  const [allMonths, setAllMonths] = useState([]);
+export default function SavingsAccountsDistributionChart() {
+  const [savings, setSavings] = useState([]);
+  const [savingsPie, setSavingsPie] = useState([]);
 
   useEffect(() => {
-    fetch(`/api/dashboard/savings-trend`)
+    fetch("/api/dashboard/savings-trend")
       .then((r) => r.json())
-      .then(({ trends, allMonths }) => {
-        setTrends(trends || []);
-        setAllMonths(allMonths || []);
+      .then(({ savings, summary }) => {
+        setSavings(savings || []);
+        setSavingsPie(summary?.savingsByType || []);
       });
   }, []);
 
-  if (!trends.length) {
+  if (!savings.length) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-medium mb-4">
-          Savings Account Balances Over Time
+        <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
+          <PiChartBarDuotone className="text-xl text-sky-500" />
+          Savings Account Distribution
         </h2>
         <div className="flex flex-col items-center justify-center h-60 text-center text-gray-500 space-y-3">
           <div className="text-5xl text-sky-400">
-            <PiChartLineLight />
+            <PiChartBarDuotone />
           </div>
-          <h3 className="text-base font-medium">No savings trend data found</h3>
+          <h3 className="text-base font-medium">No savings data found</h3>
           <p className="text-sm text-gray-400">
-            Add savings transactions to visualize account trends over time.
+            Add savings accounts and transactions to visualize distribution.
           </p>
         </div>
       </div>
     );
   }
 
-  // Prepare chart data (month + each account balance)
-  const chartData = allMonths.map((month) => {
-    const obj = { month };
-    trends.forEach(({ accountName, balances }) => {
-      const balObj = balances.find((b) => b.month === month);
-      obj[accountName] = balObj ? balObj.balance : 0;
-    });
-    return obj;
-  });
+  const chartData = savings.map((item, i) => ({
+    name: item.accountName,
+    "Balance": item.runningBalance,
+    fill: COLORS[i % COLORS.length],
+    type: item.savingsType,
+  }));
+
+  const CustomTooltip = ({ active, payload }) => {
+    if (!active || !payload?.length) return null;
+    const { name, Balance, type } = payload[0].payload;
+    return (
+      <div className="bg-white p-3 border border-gray-300 rounded shadow text-sm">
+        <p className="font-medium">{name} (<b className="text-green-500">{formatCurrency(Balance)}</b>)</p>
+        <p>{type} </p>
+        <p></p>
+      </div>
+    );
+  };
 
   return (
-    <div className="bg-white rounded-lg shadow p-4 ">
-      <h2 className="text-lg font-medium mb-4">
-        Savings Account Balances Over Time
+    <div className="bg-white rounded-lg shadow p-4">
+      <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
+        <PiChartBarDuotone className="text-xl text-sky-500" />
+        Savings Account Distribution
       </h2>
-      <ResponsiveContainer width="100%" height={350}>
-        <AreaChart
+      <ResponsiveContainer width="100%" height={50 + 50 * savings.length}>
+        <BarChart
+          layout="vertical"
           data={chartData}
-          margin={{ top: 10, right: 40, bottom: 5, left: 0 }}
+          margin={{ top: 10, right: 30, left: 20, bottom: 10 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-          <YAxis tickFormatter={(v) => `₹${v}`} />
-          <Tooltip formatter={(value) => `₹${value}`} />
-          <Legend verticalAlign="top" height={36} />
-          {trends.map(({ accountName }, i) => (
-            <Area
-              key={accountName}
-              type="monotone"
-              dataKey={accountName}
-              stackId="1"
-              stroke={COLORS[i % COLORS.length]}
-              fill={COLORS[i % COLORS.length]}
-              fillOpacity={0.3}
-              activeDot={{ r: 6 }}
-            />
-          ))}
-        </AreaChart>
+          <XAxis
+            type="number"
+            tickFormatter={formatIndiaCurrencyWithSuffix}
+            stroke="#888"
+          />
+          <YAxis
+            type="category"
+            dataKey="name"
+            width={160}
+            tick={{ fontSize: 12, fill: "#333" }}
+          />
+          <Tooltip content={<CustomTooltip />} />
+          <Legend />
+          <Bar
+            dataKey="Balance"
+            fill="#3b82f6"
+            barSize={30}
+            radius={[0, 4, 4, 0]}
+            label={{ position: "right", formatter: (v) => `${formatCurrency(v)}` }}
+          />
+        </BarChart>
       </ResponsiveContainer>
+
+      {/* <Divider variant="dashed" className="border-gray-50 border-1" dashed /> */}
+
+      <Divider
+        variant="solid"
+      />
+
+      <SavingsPieChart savingsByType={savingsPie} />
+
     </div>
   );
 }

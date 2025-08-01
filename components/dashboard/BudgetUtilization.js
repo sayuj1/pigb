@@ -26,7 +26,7 @@ export default function BudgetUtilization() {
   return (
     <div className="bg-white rounded-lg shadow p-6 mt-6  mx-auto w-[100%]">
       <h2 className="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
-        Budget Utilization
+        <PiWalletLight className="text-xl text-green-500" /> Budget Utilization
         {budgets.length > 0 && <span className="inline-flex items-center gap-1 px-2 py-[2px] bg-green-100 text-green-700 text-xs font-semibold rounded-full">
           <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
           Active
@@ -35,7 +35,7 @@ export default function BudgetUtilization() {
       {budgets.length === 0 && (
         <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500 space-y-3">
           <div className="text-5xl text-green-400">
-            <PiWalletLight />
+            <PiWalletLight className="text-5xl text-green-400" />
           </div>
           <Typography.Title level={5} className="!mb-0">
             No budgets available

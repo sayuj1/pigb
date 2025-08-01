@@ -5,7 +5,7 @@ export function formatCurrency(
     const {
         currency = "INR",
         locale = "en-IN",
-        minimumFractionDigits = 2,
+        minimumFractionDigits = 0,
         maximumFractionDigits = 2,
     } = options;
 

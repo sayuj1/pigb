@@ -52,7 +52,12 @@ export default function CategorySpendingBarChart() {
   return (
     <Card
       title={
-        <Typography.Title level={5}>Spending by Category</Typography.Title>
+        <Typography.Title level={5}>
+          <span className="flex items-center gap-2">
+            <PiChartBarLight className="text-2xl text-blue-400" />
+            Spending by Category
+          </span>
+        </Typography.Title>
       }
       extra={<Typography.Text type="secondary">{currentMonth}</Typography.Text>}
       className="shadow-md"
