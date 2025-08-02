@@ -1,5 +1,5 @@
-import Budget from "@/models/BudgetSchema"; // Adjust the path as needed
-import connectDB from "../../../lib/mongodb"; // A utility function to connect to your database (see below)
+import Budget from "@/models/BudgetSchema";
+import connectDB from "../../../lib/mongodb";
 import { authenticate } from "@/utils/backend/authMiddleware";
 import Transaction from "@/models/TransactionSchema";
 
@@ -59,19 +59,19 @@ export default async function handler(req, res) {
         const dateFilter =
           startDate && endDate
             ? {
-                startDate: { $lte: new Date(endDate) },
-                endDate: { $gte: new Date(startDate) },
-              }
+              startDate: { $lte: new Date(endDate) },
+              endDate: { $gte: new Date(startDate) },
+            }
             : {};
 
         // Search filter
         const searchFilter = searchQuery
           ? {
-              $or: [
-                { category: { $regex: searchQuery, $options: "i" } },
-                { budgetName: { $regex: searchQuery, $options: "i" } },
-              ],
-            }
+            $or: [
+              { category: { $regex: searchQuery, $options: "i" } },
+              { budgetName: { $regex: searchQuery, $options: "i" } },
+            ],
+          }
           : {};
 
         // Combined filters

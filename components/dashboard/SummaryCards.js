@@ -28,28 +28,28 @@ const cardData = (stats, month) => [
     label: "Total Balance",
     value: `${formatCurrency(stats.totalBalance)}`,
     icon: <WalletOutlined style={{ fontSize: 32 }} />,
-    bg: "linear-gradient(135deg, #4ade80, #22c55e)",
+    bg: "linear-gradient(135deg, #34d399, #10b981)", // Soft Emerald Green
   },
   {
     label: `Expenses for ${month}`,
     value: `${formatCurrency(stats.totalExpenses)}`,
     icon: <ShoppingOutlined style={{ fontSize: 32 }} />,
-    bg: "linear-gradient(135deg, #f87171, #ef4444)",
+    bg: "linear-gradient(135deg, #fca5a5, #f43f5e)", // Rosy Red
   },
   {
     label: "Total Savings",
     value: `${formatCurrency(stats.totalSavings)}`,
     icon: <BankOutlined style={{ fontSize: 32 }} />,
-    bg: "linear-gradient(135deg, #60a5fa, #3b82f6)",
+    bg: "linear-gradient(135deg, #93c5fd, #3b82f6)", // Calming Sky Blue
   },
   {
     label: "Active Budgets",
     value: stats.activeBudgets,
     icon: <FundOutlined style={{ fontSize: 32 }} />,
-    bg: "linear-gradient(135deg, #a78bfa, #8b5cf6)", // Violet
+    bg: "linear-gradient(135deg, #c4b5fd, #8b5cf6)", // Soft Violet
   },
-
-];
+]
+  ;
 
 export default function SummaryCards() {
   const [stats, setStats] = useState({
