@@ -24,7 +24,10 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const uploadDir = path.join(process.cwd(), '/uploads');
+    const uploadDir =
+        process.env.NODE_ENV === 'production'
+            ? '/tmp'
+            : path.join(process.cwd(), '/uploads');
 
     const form = new IncomingForm({
         keepExtensions: true,
