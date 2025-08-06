@@ -33,18 +33,18 @@ export default async function handler(req, res) {
         filter: part => part.mimetype === 'application/pdf',
     });
 
+    let uploadedFile;
+
     try {
         const [fields, files] = await form.parse(req);
         const bank = fields.bank?.[0] || "AXIS";
 
-        const uploadedFile = files.pdf?.[0]; // array of files even if one
+        uploadedFile = files.pdf?.[0];
         if (!uploadedFile) {
             return res.status(400).json({ error: 'No PDF file uploaded' });
         }
 
         const transactions = await extractPdfTable(uploadedFile.filepath, bank);
-
-        fs.unlinkSync(uploadedFile.filepath); // Clean up the uploaded file
 
         return res.status(200).json({
             success: true,
@@ -60,6 +60,15 @@ export default async function handler(req, res) {
             details: err.message,
         });
 
+    } finally {
+        // delete file if it exists
+        if (uploadedFile && uploadedFile.filepath && fs.existsSync(uploadedFile.filepath)) {
+            try {
+                fs.unlinkSync(uploadedFile.filepath);
+            } catch (unlinkErr) {
+                console.error('[File cleanup error]', unlinkErr);
+            }
+        }
     }
 }
 
