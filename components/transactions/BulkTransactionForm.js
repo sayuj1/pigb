@@ -86,7 +86,6 @@ export default function BulkTransactionForm({
   };
 
   return (
-    // <div style={{ maxHeight: "60vh", overflowY: "auto", paddingRight: 8 }}>
     <Form form={form} layout="vertical" onFinish={handleSubmit}>
       <Row gutter={16}>
         <Col span={12}>
@@ -298,6 +297,5 @@ export default function BulkTransactionForm({
         </div>
       </Form.Item>
     </Form>
-    // </div>
   );
 }

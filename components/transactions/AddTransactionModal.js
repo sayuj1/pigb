@@ -2,6 +2,7 @@ import { Modal, Tabs, message } from "antd";
 import { useState } from "react";
 import SingleTransactionForm from "./SingleTransactionForm";
 import BulkTransactionForm from "./BulkTransactionForm";
+import BetaTag from "../resuable/BetaTag";
 
 const { TabPane } = Tabs;
 
@@ -48,7 +49,7 @@ export default function AddTransactionModal({
             fetchAccounts={fetchAccounts}
           />
         </TabPane>
-        <TabPane tab="Bulk Transactions" key="bulk">
+        <TabPane tab={<>Bulk Transactions <BetaTag /></>} key="bulk">
           <BulkTransactionForm
             onClose={handleClose}
             onAddTransaction={onAddTransaction}

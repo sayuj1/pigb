@@ -15,6 +15,7 @@ import { useRouter } from "next/router";
 import Navbar from "./Navbar";
 import { useTheme } from "@/context/ThemeContext";
 import Link from "next/link";
+import BetaTag from "./resuable/BetaTag";
 
 const { Sider, Content } = Layout;
 
@@ -28,6 +29,16 @@ const menuItems = [
   { key: "budget", icon: <PieChartOutlined />, label: "Manage Budget" },
   { key: "category", icon: <AppstoreOutlined />, label: "Manage Category" },
   { key: "shopping", icon: <ShoppingCartOutlined />, label: "Shopping Lists" },
+  {
+    key: "import-statements",
+    icon: <FileTextOutlined />,
+    label: (
+      <span>
+        Import{" "}
+        <BetaTag />
+      </span>
+    )
+  }
 ];
 
 export default function SidebarLayout({ children }) {
