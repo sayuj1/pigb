@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
-import { Table, Input, DatePicker, Select, Typography } from 'antd';
+import { Table, Input, DatePicker, Select, Typography, Popover } from 'antd';
 import dayjs from 'dayjs';
+import { CloseOutlined } from '@ant-design/icons'; // Import icon
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -37,7 +38,45 @@ export default function TransactionReviewTable({ data, onChange, categories, err
         onChange(updated);
     };
 
+    // Remove row handler
+    const removeRow = (index) => {
+        const updated = [...data];
+        updated.splice(index, 1);
+        onChange(updated);
+
+        const updatedErrors = { ...errors };
+        delete updatedErrors[index];
+
+        // Re-index error keys after removal
+        const reindexedErrors = {};
+        Object.keys(updatedErrors).forEach((key) => {
+            const idx = parseInt(key, 10);
+            if (idx > index) {
+                reindexedErrors[idx - 1] = updatedErrors[key];
+            } else if (idx < index) {
+                reindexedErrors[idx] = updatedErrors[key];
+            }
+        });
+
+        setErrors(reindexedErrors);
+    };
+
+
     const columns = [
+        {
+            title: '',
+            dataIndex: 'action',
+            width: 50,
+            align: 'center',
+            render: (_, __, i) => (
+                <Popover content="Remove this transaction" placement="top">
+                    <CloseOutlined
+                        onClick={() => removeRow(i)}
+                        style={{ color: 'red', cursor: 'pointer', fontSize: 16 }}
+                    />
+                </Popover>
+            ),
+        },
         {
             title: 'Date',
             dataIndex: 'date',
@@ -91,7 +130,7 @@ export default function TransactionReviewTable({ data, onChange, categories, err
                         onChange={(val) => updateRow(i, 'type', val)}
                         status={errors[i]?.type ? 'error' : ''}
                         optionLabelProp="label"
-                        style={{ width: 120 }}
+                        style={{ width: "100%" }}
                     >
                         {types.map((type) => (
                             <Option
@@ -124,7 +163,7 @@ export default function TransactionReviewTable({ data, onChange, categories, err
                         value={value}
                         onChange={(val) => updateRow(i, 'category', val)}
                         status={errors[i]?.category ? 'error' : ''}
-                        style={{ width: 200 }}
+                        style={{ width: "100%" }}
                         filterOption={(input, option) =>
                             option?.label?.toLowerCase().includes(input.toLowerCase())
                         }
@@ -140,7 +179,7 @@ export default function TransactionReviewTable({ data, onChange, categories, err
                     {errors[i]?.category && <Text type="danger">{errors[i].category}</Text>}
                 </div>
             ),
-        }
+        },
     ];
 
     return (
