@@ -10,8 +10,7 @@ const ProtectedRoute = (WrappedComponent) => {
 
     useEffect(() => {
       if (!loading && !user) {
-        // router.push("/"); // Redirect to login if user is not authenticated
-        router.push(ROUTES.HOME);
+        router.push(ROUTES.HOME); // Redirect to login if user is not authenticated
       }
     }, [user, loading, router]);
 
