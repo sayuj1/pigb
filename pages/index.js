@@ -16,6 +16,7 @@ import {
   PiPiggyBankDuotone,
   PiListDashesDuotone,
   PiSquaresFourDuotone,
+  PiFileArrowUpDuotone
 } from "react-icons/pi";
 import ROUTES from "@/lib/routes";
 
@@ -174,6 +175,14 @@ export default function Home() {
               desc: "Plan purchases, mark items, and link them with expenses.",
               icon: (
                 <PiListDashesDuotone className="text-indigo-600 w-12 h-12 mb-4" />
+              ),
+            },
+            {
+              title: "Import Bank Statement",
+              link: "/import-statements",
+              desc: "Upload your bank PDF statements and convert them into categorized transactions in seconds.",
+              icon: (
+                <PiFileArrowUpDuotone className="text-indigo-600 w-12 h-12 mb-4" />
               ),
             },
           ].map((feature, index) => (

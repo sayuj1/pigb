@@ -1,0 +1,1 @@
+export const NOT_CREDIT_DETECTED_BANKS = ["AXIS"]

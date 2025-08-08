@@ -4,6 +4,7 @@ import { UploadOutlined, DeleteOutlined } from '@ant-design/icons';
 import { FileOutlined } from '@ant-design/icons';
 import { getIconComponent } from '@/utils/getIcons';
 import { formatTransactionDates } from '@/utils/dateFormatter';
+import { NOT_CREDIT_DETECTED_BANKS } from '@/contants/app_constants';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -182,9 +183,8 @@ const UploadPDF = forwardRef(({ onSuccess, onRemoveTransactions, selectedAccount
                             onClick={() => handleRemoveFile(true)}
                         />
                     </div>
-                    {bank === "AXIS" && (
+                    {NOT_CREDIT_DETECTED_BANKS.includes(bank) && (
                         <Alert
-                            // message="⚠️ Note"
                             description={
                                 <>
                                     For <strong>{bank}</strong> Bank statements, credit amounts may not be automatically detected. Please carefully review and verify the transaction types, especially for  <strong>credit</strong> entries, before saving.
