@@ -7,6 +7,7 @@ import {
 } from "@/services/accountService";
 import { authenticate } from "@/utils/backend/authMiddleware";
 import { getCache, delCache } from "@/lib/useCache";
+import { CACHE_TTL_1_DAY } from "@/contants/app_constants";
 
 export default async function handler(req, res) {
   await connectDB();
@@ -23,7 +24,7 @@ export default async function handler(req, res) {
         const accounts = await getCache({
           key: userId,
           prefix: "accounts",
-          ttl: 60 * 60 * 24 * 4, // 4 days
+          ttl: CACHE_TTL_1_DAY, // 1 day
           fetchFn: () => fetchAccountsByUserId(userId),
         });
 

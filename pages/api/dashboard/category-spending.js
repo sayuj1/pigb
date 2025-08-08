@@ -3,6 +3,7 @@ import connectDB from "../../../lib/mongodb";
 import Transaction from "@/models/TransactionSchema";
 import mongoose from "mongoose";
 import { getCache } from "@/lib/useCache";
+import { CACHE_TTL_1_DAY } from "@/contants/app_constants";
 
 export default async function handler(req, res) {
   await connectDB();
@@ -21,7 +22,7 @@ export default async function handler(req, res) {
         const data = await getCache({
           key: cacheKey,
           prefix: "category-spend",
-          ttl: 60 * 60 * 24 * 4, // 4 days
+          ttl: CACHE_TTL_1_DAY, // 1 day
           fetchFn: async () => {
             const agg = await Transaction.aggregate([
               {

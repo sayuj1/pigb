@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { getCache } from "@/lib/useCache";
+import { CACHE_TTL_1_DAY } from "@/contants/app_constants";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -28,7 +29,7 @@ export default async function handler(req, res) {
         const cached = await getCache({
           key: cacheKey,
           prefix: "expenses-income-trend",
-          ttl: 345600, // 4 days
+          ttl: CACHE_TTL_1_DAY, // 1 days = 86400 seconds
           fetchFn: async () => {
             // Step 2: Fetch from DB
             const start = new Date(startDate);
