@@ -123,7 +123,7 @@ export default function TransactionReviewTable({ data, onChange, categories, err
             ),
         },
         {
-            title: 'Amount',
+            title: 'Amount (Rs.)',
             dataIndex: 'amount',
             render: (text, _, i) => (
                 <div>
