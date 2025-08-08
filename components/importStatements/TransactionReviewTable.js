@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { Table, Input, DatePicker, Select, Typography, Popover } from 'antd';
+import { useEffect, useState } from 'react';
+import { Table, Input, DatePicker, Select, Typography, Popover, Space, Button, message, Modal } from 'antd';
 import dayjs from 'dayjs';
 import { CloseOutlined } from '@ant-design/icons'; // Import icon
 
@@ -8,8 +8,26 @@ const { Text } = Typography;
 
 const types = ['expense', 'income'];
 
+let previousSelectedRowKeys = [];
 export default function TransactionReviewTable({ data, onChange, categories, errors, setErrors, loading }) {
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+    const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+    const [bulkCategory, setBulkCategory] = useState({ key: Date.now(), value: undefined });
+    const [bulkDate, setBulkDate] = useState({ key: Math.random(), value: undefined });
 
+
+    const arraysAreEqual = (a, b) =>
+        a.length === b.length && a.every((val, i) => val === b[i]);
+
+    useEffect(() => {
+        if (!arraysAreEqual(selectedRowKeys, previousSelectedRowKeys)) {
+            setBulkCategory({ key: Date.now(), value: undefined });
+            setBulkDate({ key: Math.random(), value: undefined })
+            previousSelectedRowKeys = selectedRowKeys;
+
+        }
+        // previousSelectedRowKeys = selectedRowKeys;
+    }, [selectedRowKeys]);
 
     useEffect(() => {
         validateAll();
@@ -86,6 +104,7 @@ export default function TransactionReviewTable({ data, onChange, categories, err
                         value={text ? dayjs(text, 'YYYY-MM-DD') : null}
                         onChange={(date, dateStr) => updateRow(i, 'date', dateStr)}
                         status={errors[i]?.date ? 'error' : ''}
+                        style={{ width: "100%" }}
 
                     />
                     {errors[i]?.date && <Text type="danger">{errors[i].date}</Text>}
@@ -183,12 +202,117 @@ export default function TransactionReviewTable({ data, onChange, categories, err
     ];
 
     return (
-        <Table
-            columns={columns}
-            dataSource={data}
-            rowKey={(_, i) => i}
-            pagination={false}
-            loading={loading}
-        />
+        <>
+            <Space style={{ marginBottom: 16 }}>
+                <Button
+                    danger
+                    disabled={!selectedRowKeys.length}
+                    onClick={() => setShowConfirmDelete(true)}
+                >
+                    Delete Selected
+                </Button>
+
+                <Select
+                    key={bulkCategory.key} // force re-render
+                    value={bulkCategory.value}
+                    placeholder="Assign category"
+                    style={{ width: 200 }}
+                    onChange={(cat) => {
+                        const updated = [...data];
+                        selectedRowKeys.forEach((i) => {
+                            updated[i].category = cat;
+                        });
+                        onChange(updated);
+                        validateAll();
+                        if (cat)
+                            message.success(`Assigned category "${cat}" to selected rows`);
+                        else if (!cat && selectedRowKeys.length > 0)
+                            message.success(`Category removed for selected rows`);
+                    }}
+                    disabled={!selectedRowKeys.length}
+                    allowClear
+                >
+                    {categories.map((cat) => (
+                        <Option key={cat._id} value={cat.name}>
+                            <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                {cat.icon} {cat.name}
+                            </span>
+                        </Option>
+                    ))}
+                </Select>
+
+                <DatePicker
+                    key={bulkDate.key} // force re-render
+                    value={bulkDate.value}
+                    placeholder="Change date"
+                    // value={bulkDate}
+                    onChange={(date, dateStr) => {
+                        const updated = [...data];
+                        selectedRowKeys.forEach((i) => {
+                            updated[i].date = dateStr;
+                        });
+                        onChange(updated);
+                        validateAll();
+                        // setBulkDate(undefined);
+                        if (dateStr)
+                            message.success(`Updated date to ${dateStr} for selected rows`);
+                        else if (!dateStr && selectedRowKeys.length > 0)
+                            message.success("Removed date for selected rows");
+
+
+                    }}
+                    disabled={!selectedRowKeys.length}
+                />
+
+                <Button
+                    onClick={() => setSelectedRowKeys([])}
+                    disabled={!selectedRowKeys.length}
+                >
+                    Deselect All
+                </Button>
+            </Space>
+
+            <Table
+                columns={columns}
+                dataSource={data}
+                rowKey={(_, i) => i}
+                pagination={false}
+                loading={loading}
+                rowSelection={{
+                    selectedRowKeys,
+                    onChange: (keys) => setSelectedRowKeys(keys),
+                }}
+            />
+            <Modal
+                open={showConfirmDelete}
+                title="Confirm Delete"
+                onOk={() => {
+                    const updated = data.filter((_, i) => !selectedRowKeys.includes(i));
+                    const updatedErrors = { ...errors };
+
+                    // Clean up and reindex errors
+                    const reindexedErrors = {};
+                    updated.forEach((_, newIndex) => {
+                        const oldIndex = data.findIndex((_, i) => !selectedRowKeys.includes(i) && i === newIndex);
+                        if (errors[oldIndex]) {
+                            reindexedErrors[newIndex] = errors[oldIndex];
+                        }
+                    });
+
+                    onChange(updated);
+                    setErrors(reindexedErrors);
+                    setSelectedRowKeys([]);
+                    setShowConfirmDelete(false);
+                    message.success("Deleted selected rows");
+                }}
+                onCancel={() => setShowConfirmDelete(false)}
+                okText="Yes, Delete"
+                cancelText="Cancel"
+                okButtonProps={{ danger: true }}
+            >
+                Are you sure you want to remove the selected transactions?
+            </Modal>
+        </>
+
     );
 }
