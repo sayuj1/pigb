@@ -1,24 +1,52 @@
-// /utils/extractors/hdfc.js
-export function parseHdfc(text) {
-    const lines = text.split('\n');
+import { isNumericRow, parseAmount } from '@/utils/backend/numberUtils'
+import { ddmmyyToDDMMYYYY } from '@/utils/dateFormatter';
+
+export function parseHdfc(rows) {
+    // console.log("reach ", rows)
     const transactions = [];
+    let pending = null;
+    let stopAppending = false;
 
-    const regex = /^(\d{2}\/\d{2}\/\d{4})\s+(.*?)\s+(-?\d+\.\d{2})$/;
+    for (const row of rows) {
 
-    for (const line of lines) {
-        const match = line.match(regex);
-        if (match) {
-            const [, date, description, amountStr] = match;
-            const amount = parseFloat(amountStr);
-            transactions.push({
-                date,
+        const isTransactionRow = /^\d{2}[/]\d{2}[/]\d{2}/.test(row[0]);
+
+        if (isTransactionRow) {
+            // Push previous transaction
+            if (pending) {
+                transactions.push(pending);
+            }
+            const rowSize = row?.length;
+            const date = row[0];
+            const debit = parseAmount(row[rowSize - 2])
+            const description = row.slice(1, rowSize - 4).join(" ").trim()
+
+            pending = {
+                date: ddmmyyToDDMMYYYY(date),
                 description,
-                amount,
-                type: amount < 0 ? 'expense' : 'income',
-                category: '',
-            });
+                amount: debit,
+                type: "expense",
+            };
+
+            stopAppending = false;
+        }
+        else if (pending && !stopAppending) {
+            const joined = row.join(" ").trim().toUpperCase();
+
+            if (
+                joined.includes("STATEMENT SUMMARY") ||
+                isNumericRow(row)
+            ) {
+                stopAppending = true;
+                continue;
+            }
+
+            pending.description += " " + row.join(" ").trim();
         }
     }
+    if (pending) {
+        transactions.push(pending);
+    }
 
-    return transactions;
+    return transactions
 }

@@ -89,6 +89,7 @@ const UploadPDF = forwardRef(({ onSuccess, onRemoveTransactions, selectedAccount
                     >
                         <Option value="AXIS">AXIS</Option>
                         <Option value="ICICI">ICICI</Option>
+                        <Option value="HDFC">HDFC</Option>
                     </Select>
                 </div>
 

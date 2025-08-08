@@ -2,6 +2,7 @@ import { parseIcici } from './extractors/icici';
 import { parseAxis } from './extractors/axis';
 import fs from "fs";
 import pdf2table from 'pdf2table';
+import { parseHdfc } from './extractors/hdfc';
 
 
 export function extractPdfTable(filePath, bank) {
@@ -18,6 +19,9 @@ export function extractPdfTable(filePath, bank) {
                     switch (bank.toUpperCase()) {
                         case "ICICI":
                             transactions = parseIcici(rows);
+                            break;
+                        case "HDFC":
+                            transactions = parseHdfc(rows);
                             break;
                         case "AXIS":
                         default:

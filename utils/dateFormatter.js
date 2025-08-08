@@ -31,3 +31,19 @@ export function formatTransactionsToUTC(transactions) {
         }
     });
 }
+
+/**
+ * Converts a date string from "dd/mm/yy" to "dd-mm-yyyy".
+ * Example: "07/08/25" → "07-08-2025"
+ */
+export function ddmmyyToDDMMYYYY(dateStr) {
+    if (!dateStr || typeof dateStr !== "string") return "";
+
+    const [day, month, year] = dateStr.split("/");
+    if (!day || !month || !year) return "";
+
+    // Ensure full 4-digit year (e.g., "24" -> "2024")
+    const fullYear = parseInt(year, 10) < 50 ? `20${year}` : `19${year}`;
+
+    return `${day}-${month}-${fullYear}`;
+}
