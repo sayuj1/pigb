@@ -134,6 +134,20 @@ const UploadPDF = forwardRef(({ onSuccess, onRemoveTransactions, selectedAccount
                         customRequest={({ file }) => handleUpload(file)}
                         showUploadList={false}
                         accept="application/pdf"
+                        beforeUpload={(file) => {
+                            const isPdf = file.type === 'application/pdf';
+                            const isLt10M = file.size / 1024 / 1024 < 10;
+
+                            if (!isPdf) {
+                                message.error('Only PDF files are allowed!');
+                            }
+
+                            if (!isLt10M) {
+                                message.error('File must be smaller than 10MB!');
+                            }
+
+                            return isPdf && isLt10M;
+                        }}
                     >
                         <Button
                             type="primary"
@@ -150,7 +164,7 @@ const UploadPDF = forwardRef(({ onSuccess, onRemoveTransactions, selectedAccount
                         </Button>
                     </Upload>
                     <div style={{ marginTop: 12, color: '#888' }}>
-                        <Text type="secondary">Only PDF format is supported</Text>
+                        <Text type="secondary">Only PDF format is supported. Max file size: 10MB.</Text>
                     </div>
                 </div>
             ) : (
@@ -173,7 +187,7 @@ const UploadPDF = forwardRef(({ onSuccess, onRemoveTransactions, selectedAccount
                             // message="⚠️ Note"
                             description={
                                 <>
-                                    For <strong>{bank}</strong> Bank statements, credit amounts may not be automatically detected. Please carefully review and verify the transaction types, especially for credit entries, before saving.
+                                    For <strong>{bank}</strong> Bank statements, credit amounts may not be automatically detected. Please carefully review and verify the transaction types, especially for  <strong>credit</strong> entries, before saving.
                                 </>
                             }
                             type="warning"
