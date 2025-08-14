@@ -6,9 +6,8 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String }, // Required for manual authentication
   googleId: { type: String, unique: true, sparse: true }, // For Google authentication
-  profilePicture: { 
-    type: String, 
-    default: "https://www.example.com/default-profile.png" // Default profile picture URL
+  profilePicture: {
+    type: String,
   },
   provider: { type: String, enum: ["manual", "google"], default: "manual" }, // Tracks how the user signed up
   createdAt: { type: Date, default: Date.now },
