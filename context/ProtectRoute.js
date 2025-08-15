@@ -2,6 +2,7 @@ import { useContext, useEffect } from "react";
 import { useRouter } from "next/router";
 import AuthContext from "./AuthContext";
 import ROUTES from "@/lib/routes";
+import Loader from "@/components/resuable/Loader";
 
 const ProtectedRoute = (WrappedComponent) => {
   return function ProtectedComponent(props) {
@@ -15,7 +16,7 @@ const ProtectedRoute = (WrappedComponent) => {
     }, [user, loading, router]);
 
     if (loading || !user) {
-      return <p className="text-center mt-10">Loading...</p>; // Show a loading message
+      return <Loader />
     }
 
     return <WrappedComponent {...props} />;
