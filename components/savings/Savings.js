@@ -13,6 +13,7 @@ import EditSavingsAccountModal from "./EditSavingsAccountModal";
 import DeleteSavingsAccountModal from "./DeleteSavingsAccountModal";
 import AddSavingsTransactionModal from "./transactions/AddSavingsTransactionModal";
 import { useRouter } from "next/router";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 const SORT_OPTIONS = [
   { label: "Default (Newest)", value: "newest" },
@@ -234,13 +235,13 @@ export default function SavingsAccounts() {
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500">Initial Balance</span>
                   <span className="font-medium text-blue-600">
-                    ₹{item.amount.toLocaleString()}
+                    {formatCurrency(item.amount)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500">Current Balance</span>
                   <span className="font-medium text-green-600">
-                    ₹{item.runningBalance.toLocaleString()}
+                    {formatCurrency(item.runningBalance)}
                   </span>
                 </div>
               </div>

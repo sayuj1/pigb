@@ -32,6 +32,7 @@ import {
 
 import { Modal, Tooltip } from "antd";
 import { getIconComponent } from "@/utils/getIcons";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 const { confirm } = Modal;
 
@@ -272,7 +273,7 @@ export default function SavingsTransactions() {
 
         return (
           <span className={`flex items-center gap-1 ${color}`}>
-            <Icon />₹{amt.toLocaleString()}
+            <Icon />{formatCurrency(amt)}
           </span>
         );
       },
@@ -364,13 +365,13 @@ export default function SavingsTransactions() {
             <div>
               <strong>Initial Balance:</strong>{" "}
               <span className="text-blue-600">
-                ₹{savingAccount?.amount?.toLocaleString()}
+                {formatCurrency(savingAccount?.amount)}
               </span>
             </div>
             <div>
               <strong>Current Balance:</strong>{" "}
               <span className="text-green-600">
-                ₹{savingAccount?.runningBalance?.toLocaleString()}
+                {formatCurrency(savingAccount?.runningBalance)}
               </span>
             </div>
           </div>
