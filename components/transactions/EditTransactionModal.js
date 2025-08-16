@@ -23,7 +23,7 @@ export default function EditTransactionModal({
   transaction,
   onUpdate,
 }) {
-  
+
   const [form] = Form.useForm();
   const [accounts, setAccounts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -60,18 +60,18 @@ export default function EditTransactionModal({
   }, [visible, transaction]);
 
   const handleSubmit = async (values) => {
-    
+
     let selectedCategory = categories.find((cat) => `${cat.icon} ${cat.name}` === values.category);
-    if(!selectedCategory){
+    if (!selectedCategory) {
       selectedCategory = categories.find((cat) => cat.name === values.category);
     }
-    
+
     const formattedValues = {
       ...values,
       category: `${selectedCategory.icon} ${selectedCategory.name}`,
       date: values.date.toISOString(),
     };
-    
+
     setLoading(true);
 
     try {
@@ -88,7 +88,7 @@ export default function EditTransactionModal({
       onClose();
     } catch (error) {
       message.error(error.message);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -98,8 +98,8 @@ export default function EditTransactionModal({
       title="Edit Transaction"
       open={visible}
       width={700}
+      onCancel={onClose}
       footer={[
-       
         <Button key="cancel" onClick={onClose}>
           Cancel
         </Button>,
@@ -118,59 +118,59 @@ export default function EditTransactionModal({
           <Col xs={24} sm={12}>
             <Form.Item name="type" label="Transaction Type" rules={[{ required: true }]}>
               <Select placeholder="Select type" optionLabelProp="label">
-                             <Option
-                               value="income"
-                               label={
-                                 <span
-                                   style={{
-                                     color: "green",
-                                     display: "flex",
-                                     alignItems: "center",
-                                     gap: 5,
-                                   }}
-                                 >
-                                   <PiArrowCircleUpFill /> Income
-                                 </span>
-                               }
-                             >
-                               <span
-                                 style={{
-                                   color: "green",
-                                   display: "flex",
-                                   alignItems: "center",
-                                   gap: 5,
-                                 }}
-                               >
-                                 <PiArrowCircleUpFill /> Income
-                               </span>
-                             </Option>
-                             <Option
-                               value="expense"
-                               label={
-                                 <span
-                                   style={{
-                                     color: "red",
-                                     display: "flex",
-                                     alignItems: "center",
-                                     gap: 5,
-                                   }}
-                                 >
-                                   <PiArrowCircleDownFill /> Expense
-                                 </span>
-                               }
-                             >
-                               <span
-                                 style={{
-                                   color: "red",
-                                   display: "flex",
-                                   alignItems: "center",
-                                   gap: 5,
-                                 }}
-                               >
-                                 <PiArrowCircleDownFill /> Expense
-                               </span>
-                             </Option>
-                           </Select>
+                <Option
+                  value="income"
+                  label={
+                    <span
+                      style={{
+                        color: "green",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 5,
+                      }}
+                    >
+                      <PiArrowCircleUpFill /> Income
+                    </span>
+                  }
+                >
+                  <span
+                    style={{
+                      color: "green",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 5,
+                    }}
+                  >
+                    <PiArrowCircleUpFill /> Income
+                  </span>
+                </Option>
+                <Option
+                  value="expense"
+                  label={
+                    <span
+                      style={{
+                        color: "red",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 5,
+                      }}
+                    >
+                      <PiArrowCircleDownFill /> Expense
+                    </span>
+                  }
+                >
+                  <span
+                    style={{
+                      color: "red",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 5,
+                    }}
+                  >
+                    <PiArrowCircleDownFill /> Expense
+                  </span>
+                </Option>
+              </Select>
             </Form.Item>
           </Col>
           <Col xs={24} sm={12}>
@@ -211,7 +211,7 @@ export default function EditTransactionModal({
                 filterOption={(input, option) =>
                   option.label.toLowerCase().includes(input.toLowerCase())
                 }
-                
+
                 disabled
               >
                 {accounts.map((acc) => (
