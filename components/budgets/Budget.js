@@ -25,6 +25,7 @@ import {
 import dayjs from "dayjs";
 import CreateEditBudgetModal from "./CreateEditBudgetModal";
 import DeleteBudgetModal from "./DeleteBudgetModal"; // adjust the path as necessary
+import { formatCurrency } from "@/utils/formatCurrency";
 
 const Budget = () => {
   const [search, setSearch] = useState("");
@@ -137,7 +138,7 @@ const Budget = () => {
               title: "Limit",
               dataIndex: "limitAmount",
               key: "limitAmount",
-              render: (val) => `₹${val}`,
+              render: (val) => formatCurrency(val),
             },
             {
               title: "Date Range",
@@ -151,7 +152,7 @@ const Budget = () => {
               title: "Spent",
               dataIndex: "spentAmount",
               key: "spentAmount",
-              render: (val) => `₹${val || 0}`,
+              render: (val) => formatCurrency(val),
             },
             {
               title: "Status",
@@ -255,6 +256,12 @@ const Budget = () => {
               title: "Description",
               dataIndex: "description",
               render: (val) => val || "-",
+              onCell: () => ({
+                style: {
+                  whiteSpace: "normal",
+                  wordBreak: "break-word",
+                },
+              }),
             },
           ]}
           pagination={false}
