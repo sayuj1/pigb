@@ -15,6 +15,25 @@ export default function Document() {
       `,
           }}
         />
+
+        <script
+          src="https://www.googletagmanager.com/gtag/js?id=G-JW36P6XPLZ"
+          strategy="afterInteractive"
+        />
+        <script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-JW36P6XPLZ', {
+              page_path: window.location.pathname,
+            });
+          `,
+          }}
+        />
       </Head>
 
       <body className="antialiased">
