@@ -58,7 +58,7 @@ export default function Signup() {
         </div>
 
         <Title level={3} className="text-center mb-6">
-          Join Expensify
+          Join BudgetBliss
         </Title>
 
         <Form layout="vertical" onFinish={handleSubmit}>
