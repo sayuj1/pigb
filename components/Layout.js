@@ -63,7 +63,7 @@ export default function SidebarLayout({ children }) {
             color: token.colorText,
           }}
         >
-          <Link href="/">{collapsed ? "🧾" : "BudgetBliss"}</Link>
+          <Link href="/">{collapsed ? "🧾" : "PigB"}</Link>
 
           <Divider />
         </div>

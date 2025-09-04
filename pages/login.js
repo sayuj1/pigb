@@ -58,7 +58,7 @@ export default function Login() {
         </div>
 
         <Title level={3} className="text-center mb-6">
-          Welcome Back to BudgetBliss
+          Welcome Back to PigB
         </Title>
 
         <Form layout="vertical" onFinish={handleSubmit}>

@@ -46,7 +46,7 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-5xl font-bold mb-4">Welcome to BudgetBliss</h1>
+          <h1 className="text-5xl font-bold mb-4">Welcome to PigB</h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto mb-8">
             Manage your finances with ease — track income, expenses, budgets,
             loans, and more.
@@ -219,7 +219,7 @@ export default function Home() {
           Ready to take control of your finances?
         </h2>
         <p className="mb-6 text-lg">
-          Join thousands of users using BudgetBliss to manage their money smarter.
+          Join thousands of users using PigB to manage their money smarter.
         </p>
         <Link href="/signup">
           <button className="bg-white text-indigo-700 font-semibold px-6 py-3 rounded-lg hover:bg-gray-100">
@@ -231,7 +231,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-300 py-8 px-6 text-center">
         <p className="mb-2">
-          &copy; {new Date().getFullYear()} BudgetBliss. All rights reserved.
+          &copy; {new Date().getFullYear()} PigB. All rights reserved.
         </p>
         <div className="space-x-4">
           <Link href="#">
