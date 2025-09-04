@@ -109,7 +109,7 @@ export default async function handler(req, res) {
           userId,
           type: "",
           amount,
-          date,
+          billDate: date,
           category: savings.savingsType,
           accountId: null,
         };
