@@ -15,6 +15,7 @@ import { useRouter } from "next/router";
 import Navbar from "./Navbar";
 import { useTheme } from "@/context/ThemeContext";
 import Link from "next/link";
+import Image from "next/image";
 import BetaTag from "./resuable/BetaTag";
 
 const { Sider, Content } = Layout;
@@ -50,6 +51,7 @@ export default function SidebarLayout({ children }) {
   return (
     <Layout className="h-screen">
       {/* Sidebar */}
+
       <Sider
         collapsible
         collapsed={collapsed}
@@ -63,10 +65,32 @@ export default function SidebarLayout({ children }) {
             color: token.colorText,
           }}
         >
-          <Link href="/">{collapsed ? "🧾" : "PigB"}</Link>
+          <Link href="/" className="flex ml-6 items-center gap-2">
+            {collapsed ? (
+              <Image
+                src="/pigb-logo.png"
+                alt="PigB Logo"
+                width={32}
+                height={32}
+              />
+            ) : (
+              <>
+                <Image
+                  src="/pigb-logo.png"
+                  alt="PigB Logo"
+                  width={32}
+                  height={32}
+                />
+                <span className="bg-gradient-to-r from-[#00b894] to-[#00cec9] bg-clip-text text-transparent font-bold text-xl">
+                  PigB
+                </span>
+              </>
+            )}
+          </Link>
 
           <Divider />
         </div>
+
         <Menu
           theme={isDarkMode ? "dark" : "light"}
           mode="inline"
