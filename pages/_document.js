@@ -4,7 +4,27 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
+        {/* Favicon & Icons */}
         <link rel="icon" href="/pigb.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/pigb-logo.png" />
+        <meta name="theme-color" content="#00b894" />
+
+        {/* Primary Meta */}
+        <meta name="title" content="PigB - Manage Income, Expenses, Budgets & Savings" />
+        <meta
+          name="description"
+          content="PigB helps you manage your finances with ease — track income, expenses, budgets, loans, and savings all in one place."
+        />
+
+        {/* Open Graph  */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://pigb.sehgaltech.com/" />
+        <meta property="og:title" content="PigB - Smart Finance Manager" />
+        <meta
+          property="og:description"
+          content="Track income, expenses, budgets, loans, and savings with PigB."
+        />
+        <meta property="og:image" content="/pigb-logo.png" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
