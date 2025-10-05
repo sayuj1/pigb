@@ -15,17 +15,30 @@ const SidebarLayout = dynamic(() => import("@/components/Layout"), {
 function Dashboard() {
   const [totalSavings, setTotalSavings] = useState(0);
   return (
-    <SidebarLayout>
-      <div className="p-4 space-y-6">
-        <SummaryCards totalSavings={totalSavings} />
-        <ExpensesIncomeChart />
-        <CategorySpendingChart />
-        <BudgetUtilization />
-        <SavingsTrendChart setTotalSavings={setTotalSavings} />
-        <LoanRepaymentChart />
-        {/* <UpcomingBillsList /> */}
-      </div>
-    </SidebarLayout>
+    <>
+      <Head>
+        <title>Pigb Dashboard</title>
+        <meta
+          name="description"
+          content="Get a bird’s-eye view of your finances with real-time insights into balances, bills, and budgets."
+        />
+
+        {/*  Add favicon */}
+        <link rel="icon" href="/pigb.ico" />
+      </Head>
+      <SidebarLayout>
+        <div className="p-4 space-y-6">
+          <SummaryCards totalSavings={totalSavings} />
+          <ExpensesIncomeChart />
+          <CategorySpendingChart />
+          <BudgetUtilization />
+          <SavingsTrendChart setTotalSavings={setTotalSavings} />
+          <LoanRepaymentChart />
+          {/* <UpcomingBillsList /> */}
+        </div>
+      </SidebarLayout>
+    </>
+
   );
 }
 
