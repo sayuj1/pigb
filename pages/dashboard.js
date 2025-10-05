@@ -8,6 +8,7 @@ import SavingsTrendChart from "@/components/dashboard/SavingsTrendChart";
 import LoanRepaymentChart from "@/components/dashboard/LoanRepaymentChart";
 import UpcomingBillsList from "@/components/dashboard/UpcomingBillsList";
 import { useState } from "react";
+import Head from "next/head";
 const SidebarLayout = dynamic(() => import("@/components/Layout"), {
   ssr: false,
 });
