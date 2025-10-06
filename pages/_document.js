@@ -25,7 +25,20 @@ export default function Document() {
           content="Track income, expenses, budgets, loans, and savings with PigB."
         />
         <meta property="og:image" content="/pigb-logo.png" />
+        {/* JSON-LD Structured Data */}
         <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "PigB",
+              url: "https://pigb.sehgaltech.com",
+              logo: "https://pigb.sehgaltech.com/pigb.ico",
+            }),
+          }}
+        />
+        {/* <script
           dangerouslySetInnerHTML={{
             __html: `
         (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -54,7 +67,7 @@ export default function Document() {
             });
           `,
           }}
-        />
+        /> */}
       </Head>
 
       <body className="antialiased">
