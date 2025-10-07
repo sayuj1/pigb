@@ -29,6 +29,7 @@ export default function Home() {
       {/* ✅ SEO + Favicon */}
       <Head>
         <title>PigB - Manage Income, Expenses, Budgets & Savings</title>
+        <meta itemProp="image" content="https://pigb.sehgaltech.com/og-image.png" />
         <meta
           name="description"
           content="PigB helps you manage your finances with ease — track income, expenses, budgets, loans, and savings all in one place."
