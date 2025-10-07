@@ -25,7 +25,7 @@ function Dashboard() {
         />
 
         {/*  Add favicon */}
-        <link rel="icon" href="/pigb.ico" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       <SidebarLayout>
         <div className="p-4 space-y-6">

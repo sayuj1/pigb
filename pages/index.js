@@ -45,7 +45,7 @@ export default function Home() {
         <meta property="og:image" content="/pigb-logo.png" />
         <meta property="og:type" content="website" />
         <meta name="theme-color" content="#00b894" />
-        <link rel="icon" href="/pigb.ico" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="bg-white text-gray-800">
         {user && (

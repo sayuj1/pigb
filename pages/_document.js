@@ -5,7 +5,7 @@ export default function Document() {
     <Html lang="en">
       <Head>
         {/* Favicon & Icons */}
-        <link rel="icon" href="/pigb.ico" />
+        <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/pigb-logo.png" />
         <meta name="theme-color" content="#00b894" />
 
@@ -34,7 +34,7 @@ export default function Document() {
               "@type": "Organization",
               name: "PigB",
               url: "https://pigb.sehgaltech.com",
-              logo: "https://pigb.sehgaltech.com/pigb.ico",
+              logo: "https://pigb.sehgaltech.com/favicon.ico",
             }),
           }}
         />
