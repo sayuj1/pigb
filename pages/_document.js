@@ -34,7 +34,7 @@ export default function Document() {
               "@type": "Organization",
               name: "PigB",
               url: "https://pigb.sehgaltech.com",
-              logo: "https://pigb.sehgaltech.com/favicon.ico",
+              logo: "https://pigb.sehgaltech.com/pigb-logo-112.jpg",
             }),
           }}
         />
