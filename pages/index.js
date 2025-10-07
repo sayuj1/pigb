@@ -45,7 +45,12 @@ export default function Home() {
         <meta property="og:image" content="/pigb-logo.png" />
         <meta property="og:type" content="website" />
         <meta name="theme-color" content="#00b894" />
-        <link rel="icon" href="/favicon.ico" />
+        {/* Favicon & Icons */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/pigb-180.png" />
+        <link rel="icon" sizes="any" href="/favicon.ico" />
       </Head>
       <div className="bg-white text-gray-800">
         {user && (
