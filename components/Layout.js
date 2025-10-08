@@ -68,7 +68,7 @@ export default function SidebarLayout({ children }) {
           <Link href="/" className="flex ml-6 items-center gap-2">
             {collapsed ? (
               <Image
-                src="/pigb-logo.png"
+                src="/pigb-logo.svg"
                 alt="PigB Logo"
                 width={32}
                 height={32}
@@ -76,7 +76,7 @@ export default function SidebarLayout({ children }) {
             ) : (
               <>
                 <Image
-                  src="/pigb-logo.png"
+                  src="/pigb-logo.svg"
                   alt="PigB Logo"
                   width={32}
                   height={32}
