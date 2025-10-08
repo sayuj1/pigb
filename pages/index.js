@@ -34,9 +34,11 @@ export default function Home() {
           name="description"
           content="PigB helps you manage your finances with ease — track income, expenses, budgets, loans, and savings all in one place."
         />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
         <meta
           name="keywords"
-          content="personal finance, expense tracker, budget planner, savings tracker, financial management app, PigB"
+          content="PigB,personal finance, expense tracker, budget planner, savings tracker, financial management app, sehgaltechß"
         />
         <meta property="og:title" content="PigB | Personal Finance Manager" />
         <meta
@@ -47,11 +49,7 @@ export default function Home() {
         <meta property="og:type" content="website" />
         <meta name="theme-color" content="#00b894" />
         {/* Favicon & Icons */}
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/pigb-180.png" />
-        <link rel="icon" sizes="any" href="/favicon.ico" />
+
       </Head>
       <div className="bg-white text-gray-800">
         {user && (
