@@ -24,8 +24,7 @@ function Dashboard() {
           content="Get a bird’s-eye view of your finances with real-time insights into balances, bills, and budgets."
         />
 
-        {/*  Add favicon */}
-        <link rel="icon" href="/favicon.ico" />
+
       </Head>
       <SidebarLayout>
         <div className="p-4 space-y-6">
