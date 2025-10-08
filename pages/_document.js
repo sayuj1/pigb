@@ -7,6 +7,8 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head >
+        {/* for bing verification */}
+        <meta name="msvalidate.01" content="62E5512162829959A26CF94DC4194DF9" />
         {/* JSON-LD: Organization schema */}
         <script
           type="application/ld+json"
