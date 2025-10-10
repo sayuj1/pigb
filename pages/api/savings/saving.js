@@ -119,7 +119,7 @@ export default async function handler(req, res) {
 
         // Fetch all transactionsIds related to this savings account where type != interest only select transactionId field
         const transactionIds = await SavingsTransaction.find({ savingsId: id, type: { $ne: "interest" } }).select("transactionId");
-        console.log("Transaction IDs to delete:", transactionIds);
+        // console.log("Transaction IDs to delete:", transactionIds);
 
         if (!transactionIds || transactionIds.length === 0) {
           return res.status(404).json({

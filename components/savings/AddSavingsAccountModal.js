@@ -45,7 +45,7 @@ export default function AddSavingsAccountModal({
         ...values,
         savingsType: `${selectedCategory.icon} ${selectedCategory.name}`,
       };
-      console.log("value ", formattedValues);
+      // console.log("value ", formattedValues);
       setSubmitting(true);
       await axios.post("/api/savings/saving", formattedValues);
       form.resetFields();

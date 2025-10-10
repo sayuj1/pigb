@@ -187,7 +187,7 @@ export default async function handler(req, res) {
           status,
           accountId,
         } = req.body;
-        console.log("reach2", req.body);
+        // console.log("reach2", req.body);
 
         const bill = await Bill.findOne({ _id: id, userId });
         if (!bill) {
@@ -255,7 +255,7 @@ export default async function handler(req, res) {
             )
           );
 
-          console.log("current due date (UTC)", nextDueDate.toISOString());
+          // console.log("current due date (UTC)", nextDueDate.toISOString());
 
           switch (bill.frequency) {
             case "daily":

@@ -69,7 +69,7 @@ export default function SavingsAccounts() {
     try {
       const res = await fetch("/api/savings/saving");
       const data = await res.json();
-      console.log("data ", data);
+      // console.log("data ", data);
       setSavings(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Failed to fetch savings accounts:", error);

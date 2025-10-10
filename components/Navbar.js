@@ -20,10 +20,6 @@ export default function Navbar() {
           type="link"
           onClick={logout}
           className="flex items-center"
-          style={{
-             // Uses #001529 in dark mode
-    color: token.colorText,
-          }}
         >
           <LogoutOutlined className="mr-2" /> Logout
         </Button>
@@ -33,12 +29,14 @@ export default function Navbar() {
 
   return (
     <div className="w-full shadow-md flex items-center py-4" style={{
-      backgroundColor: token.colorBgContainer}}>
+      backgroundColor: token.colorBgContainer
+    }}>
       {/* <Menu mode="horizontal" className="w-full !p-0 flex items-center" items={menuItems} /> */}
 
       {/* Right Side: User Info or Auth Buttons */}
       <div className="ml-auto px-4 min-w-fit" style={{
-      backgroundColor: token.colorBgContainer}}>
+        backgroundColor: token.colorBgContainer
+      }}>
         {user ? (
           <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
             <div className="flex items-center gap-2 cursor-pointer">

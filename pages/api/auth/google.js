@@ -2,7 +2,7 @@ import connectDB from "@/lib/mongodb";
 import User from "@/models/UserSchema";
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
-import {serialize} from "cookie";
+import { serialize } from "cookie";
 // import axios from "axios";
 
 const client = new OAuth2Client(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
@@ -10,31 +10,31 @@ const client = new OAuth2Client(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
 export default async function handler(req, res) {
     if (req.method !== "POST") {
         return res.status(405).json({ message: `Method ${req.method} Not Allowed` });
-      }
-    
-      try {
-        
-        const { tokenId } = req.body;
-
-    if (!tokenId) {
-      return res.status(400).json({ message: "Google token is required" });
     }
 
-    // Verify Google token
-    const ticket = await client.verifyIdToken({
-      idToken: tokenId,
-      audience: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-    });
+    try {
+
+        const { tokenId } = req.body;
+
+        if (!tokenId) {
+            return res.status(400).json({ message: "Google token is required" });
+        }
+
+        // Verify Google token
+        const ticket = await client.verifyIdToken({
+            idToken: tokenId,
+            audience: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+        });
         // console.log("google user ", googleUser)
-  
+
         const { email, name, picture, sub: googleId } = ticket.getPayload(); // sub is the Google ID
 
 
-        await connectDB(); 
+        await connectDB();
 
         // Check if user already exists
         let user = await User.findOne({ googleId });
-        console.log("user ", user, googleId)
+        // console.log("user ", user, googleId)
         if (!user) {
             // Register new user if not found
             user = new User({

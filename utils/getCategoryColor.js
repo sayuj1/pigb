@@ -14,7 +14,7 @@ const colorMap = [
  * It handles emojis by skipping non-letter characters if needed.
  */
 export function getCategoryColor(savingsType = "") {
-  console.log(savingsType);
+  // console.log(savingsType);
   // Extract just the name part (assumes format: "🏦 Emergency Fund")
   const words = savingsType.split(" ");
   const base = words.length > 1 ? words.slice(1).join(" ") : savingsType;
@@ -26,6 +26,6 @@ export function getCategoryColor(savingsType = "") {
   );
 
   const index = hash % colorMap.length;
-  console.log("index", index);
+  // console.log("index", index);
   return colorMap[index];
 }

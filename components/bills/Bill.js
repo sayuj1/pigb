@@ -135,7 +135,7 @@ const Bill = () => {
             : values.frequency,
       };
       delete payload.customFrequency;
-      console.log("payload ");
+      // console.log("payload ");
       if (editingBill) {
         await axios.put(`/api/bills/bill`, payload);
       } else {
@@ -359,7 +359,7 @@ const Bill = () => {
                 variant="solid"
                 onClick={async () => {
                   try {
-                    console.log("record", record);
+                    // console.log("record", record);
                     await axios.put("/api/bills/bill", {
                       _id: record._id,
                       accountId: record.accountId._id,

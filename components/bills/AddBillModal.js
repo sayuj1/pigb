@@ -67,11 +67,11 @@ const AddBillModal = ({ open, onCancel, onSubmit, form, accounts }) => {
         </Form.Item>
 
         <Form.Item name="dueDate" label="Due Date" rules={[{ required: true }]}>
-          {console.log(
+          {/* {console.log(
             isEdit,
             form.getFieldValue("status") == "paid",
             isRecurring
-          )}
+          )} */}
           <DatePicker
             style={{ width: "100%" }}
             disabled={

@@ -66,7 +66,7 @@ export default function AddSavingsTransactionModal({
   useEffect(() => {
     if (visible) {
       if (editingTransaction) {
-        console.log("edit ", editingTransaction);
+        // console.log("edit ", editingTransaction);
         form.setFieldsValue({
           date: dayjs(editingTransaction.date),
           type: editingTransaction.type,

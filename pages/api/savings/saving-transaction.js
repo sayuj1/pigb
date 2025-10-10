@@ -215,7 +215,7 @@ export default async function handler(req, res) {
         }
 
         const transaction = await SavingsTransaction.findById(id);
-        console.log("Transaction to update:", transaction);
+        // console.log("Transaction to update:", transaction);
         if (!transaction) {
           return res.status(404).json({ message: "Transaction not found" });
         }

@@ -43,7 +43,7 @@ export default function ExpensesIncomeChart() {
 
   const dynamicDx = getDynamicDx(data, "income");
   const dynamicDxRight = getSecondaryDynamicDx(data, "expense");
-  console.log("dx ", dynamicDx, dynamicDxRight);
+  // console.log("dx ", dynamicDx, dynamicDxRight);
 
   return (
     <Card

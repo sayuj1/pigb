@@ -120,7 +120,7 @@ export default function Transactions() {
 
   // Handle Table Change (Sorting & Pagination)
   const handleTableChange = (pagination, filters, sorter) => {
-    console.log(filters);
+    // console.log(filters);
     setPagination({
       current: pagination.current,
       pageSize: pagination.pageSize,

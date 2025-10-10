@@ -148,7 +148,7 @@ export default function Accounts() {
               onClick: handleMenuClick,
             }}
           >
-            <Button icon={<FilterOutlined />}>
+            <Button type="default" icon={<FilterOutlined />} >
               Sort:{" "}
               {SORT_OPTIONS.find((opt) => opt.value === sortOption)?.label}
             </Button>
@@ -165,79 +165,79 @@ export default function Accounts() {
       ) : error ? (
         <Alert message="Error" description={error} type="error" showIcon />
       ) : // <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      filteredAndSortedAccounts().length === 0 ? (
-        <div className="flex flex-col items-center justify-center text-gray-500 min-h-[60vh]">
-          <FileSearchOutlined className="text-4xl mb-2 text-gray-400" />
-          <p className="text-base text-center mb-4">No accounts found.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredAndSortedAccounts().map((account) => {
-            const IconComponent = getIconComponent(account.icon);
+        filteredAndSortedAccounts().length === 0 ? (
+          <div className="flex flex-col items-center justify-center text-gray-500 min-h-[60vh]">
+            <FileSearchOutlined className="text-4xl mb-2 text-gray-400" />
+            <p className="text-base text-center mb-4">No accounts found.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredAndSortedAccounts().map((account) => {
+              const IconComponent = getIconComponent(account.icon);
 
-            return (
-              <Card
-                key={account._id}
-                className="relative flex items-center gap-4 p-4"
-                style={{ borderLeft: `6px solid ${account.color}` }}
-              >
-                <div className="absolute flex gap-2 justify-end w-full pr-8">
-                  <Button
-                    size="small"
-                    icon={<EditOutlined />}
-                    onClick={() => setEditAccount(account)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    size="small"
-                    icon={<DeleteOutlined />}
-                    danger
-                    onClick={() => setDeleteAccount(account)}
-                  >
-                    Delete
-                  </Button>
-                </div>
-
-                {/* Icon */}
-                <div className="flex justify-between items-center">
-                  <div
-                    className="flex items-center justify-center rounded-lg"
-                    style={{
-                      width: 50,
-                      height: 50,
-                      backgroundColor: `${account.color}20`,
-                      borderRadius: "8px",
-                    }}
-                  >
-                    <IconComponent size={32} color={account.color} />
+              return (
+                <Card
+                  key={account._id}
+                  className="relative flex items-center gap-4 p-4"
+                  style={{ borderLeft: `6px solid ${account.color}` }}
+                >
+                  <div className="absolute flex gap-2 justify-end w-full pr-8">
+                    <Button
+                      size="small"
+                      icon={<EditOutlined />}
+                      onClick={() => setEditAccount(account)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      size="small"
+                      icon={<DeleteOutlined />}
+                      danger
+                      onClick={() => setDeleteAccount(account)}
+                    >
+                      Delete
+                    </Button>
                   </div>
-                </div>
 
-                {/* Details */}
-                <div className="flex-1 mt-1">
-                  <Title level={5} className="mb-0">
-                    {account.name}
+                  {/* Icon */}
+                  <div className="flex justify-between items-center">
+                    <div
+                      className="flex items-center justify-center rounded-lg"
+                      style={{
+                        width: 50,
+                        height: 50,
+                        backgroundColor: `${account.color}20`,
+                        borderRadius: "8px",
+                      }}
+                    >
+                      <IconComponent size={32} color={account.color} />
+                    </div>
+                  </div>
+
+                  {/* Details */}
+                  <div className="flex-1 mt-1">
+                    <Title level={5} className="mb-0">
+                      {account.name}
+                    </Title>
+                    <Text type="secondary" className="mt-0">
+                      {account.type}
+                    </Text>
+                  </div>
+
+                  {/* Balance */}
+                  <Title level={5} style={{ margin: 0 }}>
+                    ₹
+                    {account.balance.toLocaleString("en-IN", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </Title>
-                  <Text type="secondary" className="mt-0">
-                    {account.type}
-                  </Text>
-                </div>
-
-                {/* Balance */}
-                <Title level={5} style={{ margin: 0 }}>
-                  ₹
-                  {account.balance.toLocaleString("en-IN", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </Title>
-              </Card>
-            );
-          })}
-        </div>
-      )
-      // </div>
+                </Card>
+              );
+            })}
+          </div>
+        )
+        // </div>
       }
       {editAccount && (
         <EditAccountModal
