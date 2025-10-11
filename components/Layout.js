@@ -108,7 +108,8 @@ export default function SidebarLayout({ children }) {
             className="p-4 m-1 rounded-md overflow-y-auto"
             style={{
               backgroundColor: token.colorBgContainer,
-              maxHeight: "calc(100vh - 64px)", // 64px for Navbar height
+              height: "calc(100vh - 75px)", // 64px for Navbar height + padding 16px
+
             }}
           >
             {children}
