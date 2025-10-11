@@ -57,65 +57,75 @@ export default function Home() {
         )}
 
         {/* 🌈 Hero Section */}
-        <section className="bg-gradient-to-br from-[#00b894] to-[#00cec9] text-white py-24 px-6 text-center relative overflow-hidden">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h1 className="text-5xl font-bold mb-4">Welcome to PigB</h1>
-            <p className="text-lg md:text-xl max-w-2xl mx-auto mb-8">
-              Manage your finances with ease — track income, expenses, budgets,
-              loans, and more.
-            </p>
+        <section className="bg-gradient-to-br from-[#00b894] to-[#00cec9] text-white py-24 px-6 md:px-16 relative overflow-hidden">
+          <div className="flex flex-col md:flex-row items-center justify-between max-w-7xl mx-auto gap-10 md:gap-16">
+            {/* 🌟 Left: Text Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center md:text-left md:flex-1 relative z-10"
+            >
+              <h1 className="text-4xl md:text-6xl font-bold mb-4 leading-tight">
+                Welcome to <span className="text-white/90">PigB</span>
+              </h1>
 
-            {/* Buttons */}
-            <div className="space-x-4">
+              <p className="text-base md:text-xl max-w-xl mx-auto md:mx-0 mb-8 text-white/90">
+                Manage your finances with ease — track income, expenses, budgets,
+                loans, and more in one beautiful dashboard.
+              </p>
+
+              {/* Buttons */}
               {user ? (
                 <Button
                   type="primary"
                   size="large"
                   onClick={() => router.push(ROUTES.DASHBOARD)}
-
+                  className="!bg-white !text-[#00b894] hover:!bg-[#00cec9] hover:!text-white font-medium shadow-md"
                 >
                   View Dashboard
                 </Button>
               ) : (
-                <div className="flex justify-center gap-4">
+                <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4">
                   <Button
                     type="primary"
+                    size="large"
                     onClick={() => router.push(ROUTES.SIGNUP)}
-
+                    className="!bg-white !text-[#00b894] hover:!bg-[#00cec9] hover:!text-white font-medium shadow-md"
                   >
                     Get Started
                   </Button>
                   <Button
+                    size="large"
                     onClick={() => router.push(ROUTES.LOGIN)}
-
+                    className="!bg-transparent border border-white text-white hover:!bg-white hover:!text-[#00b894] font-medium"
                   >
                     Login
                   </Button>
                 </div>
               )}
-            </div>
-          </motion.div>
+            </motion.div>
 
-          {/* Hero Image */}
-          <motion.div
-            className="absolute bottom-0 right-4 w-64 md:w-96 opacity-80"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            <Image
-              src="/wallet_diag.svg"
-              alt="Finance Illustration"
-              width={400}
-              height={300}
-              priority
-            />
-          </motion.div>
+            {/* 💼 Right: Hero Illustration */}
+            <motion.div
+              className="md:flex-1 flex justify-center md:justify-end"
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <Image
+                src="/wallet_diag.svg"
+                alt="Finance Illustration"
+                width={420}
+                height={320}
+                priority
+                className="object-contain drop-shadow-lg"
+              />
+            </motion.div>
+          </div>
         </section>
+
+
 
         {/* 💡 Features Section */}
         <section className="py-20 px-6 bg-white">
