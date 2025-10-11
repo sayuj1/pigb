@@ -11,16 +11,16 @@ import {
   AppstoreOutlined,
   ShoppingCartOutlined,
 } from "@ant-design/icons";
-import { useRouter } from "next/router";
+
 import Navbar from "./Navbar";
 import { useTheme } from "@/context/ThemeContext";
 import Link from "next/link";
 import Image from "next/image";
 import BetaTag from "./resuable/BetaTag";
 import FloatingAddButton from "./FloatingAddButton";
-import AddTransactionModal from "./transactions/AddTransactionModal";
-import { useDashboard } from "@/context/DashboardContext";
-import { useTransactions } from "@/context/TransactionContext";
+import { useRouter } from "next/router";
+
+
 
 const { Sider, Content } = Layout;
 
@@ -49,23 +49,10 @@ const menuItems = [
 export default function SidebarLayout({ children }) {
   const [collapsed, setCollapsed] = useState(false);
   const router = useRouter();
-  const dashboard = useDashboard();
-  const transactions = useTransactions();
   const { isDarkMode } = useTheme();
   const { token } = theme.useToken();
 
-  const [modalVisible, setModalVisible] = useState(false);
 
-  const handleAddTransaction = async () => {
-    if (router.pathname === "/dashboard") {
-      await dashboard?.fetchAllDashboardData();
-    } else if (router.pathname === "/income-expense") {
-      await Promise.all([
-        transactions?.fetchTransactions(),
-        transactions?.fetchInsights(),
-      ]);
-    }
-  };
 
   return (
     <Layout className="h-screen">
@@ -135,14 +122,9 @@ export default function SidebarLayout({ children }) {
             {children}
 
           </div>
-          <FloatingAddButton onClick={() => setModalVisible(true)} />
+          <FloatingAddButton />
 
-          {/* Add Transaction Modal */}
-          <AddTransactionModal
-            visible={modalVisible}
-            onClose={() => setModalVisible(false)}
-            onAddTransaction={handleAddTransaction}
-          />
+
         </Content>
       </Layout>
 
