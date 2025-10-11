@@ -111,7 +111,7 @@ export const DashboardProvider = ({ children }) => {
 
 
     return (
-        <DashboardContext.Provider value={{ stats, currentMonth, fetchStats, budgets, categoryChartData, incomeExpenseData, incomeExpenseLoading, savings, savingsPie, loans }}>
+        <DashboardContext.Provider value={{ stats, currentMonth, budgets, categoryChartData, incomeExpenseData, incomeExpenseLoading, savings, savingsPie, loans, fetchStats, fetchLoanRepayment, fetchCategorySpending, fetchIncomeExpenseTrend, fetchSavingsTrend, fetchLoanRepayment }}>
             {children}
         </DashboardContext.Provider>
     );
