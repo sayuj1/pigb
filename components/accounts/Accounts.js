@@ -23,6 +23,7 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 import AddAccountModal from "./AddAccountModal";
 import { getIconComponent } from "@/utils/getIcons";
 import EditAccountModal from "./EditAccountModal";
+import { useAccount } from "@/context/AccountContext";
 
 const { Title, Text } = Typography;
 
@@ -37,31 +38,11 @@ const SORT_OPTIONS = [
 export default function Accounts() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState("default");
-  const [accounts, setAccounts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [editAccount, setEditAccount] = useState(null);
   const [deleteAccount, setDeleteAccount] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
 
-  // Fetch accounts from API
-  useEffect(() => {
-    const fetchAccounts = async () => {
-      try {
-        const response = await fetch("/api/accounts/account");
-        if (!response.ok) throw new Error("Failed to fetch accounts");
-
-        const data = await response.json();
-        setAccounts(data.accounts);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAccounts();
-  }, []);
+  const { accounts, setAccounts, loading, error } = useAccount();
 
   // Handle search and sorting
   const filteredAndSortedAccounts = () => {

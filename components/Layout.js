@@ -116,7 +116,9 @@ export default function SidebarLayout({ children }) {
 
             }}
           >
+
             {children}
+
           </div>
           {/* TODO: Move refresh logic to centralized place for dashboard, transaction page based on the selected page refresh details [accounts is working fine] */}
           {/* Floating Action Button */}

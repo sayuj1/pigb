@@ -1,10 +1,14 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import dayjs from "dayjs";
 import useDebounce from "@/hooks/useDebounce";
+import { useAccount } from "./AccountContext";
 
 const TransactionContext = createContext();
 
 export const TransactionProvider = ({ children }) => {
+
+    const { fetchAccounts } = useAccount();
+
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
@@ -29,20 +33,6 @@ export const TransactionProvider = ({ children }) => {
         expenseByAccounts: [],
         topCategories: [],
     });
-
-    //TODO: move this to account context Fetch Accounts
-    useEffect(() => {
-        const fetchAccounts = async () => {
-            try {
-                const res = await fetch("/api/accounts/account");
-                const data = await res.json();
-                setAccountOptions(data.accounts || []);
-            } catch (err) {
-                console.error("Failed to load accounts", err);
-            }
-        };
-        fetchAccounts();
-    }, []);
 
     // Fetch Transactions
     const fetchTransactions = async (params = {}) => {
@@ -99,6 +89,7 @@ export const TransactionProvider = ({ children }) => {
     useEffect(() => {
         fetchTransactions();
         fetchInsights();
+        fetchAccounts().then(res => setAccountOptions(res));
     }, [
         pagination.current,
         pagination.pageSize,
