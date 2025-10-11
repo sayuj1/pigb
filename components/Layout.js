@@ -17,6 +17,8 @@ import { useTheme } from "@/context/ThemeContext";
 import Link from "next/link";
 import Image from "next/image";
 import BetaTag from "./resuable/BetaTag";
+import FloatingAddButton from "./FloatingAddButton";
+import AddTransactionModal from "./transactions/AddTransactionModal";
 
 const { Sider, Content } = Layout;
 
@@ -47,6 +49,8 @@ export default function SidebarLayout({ children }) {
   const router = useRouter();
   const { isDarkMode } = useTheme();
   const { token } = theme.useToken();
+
+  const [modalVisible, setModalVisible] = useState(false);
 
   return (
     <Layout className="h-screen">
@@ -114,8 +118,19 @@ export default function SidebarLayout({ children }) {
           >
             {children}
           </div>
+          {/* TODO: Move refresh logic to centralized place for dashboard, transaction page based on the selected page refresh details [accounts is working fine] */}
+          {/* Floating Action Button */}
+          {/* <FloatingAddButton onClick={() => setModalVisible(true)} /> */}
+
+          {/* Add Transaction Modal */}
+          {/* <AddTransactionModal
+            visible={modalVisible}
+            onClose={() => setModalVisible(false)}
+            onAddTransaction={() => console.log("reach here")}
+          /> */}
         </Content>
       </Layout>
+
     </Layout>
   );
 }
