@@ -216,13 +216,13 @@ export default function SavingsAccounts() {
                   size="small"
                   icon={<PlusOutlined />}
                   onClick={() => setAddingTransaction(item)}
-                  type="text"
+                  type="link"
                 >
                   Add Transactions
                 </Button>,
                 <Button
                   size="small"
-                  type="text"
+                  type="link"
                   onClick={() =>
                     router.push(`/savings/${item._id}/transactions`)
                   }
