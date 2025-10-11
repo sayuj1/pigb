@@ -98,7 +98,7 @@ export default function Home() {
                   <Button
                     size="large"
                     onClick={() => router.push(ROUTES.LOGIN)}
-                    className="!bg-transparent border border-white text-white hover:!bg-white hover:!text-[#00b894] font-medium"
+                    className="!bg-transparent border border-white !text-white hover:!bg-white hover:!text-[#00b894] font-medium"
                   >
                     Login
                   </Button>
