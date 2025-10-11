@@ -3,6 +3,7 @@ import { useState } from "react";
 import SingleTransactionForm from "./SingleTransactionForm";
 import BulkTransactionForm from "./BulkTransactionForm";
 import BetaTag from "../resuable/BetaTag";
+import { useAccount } from "@/context/AccountContext";
 
 const { TabPane } = Tabs;
 
@@ -13,17 +14,7 @@ export default function AddTransactionModal({
   initialValues = {},
 }) {
   const [activeTab, setActiveTab] = useState("single");
-  const [accounts, setAccounts] = useState([]);
-
-  const fetchAccounts = async () => {
-    try {
-      const res = await fetch("/api/accounts/account");
-      const data = await res.json();
-      setAccounts(data.accounts);
-    } catch {
-      message.error("Failed to refresh account data");
-    }
-  };
+  const { accounts, fetchAccounts } = useAccount();
 
   const handleClose = () => {
     setActiveTab("single"); // reset tab on close

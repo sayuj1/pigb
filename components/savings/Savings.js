@@ -14,6 +14,7 @@ import DeleteSavingsAccountModal from "./DeleteSavingsAccountModal";
 import AddSavingsTransactionModal from "./transactions/AddSavingsTransactionModal";
 import { useRouter } from "next/router";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { useAccount } from "@/context/AccountContext";
 
 const SORT_OPTIONS = [
   { label: "Default (Newest)", value: "newest" },
@@ -34,25 +35,9 @@ export default function SavingsAccounts() {
   const [deletingAccount, setDeletingAccount] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [addingTransaction, setAddingTransaction] = useState(null);
-  const [accounts, setAccounts] = useState([]);
-  const [isAccountsLoading, setIsAccountsLoading] = useState(true);
+
   const router = useRouter();
-
-  // Fetch accounts from API
-  const fetchAccounts = async () => {
-    try {
-      setIsAccountsLoading(true);
-      const response = await fetch("/api/accounts/account");
-      if (!response.ok) throw new Error("Failed to fetch accounts");
-
-      const data = await response.json();
-      setAccounts(data.accounts);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsAccountsLoading(false);
-    }
-  };
+  const { accounts, loading: isAccountsLoading, fetchAccounts } = useAccount();
 
   useEffect(() => {
     fetchAccounts();

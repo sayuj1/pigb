@@ -4,6 +4,7 @@ import TransactionReviewTable from '@/components/importStatements/TransactionRev
 import { Button, message, Popover } from 'antd';
 import { addAccountIdToTransactions, attachCategoryIconsToTransactions, replaceDateWithBillDate } from '@/utils/dataFormatter';
 import { formatTransactionsToUTC } from '@/utils/dateFormatter';
+import { useAccount } from '@/context/AccountContext';
 
 export default function ImportStatement() {
     const uploadRef = useRef();
@@ -12,8 +13,8 @@ export default function ImportStatement() {
     const [categories, setCategories] = useState([]);
     const [selectedAccount, setSelectedAccount] = useState([]);
     const [errors, setErrors] = useState({});
-    const [accounts, setAccounts] = useState([]);
     const [loading, setLoading] = useState(false);
+    const { accounts, fetchAccounts } = useAccount();
 
     const hasErrors = Object.values(errors).some(rowErrors => Object.keys(rowErrors).length > 0);
     const noAccountSelected = selectedAccount.length === 0;
@@ -25,19 +26,6 @@ export default function ImportStatement() {
     };
 
     const isDisabled = hasErrors || noAccountSelected;
-
-    const fetchAccounts = async () => {
-        try {
-            const res = await fetch("/api/accounts/account");
-            const data = await res.json();
-            setAccounts(data.accounts);
-        } catch {
-            messageApi.open({
-                type: 'error',
-                content: "Failed to load accounts",
-            });
-        }
-    };
 
     const fetchCategories = async () => {
         try {

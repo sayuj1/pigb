@@ -18,7 +18,7 @@ export const AccountProvider = ({ children }) => {
 
             const data = await response.json();
             setAccounts(data.accounts || []);
-            return data.accounts || []; // ✅ return value for awaiting components
+            return data.accounts || []; // return value for awaiting components
         } catch (err) {
             setError(err.message);
             throw err; // ✅ rethrow so caller can handle error

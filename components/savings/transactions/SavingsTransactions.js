@@ -33,6 +33,7 @@ import {
 import { Modal, Tooltip } from "antd";
 import { getIconComponent } from "@/utils/getIcons";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { useAccount } from "@/context/AccountContext";
 
 const { confirm } = Modal;
 
@@ -49,24 +50,7 @@ export default function SavingsTransactions() {
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
   const [sorter, setSorter] = useState({ field: "date", order: "descend" });
   const [editingTransaction, setEditingTransaction] = useState(null);
-  const [accounts, setAccounts] = useState([]);
-  const [isAccountsLoading, setIsAccountsLoading] = useState(true);
-
-  // Fetch accounts from API
-  const fetchAccounts = async () => {
-    try {
-      setIsAccountsLoading(true);
-      const response = await fetch("/api/accounts/account");
-      if (!response.ok) throw new Error("Failed to fetch accounts");
-
-      const data = await response.json();
-      setAccounts(data.accounts);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsAccountsLoading(false);
-    }
-  };
+  const { accounts, loading: isAccountsLoading, fetchAccounts } = useAccount();
 
   const [filters, setFilters] = useState({
     startDate: dayjs().startOf("month"),
