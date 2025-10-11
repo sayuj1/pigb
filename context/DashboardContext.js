@@ -53,42 +53,59 @@ export const DashboardProvider = ({ children }) => {
         }
     };
 
+    const fetchBudgetUtilization = async () => {
+        const res = await fetch(`/api/dashboard/budget-utilization?${query}`);
+        const json = await res.json();
+        setBudgets(json.budgets || []);
+    };
+
+    const fetchCategorySpending = async () => {
+        const res = await fetch(`/api/dashboard/category-spending?${query}`);
+        const json = await res.json();
+        setCategoryChartData(
+            Object.entries(json.byCategory || {}).map(([name, value]) => ({
+                category: name,
+                amount: value,
+            }))
+        );
+    };
+
+    const fetchIncomeExpenseTrend = async () => {
+        const res = await fetch(`/api/dashboard/expenses-income-trend?${incomeExpenseQuery}`);
+        const json = await res.json();
+        setIncomeExpenseData(json.monthly || []);
+        setIncomeExpenseLoading(false);
+    };
+
+    const fetchSavingsTrend = async () => {
+        const res = await fetch("/api/dashboard/savings-trend");
+        const { savings, summary } = await res.json();
+        setSavings(savings || []);
+        setSavingsPie(summary?.savingsByType || []);
+    };
+
+    const fetchLoanRepayment = async () => {
+        const res = await fetch(`/api/dashboard/loan-repayment`);
+        const json = await res.json();
+        setLoans(json.loans || []);
+    };
+
+
+
     useEffect(() => {
         // summary cards
         fetchStats();
         // budget utilization
-        fetch(`/api/dashboard/budget-utilization?${query}`)
-            .then((r) => r.json())
-            .then((json) => setBudgets(json.budgets || []));
+        fetchBudgetUtilization();
         // spend category chart
-        fetch(`/api/dashboard/category-spending?${query}`)
-            .then((r) => r.json())
-            .then((json) => {
-                setCategoryChartData(
-                    Object.entries(json.byCategory || {}).map(([name, value]) => ({
-                        category: name,
-                        amount: value,
-                    }))
-                );
-            });
+        fetchCategorySpending();
         // income expense chart
-        fetch(`/api/dashboard/expenses-income-trend?${incomeExpenseQuery}`)
-            .then((r) => r.json())
-            .then((json) => {
-                setIncomeExpenseData(json.monthly || []);
-                setIncomeExpenseLoading(false);
-            });
+        fetchIncomeExpenseTrend();
         //savings pie
-        fetch("/api/dashboard/savings-trend")
-            .then((r) => r.json())
-            .then(({ savings, summary }) => {
-                setSavings(savings || []);
-                setSavingsPie(summary?.savingsByType || []);
-            });
+        fetchSavingsTrend();
         // loans
-        fetch(`/api/dashboard/loan-repayment`)
-            .then((r) => r.json())
-            .then((json) => setLoans(json.loans || []));
+        fetchLoanRepayment();
+
     }, []);
 
 
