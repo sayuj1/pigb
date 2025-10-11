@@ -90,9 +90,7 @@ export const DashboardProvider = ({ children }) => {
         setLoans(json.loans || []);
     };
 
-
-
-    useEffect(() => {
+    const fetchAllDashboardData = () => {
         // summary cards
         fetchStats();
         // budget utilization
@@ -105,13 +103,16 @@ export const DashboardProvider = ({ children }) => {
         fetchSavingsTrend();
         // loans
         fetchLoanRepayment();
+    }
 
+    useEffect(() => {
+        fetchAllDashboardData();
     }, []);
 
 
 
     return (
-        <DashboardContext.Provider value={{ stats, currentMonth, budgets, categoryChartData, incomeExpenseData, incomeExpenseLoading, savings, savingsPie, loans, fetchStats, fetchLoanRepayment, fetchCategorySpending, fetchIncomeExpenseTrend, fetchSavingsTrend, fetchLoanRepayment }}>
+        <DashboardContext.Provider value={{ stats, currentMonth, budgets, categoryChartData, incomeExpenseData, incomeExpenseLoading, savings, savingsPie, loans, fetchStats, fetchLoanRepayment, fetchCategorySpending, fetchIncomeExpenseTrend, fetchSavingsTrend, fetchLoanRepayment, fetchAllDashboardData }}>
             {children}
         </DashboardContext.Provider>
     );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Divider, Layout, Menu, theme } from "antd";
 import {
   DashboardOutlined,
@@ -51,6 +51,35 @@ export default function SidebarLayout({ children }) {
   const { token } = theme.useToken();
 
   const [modalVisible, setModalVisible] = useState(false);
+
+  const [dashboardApi, setDashboardApi] = useState(null);
+  const [transactionApi, setTransactionApi] = useState(null);
+
+  useEffect(() => {
+    if (router.pathname === "/dashboard") {
+      import("@/context/DashboardContext").then((mod) => {
+        const { useDashboard } = mod;
+        setDashboardApi(useDashboard);
+      });
+    } else if (router.pathname === "/income-expense") {
+      import("@/context/TransactionContext").then((mod) => {
+        const { useTransactions } = mod;
+        setTransactionApi(useTransactions);
+      });
+    }
+  }, [router.pathname]);
+
+  const handleAddTransaction = () => {
+    if (router.pathname === "/dashboard" && dashboardApi) {
+      dashboardApi.fetchAllDashboardData();
+    } else if (router.pathname === "/income-expense" && transactionApi) {
+      console.log("modt ", transactionApi)
+      Promise.all([
+        transactionApi.fetchTransactions(),
+        transactionApi.fetchInsights(),
+      ]);
+    }
+  };
 
   return (
     <Layout className="h-screen">
@@ -120,16 +149,14 @@ export default function SidebarLayout({ children }) {
             {children}
 
           </div>
-          {/* TODO: Move refresh logic to centralized place for dashboard, transaction page based on the selected page refresh details [accounts is working fine] */}
-          {/* Floating Action Button */}
-          {/* <FloatingAddButton onClick={() => setModalVisible(true)} /> */}
+          <FloatingAddButton onClick={() => setModalVisible(true)} />
 
           {/* Add Transaction Modal */}
-          {/* <AddTransactionModal
+          <AddTransactionModal
             visible={modalVisible}
             onClose={() => setModalVisible(false)}
-            onAddTransaction={() => console.log("reach here")}
-          /> */}
+            onAddTransaction={handleAddTransaction}
+          />
         </Content>
       </Layout>
 
