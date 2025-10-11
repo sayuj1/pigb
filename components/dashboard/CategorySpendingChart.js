@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React from "react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -14,6 +14,7 @@ import { format } from "date-fns";
 import { PiChartBarLight } from "react-icons/pi";
 import dayjs from "dayjs";
 import { formatIndiaCurrencyWithSuffix } from "@/utils/formatCurrency";
+import { useDashboard } from "@/context/DashboardContext";
 
 const COLORS = [
   "#8884d8",
@@ -28,26 +29,8 @@ const COLORS = [
 ];
 
 export default function CategorySpendingBarChart() {
-  const [data, setData] = useState([]);
-  const currentMonth = format(new Date(), "MMMM yyyy");
 
-  const query = new URLSearchParams({
-    startDate: dayjs().startOf("month").toISOString(),
-    endDate: dayjs().endOf("month").toISOString(),
-  }).toString();
-
-  useEffect(() => {
-    fetch(`/api/dashboard/category-spending?${query}`)
-      .then((r) => r.json())
-      .then((json) => {
-        setData(
-          Object.entries(json.byCategory || {}).map(([name, value]) => ({
-            category: name,
-            amount: value,
-          }))
-        );
-      });
-  }, []);
+  const { categoryChartData: data, currentMonth } = useDashboard()
 
   return (
     <Card

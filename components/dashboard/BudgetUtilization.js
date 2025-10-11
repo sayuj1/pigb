@@ -1,21 +1,11 @@
-import { useEffect, useState } from "react";
+import React from "react";
 import { Progress, Tooltip, Typography } from "antd";
 import { PieChartOutlined } from "@ant-design/icons";
 import { PiWalletLight } from "react-icons/pi";
-import dayjs from "dayjs";
+import { useDashboard } from "@/context/DashboardContext";
 
 export default function BudgetUtilization() {
-  const [budgets, setBudgets] = useState([]);
-
-  const query = new URLSearchParams({
-    todayDate: dayjs().startOf("day").toISOString(),
-  }).toString();
-
-  useEffect(() => {
-    fetch(`/api/dashboard/budget-utilization?${query}`)
-      .then((r) => r.json())
-      .then((json) => setBudgets(json.budgets || []));
-  }, []);
+  const { budgets, currentMonth } = useDashboard();
 
   const getStrokeColor = (percent) => {
     if (percent < 70) return "#faad14"; // green
@@ -25,13 +15,24 @@ export default function BudgetUtilization() {
 
   return (
     <div className="bg-white rounded-lg shadow p-6 mt-6  mx-auto w-[100%]">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
-        <PiWalletLight className="text-xl text-green-500" /> Budget Utilization
-        {budgets.length > 0 && <span className="inline-flex items-center gap-1 px-2 py-[2px] bg-green-100 text-green-700 text-xs font-semibold rounded-full">
-          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-          Active
-        </span>}
-      </h2>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2 mb-0">
+            <PiWalletLight className="text-xl text-green-500" /> Budget Utilization
+            {budgets.length > 0 && (
+              <span className="inline-flex items-center gap-1 px-2 py-[2px] bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                Active
+              </span>
+            )}
+          </h2>
+        </div>
+
+        <Typography.Text type="secondary" className="text-sm">
+          {currentMonth}
+        </Typography.Text>
+      </div>
+
       {budgets.length === 0 && (
         <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500 space-y-3">
           <div className="text-5xl text-green-400">

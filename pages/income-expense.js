@@ -1,4 +1,5 @@
 import ProtectedRoute from "@/context/ProtectRoute";
+import { TransactionProvider } from "@/context/TransactionContext";
 import dynamic from "next/dynamic";
 const SidebarLayout = dynamic(() => import("@/components/Layout"), {
   ssr: false,
@@ -10,9 +11,11 @@ const Transactions = dynamic(
 
 function IncomeExpense() {
   return (
-    <SidebarLayout>
-      <Transactions />
-    </SidebarLayout>
+    <TransactionProvider>
+      <SidebarLayout>
+        <Transactions />
+      </SidebarLayout>
+    </TransactionProvider>
   );
 }
 

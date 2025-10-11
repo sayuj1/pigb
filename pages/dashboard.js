@@ -9,6 +9,7 @@ import LoanRepaymentChart from "@/components/dashboard/LoanRepaymentChart";
 import UpcomingBillsList from "@/components/dashboard/UpcomingBillsList";
 import { useState } from "react";
 import Head from "next/head";
+import { DashboardProvider } from "@/context/DashboardContext";
 const SidebarLayout = dynamic(() => import("@/components/Layout"), {
   ssr: false,
 });
@@ -26,17 +27,19 @@ function Dashboard() {
 
 
       </Head>
-      <SidebarLayout>
-        <div className="p-4 space-y-6">
-          <SummaryCards totalSavings={totalSavings} />
-          <ExpensesIncomeChart />
-          <CategorySpendingChart />
-          <BudgetUtilization />
-          <SavingsTrendChart setTotalSavings={setTotalSavings} />
-          <LoanRepaymentChart />
-          {/* <UpcomingBillsList /> */}
-        </div>
-      </SidebarLayout>
+      <DashboardProvider>
+        <SidebarLayout>
+          <div className="p-4 space-y-6">
+            <SummaryCards totalSavings={totalSavings} />
+            <ExpensesIncomeChart />
+            <CategorySpendingChart />
+            <BudgetUtilization />
+            <SavingsTrendChart setTotalSavings={setTotalSavings} />
+            <LoanRepaymentChart />
+            {/* <UpcomingBillsList /> */}
+          </div>
+        </SidebarLayout>
+      </DashboardProvider>
     </>
 
   );

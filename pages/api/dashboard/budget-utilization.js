@@ -14,17 +14,16 @@ export default async function handler(req, res) {
   switch (req.method) {
     case "GET":
       try {
-        const { todayDate } = req.query;
-        if (!todayDate) {
-          return res.status(400).json({ message: "Missing todayDate parameter" });
-        }
+        const { startDate, endDate } = req.query;
 
-        const now = new Date(todayDate);
+        if (!startDate || !endDate) {
+          return res.status(400).json({ message: "Missing start and end date parameters" });
+        }
 
         const budgets = await Budget.find({
           userId,
-          startDate: { $lte: now },
-          endDate: { $gte: now },
+          startDate: { $gte: new Date(startDate) },
+          endDate: { $lte: new Date(endDate) },
         }).select("budgetName spentAmount limitAmount");
 
         res.status(200).json({

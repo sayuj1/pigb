@@ -2,7 +2,6 @@ import { AuthProvider } from "../context/AuthContext";
 import "@/styles/globals.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ThemeProvider } from "../context/ThemeContext";
-// import ThemeWrapper from "@/components/theme/ThemeWrapper";
 import dynamic from "next/dynamic";
 const ThemeWrapper = dynamic(() => import("@/components/theme/ThemeWrapper"), {
   ssr: false,

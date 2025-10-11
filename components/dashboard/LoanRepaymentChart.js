@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import React from "react";
+import { useDashboard } from "@/context/DashboardContext";
 import {
   ResponsiveContainer,
   BarChart,
@@ -48,13 +49,8 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function LoanRepaymentChart() {
-  const [loans, setLoans] = useState([]);
 
-  useEffect(() => {
-    fetch(`/api/dashboard/loan-repayment`)
-      .then((r) => r.json())
-      .then((json) => setLoans(json.loans || []));
-  }, []);
+  const { loans } = useDashboard();
 
   if (loans.length === 0) {
     return (

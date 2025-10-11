@@ -14,16 +14,17 @@ export default async function handler(req, res) {
   switch (req.method) {
     case "GET":
       try {
-        const { todayDate } = req.query;
-        if (!todayDate) {
-          return res.status(400).json({ message: "Missing todayDate parameter" });
+
+        const { startDate, endDate } = req.query;
+
+        if (!startDate || !endDate) {
+          return res.status(400).json({ message: "Missing start and end date parameters" });
         }
-        const now = new Date(todayDate);
 
         const count = await Budget.countDocuments({
           userId,
-          startDate: { $lte: now },
-          endDate: { $gte: now },
+          startDate: { $gte: new Date(startDate) },
+          endDate: { $lte: new Date(endDate) },
         });
 
         res.status(200).json({ count });

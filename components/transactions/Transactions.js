@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Table,
   Input,
@@ -17,126 +17,34 @@ import EditTransactionModal from "./EditTransactionModal";
 import DeleteTransactionModal from "./DeleteTransacationModal";
 import dayjs from "dayjs";
 import rangePresets from "@/utils/rangePresets";
-import useDebounce from "@/hooks/useDebounce";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { useTransactions } from "@/context/TransactionContext";
 
 const { RangePicker } = DatePicker;
 
 const { Search } = Input;
 
 export default function Transactions() {
-  const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
-  const [filters, setFilters] = useState({
-    search: "",
-    minAmount: "",
-    maxAmount: "",
-    sortBy: "date",
-    sortOrder: "desc",
-    startDate: dayjs().startOf("month").toISOString(),
-    endDate: dayjs().endOf("month").toISOString(),
-    type: "",
-    accountId: [], // array of selected account IDs
-  });
+  const {
+    transactions,
+    loading,
+    pagination,
+    setPagination,
+    filters,
+    setFilters,
+    searchInput,
+    setSearchInput,
+    accountOptions,
+    insights,
+    fetchTransactions,
+    fetchInsights,
+  } = useTransactions();
+
   const [modalVisible, setModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [deleteTransaction, setDeleteTransaction] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [searchInput, setSearchInput] = useState("");
-  const debouncedSearch = useDebounce(searchInput, 500);
-  const debouncedMinAmount = useDebounce(filters.minAmount, 500);
-  const debouncedMaxAmount = useDebounce(filters.maxAmount, 500);
-  const [accountOptions, setAccountOptions] = useState([]);
-  const [insights, setInsights] = useState({
-    totalExpense: 0,
-    expenseByAccounts: [],
-    topCategories: [],
-  });
-
-  const fetchInsights = async () => {
-    try {
-      const query = new URLSearchParams({
-        startDate: filters.startDate,
-        endDate: filters.endDate,
-        ...(filters.accountId.length && {
-          accountId: filters.accountId.join(","),
-        }),
-      }).toString();
-
-      const res = await fetch(`/api/transactions/insights?${query}`);
-      const data = await res.json();
-      setInsights(data);
-    } catch (err) {
-      console.error("Failed to load insights", err);
-    }
-  };
-
-  useEffect(() => {
-    const fetchAccounts = async () => {
-      try {
-        const res = await fetch("/api/accounts/account"); // adjust endpoint if needed
-        const data = await res.json();
-        setAccountOptions(data.accounts || []);
-      } catch (err) {
-        message.error("Failed to load accounts");
-      }
-    };
-    fetchAccounts();
-  }, []);
-
-  // Fetch Transactions
-  const fetchTransactions = async (params = {}) => {
-    setLoading(true);
-    try {
-      const query = new URLSearchParams({
-        page: params.current || pagination.current,
-        limit: params.pageSize || pagination.pageSize,
-        search: debouncedSearch,
-        minAmount: debouncedMinAmount || "",
-        maxAmount: debouncedMaxAmount || "",
-        sortBy: filters.sortBy,
-        sortOrder: filters.sortOrder,
-        startDate: filters.startDate,
-        endDate: filters.endDate,
-        type: filters.type || "",
-        ...(filters.accountId.length && {
-          accountId: filters.accountId.join(","),
-        }),
-      }).toString();
-
-      const res = await fetch(`/api/transactions/transaction?${query}`);
-      const data = await res.json();
-
-      setTransactions(data.transactions);
-      setPagination((prev) => ({ ...prev, total: data.pagination.totalItems }));
-    } catch (error) {
-      message.error("Failed to fetch transactions");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle Table Change (Sorting & Pagination)
-  const handleTableChange = (pagination, filters, sorter) => {
-    // console.log(filters);
-    setPagination({
-      current: pagination.current,
-      pageSize: pagination.pageSize,
-    });
-    setFilters((prev) => ({
-      ...prev,
-      sortBy: sorter.field || "date",
-      sortOrder: sorter.order === "ascend" ? "asc" : "desc",
-      type: filters.type?.[0] || "", // 👈 enforce single value
-    }));
-  };
-
-  // Handle Search & Filters
-  const handleFilterChange = (field, value) => {
-    setFilters((prev) => ({ ...prev, [field]: value }));
-  };
 
   // Handle Delete Transaction
   const handleDelete = async () => {
@@ -144,9 +52,7 @@ export default function Transactions() {
     try {
       const res = await fetch(
         `/api/transactions/transaction?id=${deleteTransaction._id}`,
-        {
-          method: "DELETE",
-        }
+        { method: "DELETE" }
       );
       if (!res.ok) throw new Error("Failed to delete transaction");
 
@@ -161,27 +67,19 @@ export default function Transactions() {
     }
   };
 
-  useEffect(() => {
-    fetchTransactions();
-    fetchInsights();
-  }, [
-    pagination.current,
-    pagination.pageSize,
-    filters.sortBy,
-    filters.sortOrder,
-    filters.startDate,
-    filters.endDate,
-    debouncedSearch,
-    debouncedMinAmount,
-    debouncedMaxAmount,
-    filters.type,
-    filters.accountId
-  ]);
-
-  useEffect(() => {
-    setFilters((prev) => ({ ...prev, search: debouncedSearch }));
-    setPagination((prev) => ({ ...prev, current: 1 })); // reset to page 1
-  }, [debouncedSearch]);
+  // Handle Table Change (Sorting & Pagination)
+  const handleTableChange = (pagination, filtersTable, sorter) => {
+    setPagination({
+      current: pagination.current,
+      pageSize: pagination.pageSize,
+    });
+    setFilters((prev) => ({
+      ...prev,
+      sortBy: sorter.field || "date",
+      sortOrder: sorter.order === "ascend" ? "asc" : "desc",
+      type: filtersTable.type?.[0] || "",
+    }));
+  };
 
   return (
     <>

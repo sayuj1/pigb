@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React from "react";
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -18,32 +18,19 @@ import {
 import dayjs from "dayjs";
 import { formatIndiaCurrencyWithSuffix } from "@/utils/formatCurrency";
 import { LuChartLine } from "react-icons/lu";
+import { useDashboard } from "@/context/DashboardContext";
 
 
 
 const { Title, Text } = Typography;
 
 export default function ExpensesIncomeChart() {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  const query = new URLSearchParams({
-    startDate: dayjs().subtract(11, "month").startOf("month").toISOString(),
-    endDate: dayjs().endOf("month").toISOString(),
-  }).toString();
-
-  useEffect(() => {
-    fetch(`/api/dashboard/expenses-income-trend?${query}`)
-      .then((r) => r.json())
-      .then((json) => {
-        setData(json.monthly || []);
-        setLoading(false);
-      });
-  }, []);
+  const { incomeExpenseData: data, incomeExpenseLoading } = useDashboard();
 
   const dynamicDx = getDynamicDx(data, "income");
   const dynamicDxRight = getSecondaryDynamicDx(data, "expense");
-  // console.log("dx ", dynamicDx, dynamicDxRight);
+
 
   return (
     <Card
@@ -55,7 +42,7 @@ export default function ExpensesIncomeChart() {
       className="shadow-md"
       bodyStyle={{ padding: "1rem" }}
     >
-      {loading ? (
+      {incomeExpenseLoading ? (
         <div className="h-[300px] flex items-center justify-center">
           <Text type="secondary">Loading...</Text>
         </div>

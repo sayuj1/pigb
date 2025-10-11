@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React from "react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -14,6 +14,7 @@ import { Divider } from "antd";
 import { PiChartBarDuotone } from "react-icons/pi";
 import { formatCurrency, formatIndiaCurrencyWithSuffix } from "@/utils/formatCurrency";
 import SavingsPieChart from "./SavingsPieChart";
+import { useDashboard } from "@/context/DashboardContext";
 
 const COLORS = [
   "#818cf8", // Indigo-400
@@ -29,17 +30,8 @@ const COLORS = [
 ];
 
 export default function SavingsAccountsDistributionChart() {
-  const [savings, setSavings] = useState([]);
-  const [savingsPie, setSavingsPie] = useState([]);
 
-  useEffect(() => {
-    fetch("/api/dashboard/savings-trend")
-      .then((r) => r.json())
-      .then(({ savings, summary }) => {
-        setSavings(savings || []);
-        setSavingsPie(summary?.savingsByType || []);
-      });
-  }, []);
+  const { savings, savingsPie } = useDashboard();
 
   if (!savings.length) {
     return (
