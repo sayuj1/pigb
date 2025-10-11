@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Divider, Layout, Menu, theme } from "antd";
 import {
   DashboardOutlined,
@@ -19,6 +19,8 @@ import Image from "next/image";
 import BetaTag from "./resuable/BetaTag";
 import FloatingAddButton from "./FloatingAddButton";
 import AddTransactionModal from "./transactions/AddTransactionModal";
+import { useDashboard } from "@/context/DashboardContext";
+import { useTransactions } from "@/context/TransactionContext";
 
 const { Sider, Content } = Layout;
 
@@ -47,36 +49,20 @@ const menuItems = [
 export default function SidebarLayout({ children }) {
   const [collapsed, setCollapsed] = useState(false);
   const router = useRouter();
+  const dashboard = useDashboard();
+  const transactions = useTransactions();
   const { isDarkMode } = useTheme();
   const { token } = theme.useToken();
 
   const [modalVisible, setModalVisible] = useState(false);
 
-  const [dashboardApi, setDashboardApi] = useState(null);
-  const [transactionApi, setTransactionApi] = useState(null);
-
-  useEffect(() => {
+  const handleAddTransaction = async () => {
     if (router.pathname === "/dashboard") {
-      import("@/context/DashboardContext").then((mod) => {
-        const { useDashboard } = mod;
-        setDashboardApi(useDashboard);
-      });
+      await dashboard?.fetchAllDashboardData();
     } else if (router.pathname === "/income-expense") {
-      import("@/context/TransactionContext").then((mod) => {
-        const { useTransactions } = mod;
-        setTransactionApi(useTransactions);
-      });
-    }
-  }, [router.pathname]);
-
-  const handleAddTransaction = () => {
-    if (router.pathname === "/dashboard" && dashboardApi) {
-      dashboardApi.fetchAllDashboardData();
-    } else if (router.pathname === "/income-expense" && transactionApi) {
-      console.log("modt ", transactionApi)
-      Promise.all([
-        transactionApi.fetchTransactions(),
-        transactionApi.fetchInsights(),
+      await Promise.all([
+        transactions?.fetchTransactions(),
+        transactions?.fetchInsights(),
       ]);
     }
   };
