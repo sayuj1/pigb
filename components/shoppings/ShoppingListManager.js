@@ -250,9 +250,8 @@ const ShoppingListManager = () => {
           {shoppingLists.map((list) => (
             <Col xs={24} md={12} key={list._id}>
               <Card
-                title={`${capitalizeWords(list.name)} - ₹${
-                  list.totalCost || 0
-                }`}
+                title={`${capitalizeWords(list.name)} - ₹${list.totalCost || 0
+                  }`}
                 extra={
                   <Space>
                     <Button
@@ -402,10 +401,7 @@ const ShoppingListManager = () => {
       <AddTransactionModal
         visible={addTransactionModalVisible}
         onClose={() => setAddTransactionModalVisible(false)}
-        onAddTransaction={() => {
-          // Optional: Refresh data or trigger effect
-          setAddTransactionModalVisible(false);
-        }}
+        onAddTransaction={() => { }}
         initialValues={prefilledTransaction}
       />
     </div>
