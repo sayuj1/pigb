@@ -7,6 +7,7 @@ import {
   recalculateAccountBalance,
 } from "@/utils/backend/accountUtils";
 import { getTransactionsByAccountId } from "@/services/transactionService";
+import { invalidateCache } from "@/lib/cache";
 
 export const getAccountById = async (id, userId) => {
   const account = await accountRepository.findByIdAndUser(id, userId);
@@ -40,6 +41,12 @@ export const createAccount = async (userId, data) => {
   validateAccountData(data?.type, data);
   await checkAccountExists(userId, data.name);
 
+  await invalidateCache({
+    model: "account",
+    action: "onCreate",
+    data: { userId },
+  });
+
   const payload = formatAccountPayload(userId, data);
   const account = await accountRepository.create(payload);
 
@@ -49,6 +56,12 @@ export const createAccount = async (userId, data) => {
 export const deleteAccountById = async (id, userId) => {
   await getAccountById(id, userId);
   await accountRepository.deleteByIdAndUser(id, userId);
+
+  await invalidateCache({
+    model: "account",
+    action: "onDelete",
+    data: { userId },
+  });
   return { message: "Account deleted successfully." };
 };
 
@@ -74,6 +87,12 @@ export const updateAccount = async (id, userId, updates) => {
   }
 
   await accountRepository.save(account);
+
+  await invalidateCache({
+    model: "account",
+    action: "onUpdate",
+    data: { userId },
+  });
 
   return account;
 };
