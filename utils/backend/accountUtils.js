@@ -54,7 +54,7 @@ export const recalculateAccountBalance = (
  *
  * @returns {Promise<void>}
  */
-export const updateAccountBalance = async (transaction) => {
+export const updateAccountBalance = async (transaction, operation) => {
   try {
     const account = await accountRepository.findById(transaction.accountId);
     if (!account) {
@@ -64,12 +64,19 @@ export const updateAccountBalance = async (transaction) => {
 
     const { type, amount } = transaction;
 
-    if (type === "income") {
-      account.balance += amount;
-    } else if (type === "expense") {
-      account.balance -= amount;
+    if (operation === "addTransaction") {
+      if (type === "income") {
+        account.balance += amount;
+      } else if (type === "expense") {
+        account.balance -= amount;
+      }
+    } else if (operation === "deleteTransaction") {
+      if (type === "income") {
+        account.balance -= amount;
+      } else if (type === "expense") {
+        account.balance += amount;
+      }
     }
-
 
     await accountRepository.save(account);
   } catch (error) {

@@ -1,4 +1,5 @@
 import { updateAccountBalance } from "@/utils/backend/accountUtils";
+import { addExpenseToBudget, removeExpenseFromBudget } from "@/utils/backend/budgetUtils";
 import mongoose from "mongoose";
 
 const TransactionSchema = new mongoose.Schema({
@@ -18,39 +19,28 @@ const TransactionSchema = new mongoose.Schema({
 
 // Middleware to update account balance when a transaction is created
 TransactionSchema.post("save", async function (doc) {
-  await updateAccountBalance(doc);
+  await updateAccountBalance(doc, "addTransaction");
+  if (doc.type === "expense") {
+    await addExpenseToBudget(
+      doc.userId,
+      doc.category,
+      doc.date,
+      doc.amount,
+      doc._id,
+      doc.description
+    );
+  }
 });
 
 TransactionSchema.post("findOneAndDelete", async function (doc) {
   if (!doc) return;
 
   try {
-    // Lazy get Account model by name to avoid circular import
-    const Account = mongoose.model("Account");
-    const Budget = mongoose.model("Budget");
-
-    const account = await Account.findById(doc.accountId);
-    if (!account) return;
-
+    await updateAccountBalance(doc, "deleteTransaction");
     if (doc.type === "expense") {
-      await Budget.removeExpense(doc._id);
+      await removeExpenseFromBudget(doc._id);
     }
 
-    if (account.type === "credit card") {
-      if (doc.type === "expense") {
-        account.creditUsed -= doc.amount;
-      } else if (doc.type === "income") {
-        account.creditUsed = Math.max(0, account.creditUsed - doc.amount);
-      }
-    } else {
-      if (doc.type === "income") {
-        account.balance -= doc.amount;
-      } else if (doc.type === "expense") {
-        account.balance += doc.amount;
-      }
-    }
-
-    await account.save();
   } catch (error) {
     console.error("Error updating balance on transaction delete:", error);
   }
