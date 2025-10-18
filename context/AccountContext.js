@@ -1,14 +1,20 @@
 // AccountContext.js
 import { createContext, useContext, useState, useEffect } from "react";
+import AuthContext from "./AuthContext";
+
 
 const AccountContext = createContext();
 
 export const AccountProvider = ({ children }) => {
+    const { user } = useContext(AuthContext);
+
     const [accounts, setAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const fetchAccounts = async () => {
+        if (!user) return;
+
         setLoading(true);
         setError(null);
 
