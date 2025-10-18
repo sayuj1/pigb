@@ -24,7 +24,7 @@ export default async function handler(req, res) {
           userId,
           startDate: { $gte: new Date(startDate) },
           endDate: { $lte: new Date(endDate) },
-        }).select("budgetName spentAmount limitAmount");
+        }).select("budgetName spentAmount limitAmount startDate endDate category");
 
         res.status(200).json({
           budgets: budgets.map((b) => ({
@@ -32,6 +32,10 @@ export default async function handler(req, res) {
             name: b.budgetName || b.category,
             spent: b.spentAmount,
             limit: b.limitAmount,
+            startDate: b.startDate,
+            endDate: b.endDate,
+            category: b.category
+
           })),
         });
       } catch (error) {

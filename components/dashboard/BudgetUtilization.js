@@ -1,9 +1,10 @@
 import React from "react";
-import { Progress, Tooltip, Typography, Skeleton } from "antd";
-import { PieChartOutlined } from "@ant-design/icons";
+import { Progress, Tooltip, Typography } from "antd";
+import { PieChartOutlined, CalendarOutlined } from "@ant-design/icons";
 import { PiWalletLight } from "react-icons/pi";
 import { useDashboard } from "@/context/DashboardContext";
 import BudgetSkeleton from "../resuable/skeletons/BudgetSkeleton";
+import dayjs from "dayjs";
 
 export default function BudgetUtilization() {
   const { budgets, currentMonth, budgetsLoading } = useDashboard();
@@ -14,19 +15,15 @@ export default function BudgetUtilization() {
     return "#ff4d4f"; // red
   };
 
-
   return (
     <div className="bg-white rounded-lg shadow p-6 mt-6 mx-auto w-[100%]">
-      {/*  Header */}
+      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2 mb-0">
             <PiWalletLight className="text-xl text-green-500" /> Budget Utilization
             {budgets.length > 0 && !budgetsLoading && (
-              <span className="inline-flex items-center gap-1 px-2 py-[2px] bg-green-100 text-green-700 text-xs font-semibold rounded-full">
-                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                Active
-              </span>
+              <> ({currentMonth})</>
             )}
           </h2>
         </div>
@@ -36,11 +33,11 @@ export default function BudgetUtilization() {
         </Typography.Text>
       </div>
 
-      {/*  Loader */}
+      {/* Loader */}
       {budgetsLoading ? (
         <BudgetSkeleton />
       ) : budgets.length === 0 ? (
-        //  Empty State
+        // Empty State
         <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500 space-y-3">
           <div className="text-5xl text-green-400">
             <PiWalletLight className="text-5xl text-green-400" />
@@ -53,7 +50,7 @@ export default function BudgetUtilization() {
           </Typography.Text>
         </div>
       ) : (
-        //  Loaded Data
+        // Loaded Data
         <div className="space-y-6">
           {budgets.map((b) => {
             const percent = Math.min(100, Math.round((b.spent / b.limit) * 100));
@@ -67,9 +64,31 @@ export default function BudgetUtilization() {
                 </Tooltip>
 
                 <div className="flex-1">
+                  {/* Budget name */}
                   <p className="text-md font-medium text-gray-900 mb-1">
                     {b.name}
                   </p>
+
+                  {/* Category + Date Range */}
+                  <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500 mb-2">
+                    {b.category && (
+                      <span className="flex items-center gap-1">
+
+                        <span className="capitalize">{b.category}</span>
+                      </span>
+                    )}
+                    {(b.startDate || b.endDate) && (
+                      <span className="flex items-center gap-1">
+                        <CalendarOutlined className="text-gray-400" />
+                        <span>
+                          {dayjs(b.startDate).format("DD MMM")} -{" "}
+                          {dayjs(b.endDate).format("DD MMM YYYY")}
+                        </span>
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Progress Bar */}
                   <Progress
                     percent={percent}
                     strokeColor={getStrokeColor(percent)}
@@ -77,6 +96,8 @@ export default function BudgetUtilization() {
                     showInfo={false}
                     strokeLinecap="round"
                   />
+
+                  {/* Spend Summary */}
                   <p className="text-xs text-gray-500 mt-1">
                     ₹{b.spent.toLocaleString()} / ₹{b.limit.toLocaleString()} (
                     {percent}%)
