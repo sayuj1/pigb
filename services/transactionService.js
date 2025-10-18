@@ -1,11 +1,10 @@
 import { createTransaction, findTransactionByAccountId } from "@/repositories/TransactionRepository";
 import { addExpenseToBudget } from "@/repositories/BudgetRepository";
 import { invalidateCache } from "@/lib/cache";
-import { CreateTransactionSchema } from "@/validations/transaction.schema";
-import { validateSchema } from "@/validations/validate";
+import { validateCreateTransaction } from "@/validations/transactionValidations";
 
 export const handleCreateTransaction = async (userId, data) => {
-  const validatedData = validateSchema(CreateTransactionSchema, data);
+  const validatedData = validateCreateTransaction(data);
 
   const transaction = await createTransaction({
     userId,
