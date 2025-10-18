@@ -17,20 +17,6 @@ const TransactionSchema = new mongoose.Schema({
   source: { type: String, default: null },
 });
 
-// Middleware to update account balance when a transaction is created
-TransactionSchema.post("save", async function (doc) {
-  await updateAccountBalance(doc, "addTransaction");
-  if (doc.type === "expense") {
-    await addExpenseToBudget(
-      doc.userId,
-      doc.category,
-      doc.date,
-      doc.amount,
-      doc._id,
-      doc.description
-    );
-  }
-});
 
 TransactionSchema.post("findOneAndDelete", async function (doc) {
   if (!doc) return;
