@@ -7,6 +7,7 @@ import {
 } from "@ant-design/icons";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useDashboard } from "@/context/DashboardContext";
+import SummaryCardSkeleton from "../resuable/skeletons/SummaryCardSkeleton";
 
 // Card styling
 const cardStyles = {
@@ -48,13 +49,18 @@ const cardData = (stats, month) => [
 ];
 
 export default function SummaryCards() {
-  const { stats, currentMonth } = useDashboard();
+  const { stats, currentMonth, statsLoading } = useDashboard();
+
+  if (statsLoading) return <SummaryCardSkeleton />; // show skeleton while loading
 
   return (
     <Row gutter={[16, 16]}>
       {cardData(stats, currentMonth).map((card) => (
         <Col xs={24} sm={12} lg={6} key={card.label}>
-          <Card style={{ ...cardStyles, background: card.bg }} bodyStyle={{ padding: 20 }}>
+          <Card
+            style={{ ...cardStyles, background: card.bg }}
+            bodyStyle={{ padding: 20 }}
+          >
             <div className="flex justify-between items-center">
               <div>
                 <div className="text-white text-sm">{card.label}</div>
