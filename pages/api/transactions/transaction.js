@@ -4,7 +4,7 @@ import Account from "@/models/AccountSchema";
 import Budget from "@/models/BudgetSchema";
 import { authenticate } from "@/utils/backend/authMiddleware";
 import { delCache, delAllWithPrefix } from "@/lib/useCache";
-import { handleCreateTransaction } from "@/services/transactionService";
+import { handleCreateTransaction, handleDeleteTransaction } from "@/services/transactionService";
 import { handleApiError } from "@/lib/errors";
 
 export default async function handler(req, res) {
@@ -268,45 +268,16 @@ export default async function handler(req, res) {
       }
       break;
 
-    // ✅ Delete Transaction
+    // Delete Transaction
     case "DELETE":
       try {
-        const { id } = req.query;
+        const resp = await handleDeleteTransaction(userId, req.query?.id);
+        res.status(200).json(resp);
 
-        if (!id) {
-          return res
-            .status(400)
-            .json({ message: "Transaction ID is required" });
-        }
-
-        // Use findOneAndDelete instead of remove
-        const deletedTransaction = await Transaction.findOneAndDelete({
-          _id: id,
-          userId,
-        });
-
-        if (!deletedTransaction) {
-          return res.status(404).json({ message: "Transaction not found" });
-        }
-
-        // invalidate cache 
-        await delCache({ key: userId, prefix: "accounts" });
-        await delCache({
-          key: userId,
-          prefix: "total-expense",
-        });
-        await delCache({
-          key: userId,
-          prefix: "total-balance",
-        });
-        await delAllWithPrefix("expenses-income-trend");
-        await delAllWithPrefix("category-spend");
-        res.status(200).json({ message: "Transaction deleted successfully" });
       } catch (error) {
         console.error("Error deleting transaction:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+        handleApiError(res, error, "Failed to delete transaction");
       }
-      break;
 
     default:
       res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);

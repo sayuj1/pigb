@@ -18,19 +18,6 @@ const TransactionSchema = new mongoose.Schema({
 });
 
 
-TransactionSchema.post("findOneAndDelete", async function (doc) {
-  if (!doc) return;
-
-  try {
-    await updateAccountBalance(doc, "deleteTransaction");
-    if (doc.type === "expense") {
-      await removeExpenseFromBudget(doc._id);
-    }
-
-  } catch (error) {
-    console.error("Error updating balance on transaction delete:", error);
-  }
-});
 
 const Transaction =
   mongoose.models.Transaction ||
