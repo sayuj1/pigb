@@ -11,6 +11,8 @@ import {
   CartesianGrid,
   LabelList,
 } from "recharts";
+import ChartSkeleton from '@/components/resuable/skeletons/ChartSkeleton'
+
 
 const COLORS = ["#22c55e", "#ef4444"]; // emerald: Paid, red: Remaining
 
@@ -50,9 +52,11 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 export default function LoanRepaymentChart() {
 
-  const { loans } = useDashboard();
+  const { loans, loansLoading } = useDashboard();
 
-  if (loans.length === 0) {
+  if (loansLoading) return <ChartSkeleton />;
+
+  if (!loans || loans.length === 0) {
     return (
       <div className="bg-white rounded-2xl shadow-md p-10 border border-gray-100">
         <h2 className="text-xl font-semibold text-gray-800 mb-2">

@@ -6,32 +6,27 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  CartesianGrid,
   Legend,
-
 } from "recharts";
 import { Divider } from "antd";
 import { PiChartBarDuotone } from "react-icons/pi";
 import { formatCurrency, formatIndiaCurrencyWithSuffix } from "@/utils/formatCurrency";
 import SavingsPieChart from "./SavingsPieChart";
 import { useDashboard } from "@/context/DashboardContext";
+import ChartSkeleton from '@/components/resuable/skeletons/ChartSkeleton'
 
 const COLORS = [
-  "#818cf8", // Indigo-400
-  "#34d399", // Emerald-400
-  "#fbbf24", // Amber-400
-  "#c084fc", // Purple-400
-  "#fb7185", // Rose-400
-  "#60a5fa", // Blue-400
-  "#4ade80", // Green-400
-  "#38bdf8", // Sky-400
-  "#a78bfa", // Violet-400
-  "#f87171", // Red-400
+  "#818cf8", "#34d399", "#fbbf24", "#c084fc", "#fb7185",
+  "#60a5fa", "#4ade80", "#38bdf8", "#a78bfa", "#f87171",
 ];
 
 export default function SavingsAccountsDistributionChart() {
+  const { savings, savingsPie, savingsLoading } = useDashboard();
 
-  const { savings, savingsPie } = useDashboard();
+  if (savingsLoading) {
+    //  Show reusable chart skeleton
+    return <ChartSkeleton title bars={4} pie />;
+  }
 
   if (!savings.length) {
     return (
@@ -55,7 +50,7 @@ export default function SavingsAccountsDistributionChart() {
 
   const chartData = savings.map((item, i) => ({
     name: item.accountName,
-    "Balance": item.runningBalance,
+    Balance: item.runningBalance,
     fill: COLORS[i % COLORS.length],
     type: item.savingsType,
   }));
@@ -65,9 +60,10 @@ export default function SavingsAccountsDistributionChart() {
     const { name, Balance, type } = payload[0].payload;
     return (
       <div className="bg-white p-3 border border-gray-300 rounded shadow text-sm">
-        <p className="font-medium">{name} (<b className="text-green-500">{formatCurrency(Balance)}</b>)</p>
-        <p>{type} </p>
-        <p></p>
+        <p className="font-medium">
+          {name} (<b className="text-green-500">{formatCurrency(Balance)}</b>)
+        </p>
+        <p>{type}</p>
       </div>
     );
   };
@@ -78,7 +74,12 @@ export default function SavingsAccountsDistributionChart() {
         <PiChartBarDuotone className="text-xl text-sky-500" />
         Savings Account Distribution
       </h2>
-      <ResponsiveContainer width="100%" height={50 + 50 * savings.length} className="p-1">
+
+      <ResponsiveContainer
+        width="100%"
+        height={50 + 50 * savings.length}
+        className="p-1"
+      >
         <BarChart
           layout="vertical"
           data={chartData}
@@ -102,19 +103,17 @@ export default function SavingsAccountsDistributionChart() {
             fill="#3b82f6"
             barSize={30}
             radius={[0, 4, 4, 0]}
-            label={{ position: "right", formatter: (v) => `${formatIndiaCurrencyWithSuffix(v)}` }}
+            label={{
+              position: "right",
+              formatter: (v) => `${formatIndiaCurrencyWithSuffix(v)}`,
+            }}
           />
         </BarChart>
       </ResponsiveContainer>
 
-      {/* <Divider variant="dashed" className="border-gray-50 border-1" dashed /> */}
-
-      <Divider
-        variant="solid"
-      />
+      <Divider variant="solid" />
 
       <SavingsPieChart savingsByType={savingsPie} />
-
-    </div >
+    </div>
   );
 }

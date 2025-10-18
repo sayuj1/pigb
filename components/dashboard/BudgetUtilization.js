@@ -1,25 +1,28 @@
 import React from "react";
-import { Progress, Tooltip, Typography } from "antd";
+import { Progress, Tooltip, Typography, Skeleton } from "antd";
 import { PieChartOutlined } from "@ant-design/icons";
 import { PiWalletLight } from "react-icons/pi";
 import { useDashboard } from "@/context/DashboardContext";
+import BudgetSkeleton from "../resuable/skeletons/BudgetSkeleton";
 
 export default function BudgetUtilization() {
-  const { budgets, currentMonth } = useDashboard();
+  const { budgets, currentMonth, budgetsLoading } = useDashboard();
 
   const getStrokeColor = (percent) => {
-    if (percent < 70) return "#faad14"; // green
-    if (percent < 90) return "#52c41a"; // orange
+    if (percent < 70) return "#52c41a"; // green
+    if (percent < 90) return "#faad14"; // orange
     return "#ff4d4f"; // red
   };
 
+
   return (
-    <div className="bg-white rounded-lg shadow p-6 mt-6  mx-auto w-[100%]">
+    <div className="bg-white rounded-lg shadow p-6 mt-6 mx-auto w-[100%]">
+      {/*  Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2 mb-0">
             <PiWalletLight className="text-xl text-green-500" /> Budget Utilization
-            {budgets.length > 0 && (
+            {budgets.length > 0 && !budgetsLoading && (
               <span className="inline-flex items-center gap-1 px-2 py-[2px] bg-green-100 text-green-700 text-xs font-semibold rounded-full">
                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                 Active
@@ -33,7 +36,11 @@ export default function BudgetUtilization() {
         </Typography.Text>
       </div>
 
-      {budgets.length === 0 && (
+      {/*  Loader */}
+      {budgetsLoading ? (
+        <BudgetSkeleton />
+      ) : budgets.length === 0 ? (
+        //  Empty State
         <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500 space-y-3">
           <div className="text-5xl text-green-400">
             <PiWalletLight className="text-5xl text-green-400" />
@@ -45,39 +52,41 @@ export default function BudgetUtilization() {
             Start by creating a new budget to track your expenses.
           </Typography.Text>
         </div>
-      )}
-      <div className="space-y-6">
-        {budgets.map((b) => {
-          const percent = Math.min(100, Math.round((b.spent / b.limit) * 100));
-          return (
-            <div
-              key={b.id}
-              className="flex items-center gap-4 p-3 rounded-md hover:bg-gray-50 transition"
-            >
-              <Tooltip title="Budget">
-                <PieChartOutlined className="text-blue-500 text-2xl flex-shrink-0" />
-              </Tooltip>
+      ) : (
+        //  Loaded Data
+        <div className="space-y-6">
+          {budgets.map((b) => {
+            const percent = Math.min(100, Math.round((b.spent / b.limit) * 100));
+            return (
+              <div
+                key={b.id}
+                className="flex items-center gap-4 p-3 rounded-md hover:bg-gray-50 transition"
+              >
+                <Tooltip title="Budget">
+                  <PieChartOutlined className="text-blue-500 text-2xl flex-shrink-0" />
+                </Tooltip>
 
-              <div className="flex-1">
-                <p className="text-md font-medium text-gray-900 mb-1">
-                  {b.name}
-                </p>
-                <Progress
-                  percent={percent}
-                  strokeColor={getStrokeColor(percent)}
-                  strokeWidth={12}
-                  showInfo={false}
-                  strokeLinecap="round"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  ₹{b.spent.toLocaleString()} / ₹{b.limit.toLocaleString()} (
-                  {percent}%)
-                </p>
+                <div className="flex-1">
+                  <p className="text-md font-medium text-gray-900 mb-1">
+                    {b.name}
+                  </p>
+                  <Progress
+                    percent={percent}
+                    strokeColor={getStrokeColor(percent)}
+                    strokeWidth={12}
+                    showInfo={false}
+                    strokeLinecap="round"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    ₹{b.spent.toLocaleString()} / ₹{b.limit.toLocaleString()} (
+                    {percent}%)
+                  </p>
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

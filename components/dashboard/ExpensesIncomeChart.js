@@ -11,44 +11,44 @@ import {
   CartesianGrid,
 } from "recharts";
 import { Card, Typography } from "antd";
+import { LuChartLine } from "react-icons/lu";
 import {
   getDynamicDx,
   getSecondaryDynamicDx,
 } from "../../utils/chartUtils";
-import dayjs from "dayjs";
 import { formatIndiaCurrencyWithSuffix } from "@/utils/formatCurrency";
-import { LuChartLine } from "react-icons/lu";
 import { useDashboard } from "@/context/DashboardContext";
-
-
+import ChartSkeleton from '@/components/resuable/skeletons/ChartSkeleton'
 
 const { Title, Text } = Typography;
 
 export default function ExpensesIncomeChart() {
-
   const { incomeExpenseData: data, incomeExpenseLoading } = useDashboard();
 
   const dynamicDx = getDynamicDx(data, "income");
   const dynamicDxRight = getSecondaryDynamicDx(data, "expense");
 
-
   return (
     <Card
-      title={<Title level={5} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-        <LuChartLine className="text-xl text-blue-400" />
-        Monthly Expenses vs Income
-      </Title>}
+      title={
+        <Title
+          level={5}
+          style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
+        >
+          <LuChartLine className="text-xl text-blue-400" />
+          Monthly Expenses vs Income
+        </Title>
+      }
       extra={<Text type="secondary">Last 12 Months</Text>}
       className="shadow-md"
       bodyStyle={{ padding: "1rem" }}
     >
       {incomeExpenseLoading ? (
-        <div className="h-[300px] flex items-center justify-center">
-          <Text type="secondary">Loading...</Text>
-        </div>
+        // Skeleton while loading
+        <ChartSkeleton title={false} />
       ) : data.length === 0 ? (
+        // Empty state
         <div className="flex flex-col items-center justify-center h-full text-center py-10">
-          {/* <LineChartOutlined className="text-5xl text-blue-400 mb-4" /> */}
           <LuChartLine className="text-5xl text-blue-400 mb-4" />
           <Text type="secondary" strong>
             Not enough data to display the chart
@@ -58,6 +58,7 @@ export default function ExpensesIncomeChart() {
           </div>
         </div>
       ) : (
+        //  Chart when data available
         <ResponsiveContainer width="100%" height={320} className="p-1">
           <ComposedChart
             data={data}
@@ -76,18 +77,6 @@ export default function ExpensesIncomeChart() {
                 style: { textAnchor: "middle" },
               }}
             />
-            {/* <YAxis
-            yAxisId="right"
-            orientation="right"
-            tickFormatter={(v) => `₹${formatYAxis(v)}`}
-            label={{
-              value: "Expense",
-              angle: 90,
-              position: "outsideRight",
-              dx: dynamicDxRight,
-              style: { textAnchor: "middle" },
-            }}
-          /> */}
             <Tooltip formatter={(v) => `₹${v.toLocaleString()}`} />
             <Legend />
             <Bar

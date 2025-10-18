@@ -9,12 +9,12 @@ import {
   Cell,
   Legend,
 } from "recharts";
-import { Card, Typography } from "antd";
-import { format } from "date-fns";
+import { Card, Typography, Skeleton } from "antd";
 import { PiChartBarLight } from "react-icons/pi";
-import dayjs from "dayjs";
 import { formatIndiaCurrencyWithSuffix } from "@/utils/formatCurrency";
 import { useDashboard } from "@/context/DashboardContext";
+import ChartSkeleton from '@/components/resuable/skeletons/ChartSkeleton'
+
 
 const COLORS = [
   "#8884d8",
@@ -29,8 +29,7 @@ const COLORS = [
 ];
 
 export default function CategorySpendingBarChart() {
-
-  const { categoryChartData: data, currentMonth } = useDashboard()
+  const { categoryChartData: data, currentMonth, categoryLoading } = useDashboard();
 
   return (
     <Card
@@ -46,7 +45,11 @@ export default function CategorySpendingBarChart() {
       className="shadow-md"
       style={{ marginTop: 24, minHeight: 350 }}
     >
-      {data.length === 0 ? (
+      {/*  Loader State */}
+      {categoryLoading ? (
+        <ChartSkeleton title={false} />
+      ) : data.length === 0 ? (
+        //  Empty State
         <div className="flex flex-col justify-center items-center h-[300px] text-gray-500 text-center space-y-3">
           <div className="text-5xl text-blue-400">
             <PiChartBarLight />
@@ -59,13 +62,16 @@ export default function CategorySpendingBarChart() {
           </Typography.Text>
         </div>
       ) : (
+        //  Chart
         <ResponsiveContainer width="100%" height={350} className="p-1">
           <BarChart
             data={data}
             layout="vertical"
             margin={{ top: 20, right: 20, left: 40, bottom: 10 }}
           >
-            <XAxis type="number" tickFormatter={(v) => `${formatIndiaCurrencyWithSuffix(v)}`}
+            <XAxis
+              type="number"
+              tickFormatter={(v) => `${formatIndiaCurrencyWithSuffix(v)}`}
             />
             <YAxis dataKey="category" type="category" width={120} />
             <Tooltip formatter={(v) => `₹${v}`} />
@@ -86,7 +92,7 @@ export default function CategorySpendingBarChart() {
                     style={{
                       width: 12,
                       height: 12,
-                      backgroundColor: "#e9505dff", // Match your bar color
+                      backgroundColor: "#e9505dff",
                       borderRadius: 2,
                     }}
                   ></div>
@@ -94,7 +100,6 @@ export default function CategorySpendingBarChart() {
                 </div>
               )}
             />
-
             <Bar dataKey="amount" fill="#1890ff">
               {data.map((entry, index) => (
                 <Cell key={index} fill={COLORS[index % COLORS.length]} />
