@@ -10,7 +10,7 @@ export default function BudgetUtilization() {
   const { budgets, currentMonth, budgetsLoading } = useDashboard();
 
   const getStrokeColor = (percent) => {
-    if (percent < 70) return "#52c41a"; // green
+    if (percent < 50) return "#52c41a"; // green
     if (percent < 90) return "#faad14"; // orange
     return "#ff4d4f"; // red
   };
