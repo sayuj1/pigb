@@ -11,7 +11,7 @@ export default function BudgetUtilization() {
 
   const getStrokeColor = (percent) => {
     if (percent < 50) return "#52c41a"; // green
-    if (percent < 90) return "#faad14"; // orange
+    if (percent < 80) return "#faad14"; // orange
     return "#ff4d4f"; // red
   };
 
