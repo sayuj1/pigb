@@ -1,4 +1,4 @@
-import { updateAccountBalance } from "@/utils/backend/transactionUtils";
+import { updateAccountBalance } from "@/utils/backend/accountUtils";
 import mongoose from "mongoose";
 
 const TransactionSchema = new mongoose.Schema({
