@@ -42,7 +42,11 @@ export default function Accounts() {
   const [deleteAccount, setDeleteAccount] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
 
-  const { accounts, setAccounts, loading, error } = useAccount();
+  const { accounts, setAccounts, loading, error, fetchAccounts } = useAccount();
+
+  useEffect(() => {
+    fetchAccounts();
+  }, [])
 
   // Handle search and sorting
   const filteredAndSortedAccounts = () => {
