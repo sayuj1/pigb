@@ -1,4 +1,4 @@
-import { accountRepository } from "@/repositories/AccountRepository";
+import AccountSchema from "@/models/AccountSchema";
 /**
  * Applies the updates to the account instance
  */
@@ -56,7 +56,7 @@ export const recalculateAccountBalance = (
  */
 export const updateAccountBalance = async (transaction, operation) => {
   try {
-    const account = await accountRepository.findById(transaction.accountId);
+    const account = await AccountSchema.findById(transaction.accountId);
     if (!account) {
       console.error("Account not found for ID:", transaction.accountId);
       return;
@@ -78,7 +78,7 @@ export const updateAccountBalance = async (transaction, operation) => {
       }
     }
 
-    await accountRepository.save(account);
+    await account.save(account);
   } catch (error) {
     console.error("Error updating account balance:", error);
   }
@@ -95,7 +95,7 @@ export const updateAccountBalance = async (transaction, operation) => {
  */
 export const updateAccountBalanceOnEdit = async (oldTransaction, updatedTransaction) => {
   try {
-    const account = await accountRepository.findById(updatedTransaction.accountId);
+    const account = await AccountSchema.findById(updatedTransaction.accountId);
     if (!account) {
       const error = new Error("Account not found");
       error.status = 404;
@@ -110,9 +110,36 @@ export const updateAccountBalanceOnEdit = async (oldTransaction, updatedTransact
     if (updatedTransaction.type === "income") account.balance += updatedTransaction.amount;
     else if (updatedTransaction.type === "expense") account.balance -= updatedTransaction.amount;
 
-    await accountRepository.save(account);
+    return await account.save(account);
   } catch (error) {
     console.error("Error updating account balance on edit:", error);
     throw error;
   }
 };
+
+export const checkAccountExists = async (userId, name) => {
+  const IS_ACCOUNT_FOUND = await AccountSchema.findOne({
+    userId,
+    name
+  }
+  );
+  if (IS_ACCOUNT_FOUND) {
+    throw new Error("Account with this name already exists.");
+  }
+};
+
+export const createAccount = async (data) => {
+  return await AccountSchema.create(data);
+};
+
+export const findAccountById = async (id, userId) => {
+  return await AccountSchema.findOne({ _id: id, userId });
+}
+
+export const deleteAccountById = async (id, userId) => {
+  return await AccountSchema.findOneAndDelete({ _id: id, userId });
+}
+
+export const getAccountsByUserId = async (userId) => {
+  return await AccountSchema.find({ userId });
+}

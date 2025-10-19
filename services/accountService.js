@@ -1,36 +1,23 @@
 import { formatAccountPayload } from "@/utils/backend/dataFormatter";
-import { validateAccountData } from "@/utils/backend/validations";
 import { NotFoundError } from "../utils/backend/error";
-import { accountRepository } from "../repositories/AccountRepository";
 import {
   applyAccountUpdates,
+  checkAccountExists,
+  createAccount,
+  deleteAccountById,
+  findAccountById,
+  getAccountsByUserId,
   recalculateAccountBalance,
 } from "@/utils/backend/accountUtils";
 import { invalidateCache } from "@/lib/cache";
 import { deleteAllTransactionsForAccount, findTransactionsByAccountId } from "@/utils/backend/transactionUtils";
 import { removeTransactionsFromBudgets } from "@/utils/backend/budgetUtils";
 
-export const getAccountById = async (id, userId) => {
-  const account = await accountRepository.findByIdAndUser(id, userId);
-  if (!account) {
-    throw new NotFoundError("Account not found");
-  }
-  return account;
+
+export const handleFetchAccounts = async (userId) => {
+  return await getAccountsByUserId(userId);
 };
 
-export const fetchAccountsByUserId = async (userId) => {
-  return await accountRepository.findByUserId(userId);
-};
-
-export const checkAccountExists = async (userId, name) => {
-  const IS_ACCOUNT_FOUND = await accountRepository.findByNameAndUser(
-    userId,
-    name
-  );
-  if (IS_ACCOUNT_FOUND) {
-    throw new Error("Account with this name already exists.");
-  }
-};
 
 /**
  * Creates a new account after validations and formatting.
@@ -38,9 +25,11 @@ export const checkAccountExists = async (userId, name) => {
  * @param {Object} data - The account data to create.
  * @returns {Promise<Object>} The created account.
  */
-export const createAccount = async (userId, data) => {
-  validateAccountData(data?.type, data);
+export const handleCreateAccount = async (userId, data) => {
   await checkAccountExists(userId, data.name);
+
+  const payload = formatAccountPayload(userId, data);
+  const account = await createAccount(payload);
 
   await invalidateCache({
     model: "account",
@@ -48,16 +37,18 @@ export const createAccount = async (userId, data) => {
     data: { userId },
   });
 
-  const payload = formatAccountPayload(userId, data);
-  const account = await accountRepository.create(payload);
-
   return account;
 };
 
-export const deleteAccountById = async (id, userId) => {
+export const handleDeleteAccount = async (id, userId) => {
   try {
-    await getAccountById(id, userId);
-    await accountRepository.deleteByIdAndUser(id, userId);
+
+    const account = await findAccountById(id, userId);
+    if (!account) {
+      throw new NotFoundError("Account not found");
+    }
+
+    await deleteAccountById(id, userId);
 
     // delete all transactions related to this account and remove transactions from budgets
     const deletedTransactions = await deleteAllTransactionsForAccount(id);
@@ -73,7 +64,7 @@ export const deleteAccountById = async (id, userId) => {
     });
     return { message: "Account deleted successfully." };
   } catch (error) {
-    console.log("Error in deleteAccountById: ", error);
+    console.log("Error in handleDeleteAccount: ", error);
     throw error;
   }
 
@@ -84,7 +75,7 @@ export const deleteAccountById = async (id, userId) => {
  * Validates name conflicts, updates fields, and recalculates balance if needed.
  */
 export const updateAccount = async (id, userId, updates) => {
-  const account = await getAccountById(id, userId);
+  const account = await findAccountById(id, userId);
 
   if (updates.name && updates.name !== account.name) {
     await checkAccountExists(userId, updates.name);
@@ -100,7 +91,7 @@ export const updateAccount = async (id, userId, updates) => {
     recalculateAccountBalance(account, updates.initialBalance, transactions);
   }
 
-  await accountRepository.save(account);
+  await account.save(account);
 
   await invalidateCache({
     model: "account",

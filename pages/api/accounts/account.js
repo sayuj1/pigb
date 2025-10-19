@@ -1,8 +1,8 @@
 import connectDB from "../../../lib/mongodb";
 import {
-  createAccount,
-  fetchAccountsByUserId,
-  deleteAccountById,
+  handleCreateAccount,
+  handleFetchAccounts,
+  handleDeleteAccount,
   updateAccount,
 } from "@/services/accountService";
 import { authenticate } from "@/utils/backend/authMiddleware";
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
           key: userId,
           prefix: "accounts",
           ttl: CACHE_TTL_1_DAY, // 1 day
-          fetchFn: () => fetchAccountsByUserId(userId),
+          fetchFn: () => handleFetchAccounts(userId),
         });
 
         res
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
 
     case "POST":
       try {
-        const newAccount = await createAccount(userId, req.body);
+        const newAccount = await handleCreateAccount(userId, req.body);
         res.status(201).json({
           message: "Account created successfully.",
           account: newAccount,
@@ -52,7 +52,7 @@ export default async function handler(req, res) {
       try {
         const { id: accountId } = req.query;
 
-        const result = await deleteAccountById(accountId, userId);
+        const result = await handleDeleteAccount(accountId, userId);
 
         res.status(200).json(result);
       } catch (error) {
