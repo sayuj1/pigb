@@ -2,6 +2,8 @@ import Budget from "@/models/BudgetSchema";
 import connectDB from "../../../lib/mongodb";
 import { authenticate } from "@/utils/backend/authMiddleware";
 import Transaction from "@/models/TransactionSchema";
+import { handleCreateBudget } from "@/services/budgetService";
+import { handleApiError } from "@/lib/errors";
 
 export default async function handler(req, res) {
   await connectDB();
@@ -16,27 +18,13 @@ export default async function handler(req, res) {
     // ✅ Create a new budget
     case "POST":
       try {
-        const { category, startDate, endDate, limitAmount, budgetName } =
-          req.body;
-
-        if (!category || !startDate || !endDate || !limitAmount) {
-          return res.status(400).json({ message: "Missing required fields" });
-        }
-
-        const newBudget = await Budget.createBudget(
-          userId,
-          category,
-          new Date(startDate),
-          new Date(endDate),
-          limitAmount,
-          budgetName || ""
-        );
-        res
-          .status(201)
-          .json({ message: "Budget created successfully", budget: newBudget });
+        const newBudget = await handleCreateBudget(userId, req.body);
+        res.status(201).json({
+          message: "Budget created successfully",
+          newBudget,
+        });
       } catch (error) {
-        console.error("Error creating budget:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+        handleApiError(res, error, "Error adding budget");
       }
       break;
 

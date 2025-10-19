@@ -27,3 +27,15 @@ export const removeTransactionsFromBudgets = async (transactionIds) => {
         await removeExpenseFromBudget(tId);
     }
 }
+
+export const createBudget = async (userId, budgetData) => {
+    return BudgetSchema.createBudget(
+        userId,
+        budgetData.category,
+        budgetData.startDate,
+        budgetData.endDate,
+        budgetData.limitAmount,
+        budgetData.budgetName || ""
+    );
+};
+
