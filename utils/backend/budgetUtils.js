@@ -14,3 +14,16 @@ export const addExpenseToBudget = async (
 export const removeExpenseFromBudget = async (transactionId) => {
     return BudgetSchema.removeExpense(transactionId);
 }
+
+export const updateExpenseInBudget = async (
+    transactionId,
+    newAmount
+) => {
+    BudgetSchema.updateExpenseAmount(transactionId, newAmount);
+};
+
+export const removeTransactionsFromBudgets = async (transactionIds) => {
+    for (const tId of transactionIds) {
+        await removeExpenseFromBudget(tId);
+    }
+}

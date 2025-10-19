@@ -29,26 +29,6 @@ const AccountSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-AccountSchema.pre("findOneAndDelete", async function (next) {
-  try {
-    const account = await this.model.findOne(this.getQuery());
-    if (!account) return next();
-
-    const Transaction = mongoose.model("Transaction");
-
-    // Step 1: Fetch transaction IDs for this account
-    const transactionIds = await Transaction.find({ accountId: account._id }).select("_id");
-
-    // Step 2: Delete each transaction using findOneAndDelete to trigger middleware
-    for (const tx of transactionIds) {
-      await Transaction.findOneAndDelete({ _id: tx._id });
-    }
-
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
 
 
 const Account =

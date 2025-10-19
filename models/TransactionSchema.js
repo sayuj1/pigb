@@ -1,5 +1,3 @@
-import { updateAccountBalance } from "@/utils/backend/accountUtils";
-import { addExpenseToBudget, removeExpenseFromBudget } from "@/utils/backend/budgetUtils";
 import mongoose from "mongoose";
 
 const TransactionSchema = new mongoose.Schema({

@@ -4,7 +4,7 @@ import Account from "@/models/AccountSchema";
 import Budget from "@/models/BudgetSchema";
 import { authenticate } from "@/utils/backend/authMiddleware";
 import { delCache, delAllWithPrefix } from "@/lib/useCache";
-import { handleCreateTransaction, handleDeleteTransaction } from "@/services/transactionService";
+import { handleCreateTransaction, handleDeleteTransaction, handleUpdateTransaction } from "@/services/transactionService";
 import { handleApiError } from "@/lib/errors";
 
 export default async function handler(req, res) {
@@ -126,145 +126,13 @@ export default async function handler(req, res) {
     // ✅ Edit (Update) Transaction
     case "PUT":
       try {
-        const { id } = req.query;
-        const { accountId, type, category, amount, date, description, source } =
-          req.body;
-
-        if (!id) {
-          return res
-            .status(400)
-            .json({ message: "Transaction ID is required" });
-        }
-
-        // Fetch the existing transaction before updating
-        const oldTransaction = await Transaction.findById(id);
-        if (!oldTransaction) {
-          return res.status(404).json({ message: "Transaction not found" });
-        }
-
-        // Check if category or amount has changed
-        const categoryChanged = oldTransaction.category !== category;
-        const amountChanged = oldTransaction.amount !== amount;
-        const typeChanged = oldTransaction.type !== type;
-
-        // Find the transaction and update it
-        const transaction = await Transaction.findOneAndUpdate(
-          { _id: id, userId },
-          {
-            $set: {
-              accountId,
-              type,
-              category,
-              amount,
-              date,
-              description,
-              source: source || null, // Default to null if not provided
-            },
-          },
-          { new: true } // Return the updated transaction document
-        );
-
-        if (!transaction) {
-          return res.status(404).json({ message: "Transaction not found" });
-        }
-
-        // ✅ Handle budget updates if the transaction is an expense
-        if (oldTransaction.type === "expense") {
-          if (typeChanged || categoryChanged) {
-            // If transaction type changes to income OR category changes, remove from old budget
-            await Budget.removeExpense(oldTransaction._id);
-
-            // Only re-add if it's still an expense (i.e., type didn't change to income)
-            if (type === "expense") {
-              await Budget.addExpense(
-                userId,
-                category,
-                date,
-                amount,
-                transaction._id,
-                description
-              );
-            }
-          } else if (amountChanged) {
-            // If only the amount changed, update the existing budget entry
-            await Budget.updateExpenseAmount(oldTransaction._id, amount);
-          }
-        } else if (type === "expense") {
-          // If it's a brand-new expense (wasn't an expense before), add it
-          await Budget.addExpense(
-            userId,
-            category,
-            date,
-            amount,
-            transaction._id,
-            description
-          );
-        }
-
-        // ✅ Update account balance correctly based on old and new values
-        const account = await Account.findById(transaction.accountId);
-        if (!account) {
-          return res.status(404).json({ message: "Account not found" });
-        }
-
-        // Reverse the effect of the OLD transaction
-        if (account.type === "credit card") {
-          if (oldTransaction.type === "expense") {
-            account.creditUsed -= oldTransaction.amount;
-            if (account.creditUsed < 0) account.creditUsed = 0;
-          } else if (oldTransaction.type === "income") {
-            account.creditUsed = Math.max(
-              0,
-              account.creditUsed - oldTransaction.amount
-            );
-          }
-
-          // Apply the effect of the NEW transaction
-          if (type === "expense") {
-            if (account.creditUsed + amount > account.creditLimit) {
-              return res.status(400).json({ message: "Credit limit exceeded" });
-            }
-            account.creditUsed += amount;
-          } else if (type === "income") {
-            account.creditUsed = Math.max(0, account.creditUsed - amount);
-          }
-        } else {
-          // Reverse OLD transaction effect
-          if (oldTransaction.type === "income") {
-            account.balance -= oldTransaction.amount;
-          } else if (oldTransaction.type === "expense") {
-            account.balance += oldTransaction.amount;
-          }
-
-          // Apply NEW transaction effect
-          if (type === "income") {
-            account.balance += amount;
-          } else if (type === "expense") {
-            account.balance -= amount;
-          }
-        }
-
-        await account.save();
-
-        // invalidate cache 
-        await delCache({ key: userId, prefix: "accounts" });
-        await delCache({
-          key: userId,
-          prefix: "total-expense",
+        const transaction = await handleUpdateTransaction(userId, req.query?.id, req.body);
+        res.status(200).json({
+          message: "Transaction updated successfully",
+          transaction,
         });
-        await delCache({
-          key: userId,
-          prefix: "total-balance",
-        });
-        await delAllWithPrefix("expenses-income-trend");
-        await delAllWithPrefix("category-spend");
-
-        res
-          .status(200)
-          .json({ message: "Transaction updated successfully", transaction });
       } catch (error) {
-        console.error("Error updating transaction:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+        handleApiError(res, error, "Error updating transaction");
       }
       break;
 

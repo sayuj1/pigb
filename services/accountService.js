@@ -8,6 +8,8 @@ import {
 } from "@/utils/backend/accountUtils";
 import { getTransactionsByAccountId } from "@/services/transactionService";
 import { invalidateCache } from "@/lib/cache";
+import { deleteAllTransactionsForAccount } from "@/utils/backend/transactionUtils";
+import { removeTransactionsFromBudgets } from "@/utils/backend/budgetUtils";
 
 export const getAccountById = async (id, userId) => {
   const account = await accountRepository.findByIdAndUser(id, userId);
@@ -54,15 +56,28 @@ export const createAccount = async (userId, data) => {
 };
 
 export const deleteAccountById = async (id, userId) => {
-  await getAccountById(id, userId);
-  await accountRepository.deleteByIdAndUser(id, userId);
+  try {
+    await getAccountById(id, userId);
+    await accountRepository.deleteByIdAndUser(id, userId);
 
-  await invalidateCache({
-    model: "account",
-    action: "onDelete",
-    data: { userId },
-  });
-  return { message: "Account deleted successfully." };
+    // delete all transactions related to this account and remove transactions from budgets
+    const deletedTransactions = await deleteAllTransactionsForAccount(id);
+
+    if (deletedTransactions.length > 0) {
+      await removeTransactionsFromBudgets(deletedTransactions);
+    }
+
+    await invalidateCache({
+      model: "account",
+      action: "onDelete",
+      data: { userId },
+    });
+    return { message: "Account deleted successfully." };
+  } catch (error) {
+    console.log("Error in deleteAccountById: ", error);
+    throw error;
+  }
+
 };
 
 /**

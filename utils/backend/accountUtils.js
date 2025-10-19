@@ -83,3 +83,36 @@ export const updateAccountBalance = async (transaction, operation) => {
     console.error("Error updating account balance:", error);
   }
 };
+
+/**
+ *  Reverses an old transaction’s balance effect and applies a new one.
+ *
+ * Useful for PUT/update handlers to ensure account balance stays accurate.
+ *
+ * @param {Object} oldTransaction - The previous transaction data
+ * @param {Object} updatedTransaction - The new transaction data
+ * @returns {Promise<void>}
+ */
+export const updateAccountBalanceOnEdit = async (oldTransaction, updatedTransaction) => {
+  try {
+    const account = await accountRepository.findById(updatedTransaction.accountId);
+    if (!account) {
+      const error = new Error("Account not found");
+      error.status = 404;
+      throw error;
+    }
+
+    // Reverse old transaction
+    if (oldTransaction.type === "income") account.balance -= oldTransaction.amount;
+    else if (oldTransaction.type === "expense") account.balance += oldTransaction.amount;
+
+    // Apply new transaction
+    if (updatedTransaction.type === "income") account.balance += updatedTransaction.amount;
+    else if (updatedTransaction.type === "expense") account.balance -= updatedTransaction.amount;
+
+    await accountRepository.save(account);
+  } catch (error) {
+    console.error("Error updating account balance on edit:", error);
+    throw error;
+  }
+};

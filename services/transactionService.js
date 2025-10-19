@@ -1,9 +1,9 @@
 import { createTransaction, findTransactionByAccountId } from "@/repositories/TransactionRepository";
 import { invalidateCache } from "@/lib/cache";
 import { validateCreateTransaction } from "@/validations/transactionValidations";
-import { updateAccountBalance } from "@/utils/backend/accountUtils";
-import { addExpenseToBudget, removeExpenseFromBudget } from "@/utils/backend/budgetUtils";
-import { deleteTransactionById, findTransactionById } from "@/utils/backend/transactionUtils";
+import { updateAccountBalance, updateAccountBalanceOnEdit } from "@/utils/backend/accountUtils";
+import { addExpenseToBudget, removeExpenseFromBudget, updateExpenseInBudget } from "@/utils/backend/budgetUtils";
+import { deleteTransactionById, findTransactionById, updateTransactionById } from "@/utils/backend/transactionUtils";
 
 export const handleCreateTransaction = async (userId, data) => {
   const validatedData = validateCreateTransaction(data);
@@ -36,6 +36,89 @@ export const handleCreateTransaction = async (userId, data) => {
   return transaction;
 };
 
+export const handleUpdateTransaction = async (userId, transactionId, transaction) => {
+  if (!transactionId) {
+    const error = new Error("Transaction ID is required");
+    error.status = 400;
+    throw error;
+  }
+  const { accountId, type, category, amount, date, description, source } = transaction;
+
+  // Fetch the existing transaction before updating
+  const oldTransaction = await findTransactionById(transactionId);
+  if (!oldTransaction || oldTransaction.userId.toString() !== userId.toString()) {
+    const error = new Error("Transaction not found");
+    error.status = 404;
+    throw error;
+  }
+
+  // Check if category or amount has changed
+  const categoryChanged = oldTransaction.category !== category;
+  const amountChanged = oldTransaction.amount !== amount;
+  const typeChanged = oldTransaction.type !== type;
+
+
+  const updatedTransaction = await updateTransactionById(userId, transactionId, {
+    accountId,
+    type,
+    category,
+    amount,
+    date,
+    description,
+    source: source || null, // Default to null if not provided
+  });
+
+  if (!updatedTransaction) {
+    const error = new Error("Failed to update transaction");
+    error.status = 404;
+    throw error;
+  }
+
+  // Handle budget updates if the transaction is an expense
+  if (oldTransaction.type === "expense") {
+    if (typeChanged || categoryChanged) {
+      // If transaction type changes to income OR category changes, remove from old budget
+      await removeExpenseFromBudget(oldTransaction._id);
+      // Only re-add if it's still an expense (i.e., type didn't change to income)
+      if (type === "expense") {
+        await addExpenseToBudget(
+          userId,
+          category,
+          date,
+          amount,
+          updatedTransaction._id,
+          description
+        );
+      }
+    } else if (amountChanged) {
+      // If only the amount changed, update the existing budget entry
+      await updateExpenseInBudget(oldTransaction._id, amount);
+    }
+  } else if (type === "expense") {
+    // If it's a brand-new expense (wasn't an expense before), add it
+    await addExpenseToBudget(
+      userId,
+      category,
+      date,
+      amount,
+      updatedTransaction._id,
+      description
+    );
+  }
+
+  await updateAccountBalanceOnEdit(oldTransaction, updatedTransaction);
+
+  // invalidate cache 
+  await invalidateCache({
+    model: "transaction",
+    action: "onUpdate",
+    data: { userId },
+  });
+
+  return updatedTransaction;
+}
+
+// TODO: move below function to transaction utils
 export const getTransactionsByAccountId = async (accountId) => {
   return await findTransactionByAccountId(accountId);
 };
