@@ -39,3 +39,6 @@ export const createBudget = async (userId, budgetData) => {
     );
 };
 
+export const deleteBudgetById = async (userId, budgetId) => {
+    return BudgetSchema.findOneAndDelete({ _id: budgetId, userId });
+}

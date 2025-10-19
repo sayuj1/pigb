@@ -2,7 +2,7 @@ import Budget from "@/models/BudgetSchema";
 import connectDB from "../../../lib/mongodb";
 import { authenticate } from "@/utils/backend/authMiddleware";
 import Transaction from "@/models/TransactionSchema";
-import { handleCreateBudget } from "@/services/budgetService";
+import { handleCreateBudget, handleDeleteBudget } from "@/services/budgetService";
 import { handleApiError } from "@/lib/errors";
 
 export default async function handler(req, res) {
@@ -91,25 +91,13 @@ export default async function handler(req, res) {
 
     case "DELETE":
       try {
-        const { id } = req.query;
-        if (!id) return res.status(400).json({ message: "Missing budget ID" });
+        const resp = await handleDeleteBudget(userId, req.query?.id);
+        res.status(200).json(resp);
 
-        // Make sure the budget belongs to the logged-in user
-        const budget = await Budget.findOneAndDelete({ _id: id, userId });
-
-        if (!budget) {
-          return res
-            .status(404)
-            .json({ message: "Budget not found or unauthorized" });
-        }
-
-        // Successfully deleted budget
-        res.status(200).json({ message: "Budget deleted successfully" });
       } catch (error) {
         console.error("Error deleting budget:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+        handleApiError(res, error, "Failed to delete budget");
       }
-      break;
 
     case "PUT":
       try {
