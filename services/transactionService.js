@@ -1,9 +1,8 @@
-import { createTransaction, findTransactionByAccountId } from "@/repositories/TransactionRepository";
 import { invalidateCache } from "@/lib/cache";
 import { validateCreateTransaction } from "@/validations/transactionValidations";
 import { updateAccountBalance, updateAccountBalanceOnEdit } from "@/utils/backend/accountUtils";
 import { addExpenseToBudget, removeExpenseFromBudget, updateExpenseInBudget } from "@/utils/backend/budgetUtils";
-import { deleteTransactionById, findTransactionById, updateTransactionById } from "@/utils/backend/transactionUtils";
+import { createTransaction, deleteTransactionById, findTransactionById, updateTransactionById } from "@/utils/backend/transactionUtils";
 
 export const handleCreateTransaction = async (userId, data) => {
   const validatedData = validateCreateTransaction(data);
@@ -118,10 +117,6 @@ export const handleUpdateTransaction = async (userId, transactionId, transaction
   return updatedTransaction;
 }
 
-// TODO: move below function to transaction utils
-export const getTransactionsByAccountId = async (accountId) => {
-  return await findTransactionByAccountId(accountId);
-};
 
 export const handleDeleteTransaction = async (userId, transactionId) => {
   if (!transactionId) {

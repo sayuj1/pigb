@@ -6,9 +6,8 @@ import {
   applyAccountUpdates,
   recalculateAccountBalance,
 } from "@/utils/backend/accountUtils";
-import { getTransactionsByAccountId } from "@/services/transactionService";
 import { invalidateCache } from "@/lib/cache";
-import { deleteAllTransactionsForAccount } from "@/utils/backend/transactionUtils";
+import { deleteAllTransactionsForAccount, findTransactionsByAccountId } from "@/utils/backend/transactionUtils";
 import { removeTransactionsFromBudgets } from "@/utils/backend/budgetUtils";
 
 export const getAccountById = async (id, userId) => {
@@ -97,7 +96,7 @@ export const updateAccount = async (id, userId, updates) => {
     updates.initialBalance !== undefined &&
     updates.initialBalance !== account.initialBalance
   ) {
-    const transactions = await getTransactionsByAccountId(account._id);
+    const transactions = await findTransactionsByAccountId(account._id);
     recalculateAccountBalance(account, updates.initialBalance, transactions);
   }
 

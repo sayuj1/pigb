@@ -1,5 +1,9 @@
 import TransactionSchema from "@/models/TransactionSchema";
 
+export const createTransaction = async (data) => {
+    return await TransactionSchema.create(data);
+};
+
 export const findTransactionById = async (tId) => {
     return await TransactionSchema.findById({ _id: tId });
 }
@@ -32,4 +36,8 @@ export const deleteAllTransactionsForAccount = async (accountId) => {
 
     // 4️ Return IDs of deleted expense transactions
     return expenseTransactionIds;
+};
+
+export const findTransactionsByAccountId = async (accountId) => {
+    return await TransactionSchema.find({ accountId });
 };
