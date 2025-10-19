@@ -1,4 +1,5 @@
 import AccountSchema from "@/models/AccountSchema";
+import { ValidationError } from "./error";
 /**
  * Applies the updates to the account instance
  */
@@ -124,7 +125,7 @@ export const checkAccountExists = async (userId, name) => {
   }
   );
   if (IS_ACCOUNT_FOUND) {
-    throw new Error("Account with this name already exists.");
+    throw new ValidationError("Account with this name already exists.");
   }
 };
 
