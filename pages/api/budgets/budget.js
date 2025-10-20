@@ -1,8 +1,7 @@
 import Budget from "@/models/BudgetSchema";
 import connectDB from "../../../lib/mongodb";
 import { authenticate } from "@/utils/backend/authMiddleware";
-import Transaction from "@/models/TransactionSchema";
-import { handleCreateBudget, handleDeleteBudget } from "@/services/budgetService";
+import { handleCreateBudget, handleDeleteBudget, handleUpdateBudget } from "@/services/budgetService";
 import { handleApiError } from "@/lib/errors";
 
 export default async function handler(req, res) {
@@ -101,96 +100,13 @@ export default async function handler(req, res) {
 
     case "PUT":
       try {
-        const { id } = req.query;
-        const { category, limitAmount, startDate, endDate, budgetName } =
-          req.body;
-
-        if (!category || !limitAmount || !startDate || !endDate || !userId) {
-          return res.status(400).json({ message: "Missing required fields" });
-        }
-
-        // Find the existing budget by ID
-        const budget = await Budget.findById(id);
-
-        if (!budget) {
-          return res.status(404).json({ message: "Budget not found" });
-        }
-
-        // Check if the logged-in user is the owner of the budget
-        if (budget.userId.toString() !== userId) {
-          return res
-            .status(403)
-            .json({ message: "You are not authorized to edit this budget" });
-        }
-
-        const oldStartDate = budget.startDate;
-        const oldEndDate = budget.endDate;
-        const oldCategory = budget.category;
-
-        // Check if startDate, endDate, or category is being changed
-        const startDateChanged =
-          new Date(startDate).getTime() !== new Date(oldStartDate).getTime();
-        const endDateChanged =
-          new Date(endDate).getTime() !== new Date(oldEndDate).getTime();
-        const categoryChanged = category !== oldCategory;
-
-        // 1. Remove transactions from the old budget if date range or category changes
-        if (startDateChanged || endDateChanged || categoryChanged) {
-          // Remove affected transactions from the old budget
-          for (const transaction of budget.transactions) {
-            const transactionDetails = await Transaction.findById(
-              transaction.transactionId
-            );
-
-            // If transaction falls within the old budget's date range or category, remove it from the budget
-            if (
-              transactionDetails &&
-              transactionDetails.date >= oldStartDate &&
-              transactionDetails.date <= oldEndDate &&
-              transactionDetails.category === oldCategory
-            ) {
-              await Budget.removeExpense(transaction.transactionId);
-            }
-          }
-        }
-
-        // 2. Update the budget fields
-        budget.category = category;
-        budget.limitAmount = limitAmount;
-        budget.startDate = new Date(startDate);
-        budget.endDate = new Date(endDate);
-        budget.budgetName = budgetName || "";
-
-        // 3. Add transactions back to the new budget
-        if (startDateChanged || endDateChanged || categoryChanged) {
-          // Find all transactions that match the new date range and category, and add them back
-          const transactionsToAdd = await Transaction.find({
-            userId: budget.userId,
-            category: category,
-            date: { $gte: startDate, $lte: endDate },
-          });
-
-          for (const transaction of transactionsToAdd) {
-            await Budget.addExpense(
-              budget.userId,
-              category,
-              transaction.date,
-              transaction.amount,
-              transaction._id,
-              transaction.description
-            );
-          }
-        }
-
-        // 4. Save the updated budget
-        await budget.save();
-
-        res
-          .status(200)
-          .json({ message: "Budget updated successfully", budget });
+        const budget = await handleUpdateBudget(userId, req.query?.id, req.body);
+        res.status(200).json({
+          message: "Budget updated successfully",
+          budget,
+        });
       } catch (error) {
-        console.error("Error updating budget:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+        handleApiError(res, error, "Error updating budget");
       }
       break;
 

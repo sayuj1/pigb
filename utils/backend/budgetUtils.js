@@ -42,3 +42,7 @@ export const createBudget = async (userId, budgetData) => {
 export const deleteBudgetById = async (userId, budgetId) => {
     return BudgetSchema.findOneAndDelete({ _id: budgetId, userId });
 }
+
+export const findBudgetById = async (userId, budgetId) => {
+    return BudgetSchema.findOne({ _id: budgetId, userId });
+}

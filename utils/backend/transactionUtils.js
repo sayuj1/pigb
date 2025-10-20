@@ -41,3 +41,11 @@ export const deleteAllTransactionsForAccount = async (accountId) => {
 export const findTransactionsByAccountId = async (accountId) => {
     return await TransactionSchema.find({ accountId });
 };
+
+export const findTransactionsByCategoryAndDateRange = async (userId, category, startDate, endDate) => {
+    return await TransactionSchema.find({
+        userId,
+        category,
+        date: { $gte: startDate, $lte: endDate },
+    });
+};

@@ -32,6 +32,7 @@ export const validateBudget = (budget) => {
 
     // Return cleaned/normalized data
     return {
+        ...budget,
         category: budget.category.trim(),
         startDate: new Date(budget.startDate),
         endDate: new Date(budget.endDate),

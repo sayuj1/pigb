@@ -104,10 +104,7 @@ BudgetSchema.statics.addExpense = async function (
     endDate: { $gte: expenseDate },
   });
 
-  if (!budget) {
-    // throw new Error("No matching budget found for this expense.");
-    return;
-  }
+  if (!budget) return; // No matching budget found
 
   // Add expense to transactions
   budget.transactions.push({
