@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Account from "@/models/AccountSchema";
+import Account from "./AccountSchema.js";
 
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -10,7 +10,15 @@ const UserSchema = new mongoose.Schema({
     type: String,
   },
   provider: { type: String, enum: ["manual", "google"], default: "manual" }, // Tracks how the user signed up
-  createdAt: { type: Date, default: Date.now },
+  locale: {
+    iso: { type: String, default: "IN" }, // Country ISO code
+    currency: { type: String, default: "INR" }, // Currency code
+    symbol: { type: String, default: "₹" }, // Currency symbol
+    countryName: { type: String, default: "India" }, // Country name
+    dateFormat: { type: String, default: "d/M/yyyy" }, // Date display format
+  },
+}, {
+  timestamps: true, // Adds createdAt and updatedAt automatically
 });
 
 // After a new user is created, automatically create a "Cash" account

@@ -36,13 +36,29 @@ export default async function handler(req, res) {
         let user = await User.findOne({ googleId });
         // console.log("user ", user, googleId)
         if (!user) {
+            // Get locale details from ISO
+            const localeInfo = getAllInfoByISO("IN");
+
+            if (!localeInfo) {
+                throw new ValidationError("Invalid country ISO code");
+            }
+
+            // Construct the locale object
+            const locale = {
+                iso: localeInfo.iso,
+                currency: localeInfo.currency,
+                symbol: localeInfo.symbol,
+                countryName: localeInfo.countryName,
+                dateFormat: localeInfo.dateFormat || "d/M/yyyy", // fallback
+            };
             // Register new user if not found
             user = new User({
                 googleId,
                 email,
                 name,
                 profilePicture: picture,
-                provider: "google"
+                provider: "google",
+                locale
             });
             await user.save();
         }
