@@ -60,4 +60,4 @@ async function updateUserLocales() {
     }
 }
 
-// updateUserLocales();
+updateUserLocales();
