@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postbuild": "next-sitemap"
+    "postbuild": "next-sitemap",
+    "update-locales": "node scripts/updateUserLocales.js"
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.0",
@@ -21,10 +22,12 @@
     "d3-format": "^3.1.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
+    "dotenv": "^17.2.3",
     "emoji-picker-react": "^4.12.2",
     "formidable": "^3.5.4",
     "framer-motion": "^12.23.12",
     "google-auth-library": "^9.15.1",
+    "iso-country-currency": "^0.7.2",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "moment": "^2.30.1",
