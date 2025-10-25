@@ -72,9 +72,9 @@ export const updateAccountBalance = async (transaction, operation) => {
         account.balance -= amount;
       }
     } else if (operation === "deleteTransaction") {
-      if (type === "income") {
+      if (type === "income" || type === "withdrawal") {
         account.balance -= amount;
-      } else if (type === "expense") {
+      } else if (type === "expense" || type === "deposit") {
         account.balance += amount;
       }
     }

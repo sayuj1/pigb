@@ -1,6 +1,7 @@
 import SavingsSchema from "@/models/SavingsSchema";
 import { deleteAllTransactionsByIds } from "./transactionUtils";
 import SavingsTransactionSchema from "@/models/SavingsTransactionSchema";
+import { updateAccountBalance } from "./accountUtils";
 
 export const createSavings = async (data) => {
     return await SavingsSchema.create(data);
@@ -12,7 +13,7 @@ export const deleteAllTransactionsForSavingsAccount = async (userId, savingsId) 
     const transactions = await SavingsTransactionSchema.find({
         savingsId,
         type: { $nin: ["interest", "loss"] },
-    }).select("transactionId");
+    });
 
     const transactionIds = transactions.map((t) => t.transactionId);
 
@@ -20,6 +21,11 @@ export const deleteAllTransactionsForSavingsAccount = async (userId, savingsId) 
 
         // 2. Delete associated main transactions
         await deleteAllTransactionsByIds(userId, transactionIds);
+    }
+
+    for (const existingTransaction of transactions) {
+        // update account balance
+        await updateAccountBalance(existingTransaction, "deleteTransaction");
     }
 
     // 3. Delete all related savings transactions for this savings account
