@@ -310,7 +310,7 @@ export default function SavingsTransactions() {
   ];
 
   return (
-    <div className="p-4 max-w-5xl mx-auto space-y-6">
+    <div className="p-4 max-w-8xl mx-auto space-y-6">
       {/* Header Buttons */}
       <div className="flex justify-between items-center mb-4">
         <Button
