@@ -49,3 +49,7 @@ export const findTransactionsByCategoryAndDateRange = async (userId, category, s
         date: { $gte: startDate, $lte: endDate },
     });
 };
+
+export const deleteAllTransactionsByIds = async (userId, transactionIds) => {
+    return await TransactionSchema.deleteMany({ _id: { $in: transactionIds }, userId });
+}

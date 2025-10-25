@@ -3,6 +3,7 @@ import { validateCreateTransaction } from "@/validations/transactionValidations"
 import { updateAccountBalance, updateAccountBalanceOnEdit } from "@/utils/backend/accountUtils";
 import { addExpenseToBudget, removeExpenseFromBudget, updateExpenseInBudget } from "@/utils/backend/budgetUtils";
 import { createTransaction, deleteTransactionById, findTransactionById, updateTransactionById } from "@/utils/backend/transactionUtils";
+import { ForbiddenError, ValidationError } from "@/utils/backend/error";
 
 export const handleCreateTransaction = async (userId, data) => {
   const validatedData = validateCreateTransaction(data);
@@ -120,28 +121,24 @@ export const handleUpdateTransaction = async (userId, transactionId, transaction
 
 export const handleDeleteTransaction = async (userId, transactionId) => {
   if (!transactionId) {
-    const error = new Error("Transaction ID is required");
-    error.status = 400;
-    throw error;
+    throw new ValidationError("Transaction ID is required");
   }
 
   // Find the transaction to know how to rollback its effects
   const existingTransaction = await findTransactionById(transactionId);
-  console.log("Existing Transaction:", existingTransaction, existingTransaction.userId);
 
-  if (!existingTransaction || existingTransaction.userId.toString() !== userId.toString()) {
-    const error = new Error("Transaction not found");
-    error.status = 404;
-    throw error;
+  if (!existingTransaction) {
+    throw new ValidationError("Transaction not found");
+  }
+  if (existingTransaction.userId.toString() !== userId.toString()) {
+    throw new ForbiddenError("You do not have permission to delete this transaction");
   }
 
   // Delete the transaction
   const deletedTransaction = await deleteTransactionById(userId, transactionId);
 
   if (!deletedTransaction) {
-    const error = new Error("Transaction not found");
-    error.status = 404;
-    throw error;
+    throw new ValidationError("Transaction not found");
   }
 
   await updateAccountBalance(existingTransaction, "deleteTransaction");

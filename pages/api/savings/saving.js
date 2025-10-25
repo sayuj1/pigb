@@ -4,7 +4,8 @@ import Savings from "@/models/SavingsSchema";
 import SavingsTransaction from "@/models/SavingsTransactionSchema";
 import Transaction from "@/models/TransactionSchema";
 import { authenticate } from "@/utils/backend/authMiddleware";
-import { handleCreateSavings } from "@/services/savingsService";
+import { handleCreateSavings, handleDeleteSavings } from "@/services/savingsService";
+import { handleApiError } from "@/lib/errors";
 
 export default async function handler(req, res) {
   await connectDB();
@@ -88,66 +89,15 @@ export default async function handler(req, res) {
       }
       break;
 
-    // ✅ Delete Savings Account and All Related Transactions
     case "DELETE":
       try {
-        const { id } = req.query;
-        // Find savings account
-        const savings = await Savings.findById(id);
-        if (!savings) {
-          return res.status(404).json({ message: "Savings account not found" });
-        }
+        const resp = await handleDeleteSavings(userId, req.query?.id);
+        res.status(200).json(resp);
 
-        // ✅ Ensure only the owner can edit or delete
-        if (savings.userId.toString() !== userId) {
-          return res
-            .status(403)
-            .json({ message: "Forbidden: You cannot modify this record" });
-        }
-
-        // Fetch all transactionsIds related to this savings account where type != interest only select transactionId field
-        const transactionIds = await SavingsTransaction.find({ savingsId: id, type: { $ne: "interest" } }).select("transactionId");
-        // console.log("Transaction IDs to delete:", transactionIds);
-
-        if (!transactionIds || transactionIds.length === 0) {
-          return res.status(404).json({
-            message: "No transactions found for this savings account",
-          });
-        }
-
-        // Delete associated transactions
-        for (const tx of transactionIds) {
-          await Transaction.findOneAndDelete({ _id: tx.transactionId });
-        }
-
-        // Delete all related transactions
-        await SavingsTransaction.deleteMany({ savingsId: id });
-
-        // Delete the savings account
-        await Savings.findByIdAndDelete(id);
-
-        // Invalidate the cache for transactions, accounts, budgets, etc.
-        await delCache({ key: userId, prefix: "accounts" });
-        await delCache({
-          key: userId,
-          prefix: "total-expense",
-        });
-        await delCache({
-          key: userId,
-          prefix: "total-balance",
-        });
-        await delAllWithPrefix("expenses-income-trend");
-        await delAllWithPrefix("category-spend");
-
-        res.status(200).json({
-          message:
-            "Savings account and all related transactions deleted successfully",
-        });
       } catch (error) {
         console.error("Error deleting savings account:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+        handleApiError(res, error, "Failed to delete savings account");
       }
-      break;
 
     default:
       res.setHeader("Allow", ["GET", "POST", "DELETE", "PUT"]);
