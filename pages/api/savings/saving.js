@@ -4,6 +4,7 @@ import Savings from "@/models/SavingsSchema";
 import SavingsTransaction from "@/models/SavingsTransactionSchema";
 import Transaction from "@/models/TransactionSchema";
 import { authenticate } from "@/utils/backend/authMiddleware";
+import { handleCreateSavings } from "@/services/savingsService";
 
 export default async function handler(req, res) {
   await connectDB();
@@ -17,26 +18,13 @@ export default async function handler(req, res) {
   switch (req.method) {
     case "POST":
       try {
-        const { accountName, savingsType, amount } = req.body;
-
-        if (!accountName || !savingsType || amount == null || isNaN(amount)) {
-          return res.status(400).json({ message: "Missing required fields" });
-        }
-
-        const savings = new Savings({
-          userId,
-          accountName,
-          savingsType,
-          amount,
-          runningBalance: amount, // Initial balance
+        const savings = await handleCreateSavings(userId, req.body);
+        res.status(201).json({
+          message: "Savings account created successfully",
+          savings,
         });
-
-        await savings.save();
-
-        res.status(201).json(savings);
       } catch (error) {
-        console.error("Error creating savings account:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+        handleApiError(res, error, "Error creating savings account");
       }
       break;
 
