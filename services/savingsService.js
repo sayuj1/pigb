@@ -1,7 +1,7 @@
 import { invalidateCache } from "@/lib/cache";
 import { removeTransactionsFromBudgets } from "@/utils/backend/budgetUtils";
 import { ValidationError } from "@/utils/backend/error";
-import { createSavings, deleteAllTransactionsForSavingsAccount } from "@/utils/backend/savingsUtils";
+import { createSavings, deleteAllTransactionsForSavingsAccount, findSavingsById } from "@/utils/backend/savingsUtils";
 import { validateCreateSavings } from "@/validations/savingsValidations";
 
 export const handleCreateSavings = async (userId, data) => {
@@ -35,4 +35,22 @@ export const handleDeleteSavings = async (userId, savingsId) => {
         data: { userId },
     });
     return { message: "Savings Account deleted successfully." };
+}
+
+export const handleUpdateSavings = async (userId, savingsId, saving) => {
+    const validateSavingsData = validateCreateSavings(saving);
+    const existingSavings = await findSavingsById(userId, savingsId);
+    if (!existingSavings) {
+        throw new ValidationError("Savings account not found");
+    }
+    // if amount is changed, adjust running balance accordingly
+    const difference = validateSavingsData.amount - existingSavings.amount;
+    existingSavings.amount = validateSavingsData.amount;
+    existingSavings.savingsType = validateSavingsData.savingsType;
+    existingSavings.accountName = validateSavingsData.accountName;
+    existingSavings.runningBalance += difference;
+
+    await existingSavings.save();
+
+    return existingSavings;
 }

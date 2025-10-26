@@ -36,3 +36,7 @@ export const deleteAllTransactionsForSavingsAccount = async (userId, savingsId) 
 
     return transactionIds;
 };
+
+export const findSavingsById = async (userId, savingsId) => {
+    return await SavingsSchema.findOne({ userId, _id: savingsId });
+};

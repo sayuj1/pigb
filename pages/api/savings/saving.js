@@ -4,7 +4,7 @@ import Savings from "@/models/SavingsSchema";
 import SavingsTransaction from "@/models/SavingsTransactionSchema";
 import Transaction from "@/models/TransactionSchema";
 import { authenticate } from "@/utils/backend/authMiddleware";
-import { handleCreateSavings, handleDeleteSavings } from "@/services/savingsService";
+import { handleCreateSavings, handleDeleteSavings, handleUpdateSavings } from "@/services/savingsService";
 import { handleApiError } from "@/lib/errors";
 
 export default async function handler(req, res) {
@@ -45,47 +45,15 @@ export default async function handler(req, res) {
         res.status(500).json({ message: "Server error", error: error.message });
       }
       break;
-    // ✅ Edit Savings Account
     case "PUT":
       try {
-        const { id } = req.query;
-        const { accountName, savingsType, amount } = req.body;
-
-        if (!accountName || !savingsType || amount === undefined) {
-          return res.status(400).json({
-            message: "Account name, savings type, and amount are required",
-          });
-        }
-
-        // Fetch existing savings account
-        const existingSavings = await Savings.findById(id);
-        if (!existingSavings) {
-          return res.status(404).json({ message: "Savings account not found" });
-        }
-
-        // ✅ Ensure only the owner can edit or delete
-        if (existingSavings.userId.toString() !== userId) {
-          return res
-            .status(403)
-            .json({ message: "Forbidden: You cannot modify this record" });
-        }
-
-        // If the amount is changed, adjust the running balance accordingly
-        const difference = amount - existingSavings.amount;
-        existingSavings.amount = amount;
-        existingSavings.savingsType = savingsType;
-        existingSavings.accountName = accountName;
-        existingSavings.runningBalance += difference;
-
-        await existingSavings.save();
-
+        const savings = await handleUpdateSavings(userId, req.query?.id, req.body);
         res.status(200).json({
           message: "Savings account updated successfully",
-          savings: existingSavings,
+          savings,
         });
       } catch (error) {
-        console.error("Error updating savings account:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+        handleApiError(res, error, "Error updating savings account");
       }
       break;
 
