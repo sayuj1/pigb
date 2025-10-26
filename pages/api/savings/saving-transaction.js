@@ -3,6 +3,8 @@ import SavingsTransaction from "@/models/SavingsTransactionSchema";
 import Savings from "@/models/SavingsSchema";
 import { authenticate } from "@/utils/backend/authMiddleware";
 import { generateSavingsDescription } from "@/utils/backend/messageUtils";
+import { handleCreateSavingsTransaction } from "@/services/savingsTransactionService";
+import { handleApiError } from "@/lib/errors";
 
 export default async function handler(req, res) {
   await connectDB();
@@ -88,121 +90,15 @@ export default async function handler(req, res) {
       }
       break;
 
-
     case "POST":
       try {
-        const { savingsId, date, amount, type, description, accountId } = req.body;
-
-        if (!savingsId || !date || !amount || !type) {
-          return res.status(400).json({ message: "Missing required fields" });
-        }
-
-        const savings = await Savings.findOne({ _id: savingsId, userId });
-        if (!savings) {
-          return res.status(403).json({
-            message: "Forbidden: You cannot modify this savings account",
-          });
-        }
-
-        let savingsBalance = savings.runningBalance;
-        let transactionPayload = {
-          userId,
-          type: "",
-          amount,
-          billDate: date,
-          category: savings.savingsType,
-          accountId: null,
-        };
-
-        if (type === "withdrawal") {
-          if (!accountId) {
-            return res.status(400).json({ message: "Missing accountId for withdrawal" });
-          }
-
-          savingsBalance -= amount;
-
-          transactionPayload.type = "income";
-          transactionPayload.accountId = accountId;
-          transactionPayload.description = generateSavingsDescription({ type, savingsName: savings.accountName });
-
-        } else if (type === "deposit") {
-          if (!accountId) {
-            return res.status(400).json({ message: "Missing accountId for deposit" });
-          }
-
-          savingsBalance += amount;
-
-          transactionPayload.type = "expense";
-          transactionPayload.accountId = accountId;
-          transactionPayload.description = generateSavingsDescription({ type, savingsName: savings.accountName });
-
-        } else if (type === "interest") {
-          // Interest added to savings (by bank), use same savingsId as accountId
-          savingsBalance += amount;
-          transactionPayload = null; // No linked account transaction needed
-        } else if (type === "loss") {
-          // loss deducted from savings (market loss/charges), use same savingsId as accountId
-          savingsBalance -= amount;
-          transactionPayload = null; // No linked account transaction needed
-        }
-        else {
-          return res.status(400).json({ message: "Invalid transaction type" });
-        }
-
-        // Create linked transaction if applicable
-        let linkedTransaction = null;
-        if (transactionPayload) {
-          transactionPayload.source = "savings";
-          const transactionRes = await fetch(
-            `${process.env.API_BASE_URL || "http://localhost:3000"
-            }/api/transactions/transaction`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                cookie: req.headers.cookie || "",
-              },
-              body: JSON.stringify(transactionPayload),
-            }
-          );
-
-          const transactionData = await transactionRes.json();
-
-          if (!transactionRes.ok || !transactionData.transaction) {
-            console.error("Transaction creation failed:", transactionData);
-            return res.status(500).json({
-              message: "Failed to create transaction for paid bill",
-              error: transactionData.message || "Unknown error",
-            });
-          }
-
-          linkedTransaction = transactionData.transaction;
-
-        }
-
-        // Create savings transaction
-        const savingsTransaction = await SavingsTransaction.create({
-          savingsId,
-          amount,
-          date,
-          type,
-          description: description || generateSavingsDescription({ type, savingsName: savings.accountName }),
-          accountId: transactionPayload?.accountId || null, // default to savings for interest
-          transactionId: linkedTransaction?._id || null, // Link to transaction if applicable
+        const savings = await handleCreateSavingsTransaction(userId, req.body);
+        res.status(201).json({
+          message: "Savings transaction created successfully",
+          ...savings,
         });
-
-        // Update savings balance
-        savings.runningBalance = savingsBalance;
-        await savings.save();
-
-        return res.status(201).json({
-          transaction: savingsTransaction,
-          updatedBalance: savings.runningBalance,
-        });
-
       } catch (error) {
-        console.error("Error creating transaction:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+        handleApiError(res, error, "Error creating savings transaction");
       }
       break;
 
