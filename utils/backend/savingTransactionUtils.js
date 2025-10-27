@@ -64,3 +64,7 @@ export const createSavingsTransaction = async (savingsAccount, linkedTransaction
         transactionId: linkedTransaction?._id || null,
     })
 }
+
+export const findSavingsTransactionById = async (transactionId) => {
+    return await SavingsTransactionSchema.findOne({ _id: transactionId });
+}

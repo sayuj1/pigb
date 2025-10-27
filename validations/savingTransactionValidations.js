@@ -1,4 +1,4 @@
-export const validateCreateSavingsTransaction = (data) => {
+export const validateSavingsTransaction = (data) => {
     const errors = [];
 
     // savingsId

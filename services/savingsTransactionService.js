@@ -1,13 +1,14 @@
 import { ValidationError } from "@/utils/backend/error";
 import { findSavingsById } from "@/utils/backend/savingsUtils";
-import { createSavingsTransaction, prepareSavingsTransactionPayload } from "@/utils/backend/savingTransactionUtils";
-import { validateCreateSavingsTransaction } from "@/validations/savingTransactionValidations";
-import { handleCreateTransaction } from "./transactionService";
+import { createSavingsTransaction, findSavingsTransactionById, prepareSavingsTransactionPayload } from "@/utils/backend/savingTransactionUtils";
+import { validateSavingsTransaction } from "@/validations/savingTransactionValidations";
+import { handleCreateTransaction, handleUpdateTransaction } from "./transactionService";
+import { generateSavingsDescription } from "@/utils/backend/messageUtils";
 
 
 
 export const handleCreateSavingsTransaction = async (userId, savingTransaction) => {
-    const validateSavingsTransactionData = validateCreateSavingsTransaction(savingTransaction);
+    const validateSavingsTransactionData = validateSavingsTransaction(savingTransaction);
 
     const savingsAccount = await findSavingsById(userId, savingTransaction.savingsId);
     if (!savingsAccount) {
@@ -35,6 +36,93 @@ export const handleCreateSavingsTransaction = async (userId, savingTransaction) 
         updatedBalance: savingsAccount.runningBalance,
     };
 
-
 }
 
+export const handleUpdateSavingsTransaction = async (userId, savingTransaction) => {
+    const validateSavingsTransactionData = validateSavingsTransaction(savingTransaction);
+
+    const existingSavingsTransaction = await findSavingsTransactionById(validateSavingsTransactionData._id);
+
+    if (!existingSavingsTransaction) {
+        throw new ValidationError("Savings transaction not found");
+    }
+
+    const savingsAccount = await findSavingsById(userId, existingSavingsTransaction.savingsId);
+    if (!savingsAccount) {
+        throw new ValidationError("Savings account not found");
+    }
+
+    let savingsBalance = savingsAccount.runningBalance;
+
+    // Reverse old effect
+    if (existingSavingsTransaction.type === "deposit" || existingSavingsTransaction.type === "interest") {
+        savingsBalance -= existingSavingsTransaction.amount;
+    } else if (existingSavingsTransaction.type === "withdrawal" || existingSavingsTransaction.type === "loss") {
+        savingsBalance += existingSavingsTransaction.amount;
+    }
+
+    // apply new effect
+    if (validateSavingsTransactionData.type === "deposit" || validateSavingsTransactionData.type === "interest") {
+        savingsBalance += validateSavingsTransactionData.amount;
+    } else if (validateSavingsTransactionData.type === "withdrawal" || validateSavingsTransactionData.type === "loss") {
+        savingsBalance -= validateSavingsTransactionData.amount;
+    }
+
+    const generatedDescription = generateSavingsDescription({
+        type: validateSavingsTransactionData.type,
+        savingsName: savingsAccount.accountName,
+    });
+
+    if (String(validateSavingsTransactionData.accountId) !== String(existingSavingsTransaction.accountId)) {
+        // throw error account change not allowed
+        throw new ValidationError("Changing linked account is not allowed");
+    }
+
+    if (existingSavingsTransaction.type !== validateSavingsTransactionData.type) {
+        // throw error type change not allowed
+        throw new ValidationError("Changing transaction type is not allowed");
+    }
+
+
+    let updatedTransactionId = existingSavingsTransaction.transactionId;
+
+    const isTransactionExists = existingSavingsTransaction.type === "deposit" || existingSavingsTransaction.type === "withdrawal";
+
+    if (isTransactionExists && existingSavingsTransaction.transactionId) {
+        // Update existing transaction
+        const updatePayload = {
+            _id: existingSavingsTransaction.transactionId,
+            amount: validateSavingsTransactionData.amount,
+            date: validateSavingsTransactionData.date,
+            type: validateSavingsTransactionData.type === "withdrawal" ? "income" : "expense",
+            accountId: existingSavingsTransaction.accountId,
+            description: generatedDescription,
+            source: "savings",
+        };
+
+        const updatedTransaction = await handleUpdateTransaction(userId, existingSavingsTransaction.transactionId, updatePayload);
+        if (!updatedTransaction) {
+            throw new ValidationError("Failed to update linked transaction");
+        }
+    }
+
+
+    // Update savings transaction
+    existingSavingsTransaction.amount = validateSavingsTransactionData.amount;
+    existingSavingsTransaction.date = validateSavingsTransactionData.date;
+    existingSavingsTransaction.type = validateSavingsTransactionData.type;
+    existingSavingsTransaction.description = validateSavingsTransactionData.description || generatedDescription;
+    existingSavingsTransaction.accountId = existingSavingsTransaction.accountId;
+    existingSavingsTransaction.transactionId = updatedTransactionId;
+    await existingSavingsTransaction.save();
+
+    // Save new balance
+    savingsAccount.runningBalance = savingsBalance;
+    await savingsAccount.save();
+
+    return {
+        transaction: existingSavingsTransaction,
+        updatedBalance: savingsAccount.runningBalance,
+    };
+
+}

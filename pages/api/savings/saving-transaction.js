@@ -2,8 +2,7 @@ import connectDB from "../../../lib/mongodb";
 import SavingsTransaction from "@/models/SavingsTransactionSchema";
 import Savings from "@/models/SavingsSchema";
 import { authenticate } from "@/utils/backend/authMiddleware";
-import { generateSavingsDescription } from "@/utils/backend/messageUtils";
-import { handleCreateSavingsTransaction } from "@/services/savingsTransactionService";
+import { handleCreateSavingsTransaction, handleUpdateSavingsTransaction } from "@/services/savingsTransactionService";
 import { handleApiError } from "@/lib/errors";
 
 export default async function handler(req, res) {
@@ -104,115 +103,13 @@ export default async function handler(req, res) {
 
     case "PUT":
       try {
-        const { _id: id, amount, date, type, description, accountId } = req.body;
-
-        if (!amount || !date || !type) {
-          return res.status(400).json({ message: "Missing required fields" });
-        }
-
-        const transaction = await SavingsTransaction.findById(id);
-        // console.log("Transaction to update:", transaction);
-        if (!transaction) {
-          return res.status(404).json({ message: "Transaction not found" });
-        }
-
-        const savings = await Savings.findOne({
-          _id: transaction.savingsId,
-          userId,
+        const savings = await handleUpdateSavingsTransaction(userId, req.body);
+        res.status(200).json({
+          message: "Savings transaction updated successfully",
+          ...savings,
         });
-        if (!savings) {
-          return res.status(403).json({
-            message: "Forbidden: You do not own this savings account",
-          });
-        }
-
-        let savingsBalance = savings.runningBalance;
-
-        // Reverse old effect
-        if (transaction.type === "deposit" || transaction.type === "interest") {
-          savingsBalance -= transaction.amount;
-        } else if (transaction.type === "withdrawal" || transaction.type === "loss") {
-          savingsBalance += transaction.amount;
-        }
-
-        // Apply new effect
-        if (type === "deposit" || type === "interest") {
-          savingsBalance += amount;
-        } else if (type === "withdrawal" || type === "loss") {
-          savingsBalance -= amount;
-        }
-
-        const generatedDescription = generateSavingsDescription({
-          type,
-          savingsName: savings.accountName,
-        });
-
-        // Track new values
-        let updatedAccountId = accountId || transaction.accountId;
-        let updatedTransactionId = transaction.transactionId;
-
-        const typeChanged = transaction.type !== type;
-        const isTransactionExists = type === "deposit" || type === "withdrawal";
-
-        if (typeChanged) {
-          return res.status(400).json({ message: "Transaction Type cannot be changed!" });
-        }
-
-        if (isTransactionExists && transaction.transactionId) {
-          // Update existing transaction
-          const updatePayload = {
-            _id: transaction.transactionId,
-            amount,
-            date,
-            type: type === "withdrawal" ? "income" : "expense",
-            accountId: updatedAccountId,
-            description: generatedDescription,
-            source: "savings",
-          };
-
-          //TODO: Refactor this to reusue respective service function
-          const updateRes = await fetch(
-            `${process.env.API_BASE_URL || "http://localhost:3000"}/api/transactions/transaction?id=${transaction.transactionId}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                cookie: req.headers.cookie || "",
-              },
-              body: JSON.stringify(updatePayload),
-            }
-          );
-
-          const updateData = await updateRes.json();
-          if (!updateRes.ok) {
-            return res.status(500).json({
-              message: "Failed to update linked transaction",
-              error: updateData.message || "Unknown error",
-            });
-          }
-        }
-
-        // Update savings transaction
-        transaction.amount = amount;
-        transaction.date = date;
-        transaction.type = type;
-        transaction.description = description || generatedDescription;
-        transaction.accountId = updatedAccountId;
-        transaction.transactionId = updatedTransactionId;
-        await transaction.save();
-
-        // Save new balance
-        savings.runningBalance = savingsBalance;
-        await savings.save();
-
-        return res.status(200).json({
-          transaction,
-          updatedBalance: savingsBalance,
-        });
-
       } catch (error) {
-        console.error("Error updating transaction:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+        handleApiError(res, error, "Error updating savings transaction");
       }
       break;
 
