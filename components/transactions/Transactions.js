@@ -324,10 +324,12 @@ export default function Transactions() {
             title: "Actions",
             key: "actions",
             render: (_, record) => {
-              const isSavingsSource = record.source === "savings";
+              const isReadOnlySource = ["savings", "bills"].includes(record.source);
+
               const message = (
                 <span>
-                  Please make changes from <b>Savings</b> section
+                  Please make changes from{" "}
+                  <b>{record.source === "savings" ? "Savings" : "Planned Bills"}</b> section
                 </span>
               );
 
@@ -341,19 +343,19 @@ export default function Transactions() {
                       setSelectedTransaction(record);
                       setEditModalVisible(true);
                     }}
-                    disabled={isSavingsSource}
+                    disabled={isReadOnlySource}
                   />
                   <Button
                     type="link"
                     icon={<DeleteOutlined />}
                     danger
                     onClick={() => setDeleteTransaction(record)}
-                    disabled={isSavingsSource}
+                    disabled={isReadOnlySource}
                   />
                 </Space>
               );
 
-              return isSavingsSource ? (
+              return isReadOnlySource ? (
                 <Popover content={message} placement="leftTop">
                   <div className="cursor-not-allowed">{actionButtons}</div>
                 </Popover>

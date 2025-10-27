@@ -37,6 +37,7 @@ function Dashboard() {
             <SavingsTrendChart setTotalSavings={setTotalSavings} />
             <LoanRepaymentChart />
             {/* <UpcomingBillsList /> */}
+            {/*TODO: Add section for overdue bills */}
           </div>
         </SidebarLayout>
       </DashboardProvider>

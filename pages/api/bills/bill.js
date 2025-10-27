@@ -55,6 +55,7 @@ export default async function handler(req, res) {
                 amount,
                 billDate: dueDate,
                 description: `Auto-added from bill: ${name}`,
+                source: "bills",
               }),
             }
           );
@@ -75,6 +76,7 @@ export default async function handler(req, res) {
         // Handle recurring bill's next due date
         if (isRecurring && status === "paid") {
           let nextDueDate = new Date(dueDate);
+          status = "unpaid"; // Reset status for recurring bills
           switch (frequency) {
             case "daily":
               nextDueDate.setDate(nextDueDate.getDate() + 1);
@@ -221,6 +223,7 @@ export default async function handler(req, res) {
                 amount: bill.amount,
                 billDate: bill.dueDate,
                 description: `Auto-added from bill: ${bill.name}`,
+                source: "bills",
               }),
             }
           );

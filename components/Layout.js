@@ -6,6 +6,7 @@ import {
   DollarOutlined,
   CreditCardOutlined,
   FileTextOutlined,
+  SyncOutlined,
   WalletOutlined,
   PieChartOutlined,
   AppstoreOutlined,
@@ -28,8 +29,7 @@ const menuItems = [
   { key: "dashboard", icon: <DashboardOutlined />, label: "Dashboard" },
   { key: "accounts", icon: <BankOutlined />, label: "Accounts" },
   { key: "income-expense", icon: <DollarOutlined />, label: "Income/Expense" },
-  { key: "loans", icon: <CreditCardOutlined />, label: "Manage Loans" },
-  // { key: "bills", icon: <FileTextOutlined />, label: "Manage Bills" },
+  // { key: "bills", icon: <SyncOutlined />, label: "Planned Bills" },
   { key: "savings", icon: <WalletOutlined />, label: "Manage Savings" },
   { key: "budget", icon: <PieChartOutlined />, label: "Manage Budget" },
   { key: "category", icon: <AppstoreOutlined />, label: "Manage Category" },
@@ -43,7 +43,8 @@ const menuItems = [
         <BetaTag />
       </span>
     )
-  }
+  },
+  { key: "loans", icon: <CreditCardOutlined />, label: "Manage Loans" },
 ];
 
 export default function SidebarLayout({ children }) {
