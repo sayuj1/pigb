@@ -63,7 +63,7 @@ export default async function handler(req, res) {
         console.error("Error deleting savings account:", error);
         handleApiError(res, error, "Failed to delete savings account");
       }
-
+      break;
     default:
       res.setHeader("Allow", ["GET", "POST", "DELETE", "PUT"]);
       res.status(405).json({ message: `Method ${req.method} Not Allowed` });

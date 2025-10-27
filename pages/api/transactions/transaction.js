@@ -146,7 +146,7 @@ export default async function handler(req, res) {
         console.error("Error deleting transaction:", error);
         handleApiError(res, error, "Failed to delete transaction");
       }
-
+      break;
     default:
       res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);
       res.status(405).json({ message: `Method ${req.method} Not Allowed` });

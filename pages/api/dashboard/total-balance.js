@@ -34,7 +34,7 @@ export default async function handler(req, res) {
         console.error("Error fetching total balance:", error);
         res.status(500).json({ message: "Server error", error: error.message });
       }
-
+      break;
     default:
       res.setHeader("Allow", ["GET"]);
       res.status(405).json({ message: `Method ${req.method} Not Allowed` });
