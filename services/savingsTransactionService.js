@@ -1,8 +1,8 @@
 import { ValidationError } from "@/utils/backend/error";
 import { findSavingsById } from "@/utils/backend/savingsUtils";
-import { createSavingsTransaction, findSavingsTransactionById, prepareSavingsTransactionPayload } from "@/utils/backend/savingTransactionUtils";
+import { createSavingsTransaction, deleteSavingsTransactionById, findSavingsTransactionById, prepareSavingsTransactionPayload } from "@/utils/backend/savingTransactionUtils";
 import { validateSavingsTransaction } from "@/validations/savingTransactionValidations";
-import { handleCreateTransaction, handleUpdateTransaction } from "./transactionService";
+import { handleCreateTransaction, handleDeleteTransaction, handleUpdateTransaction } from "./transactionService";
 import { generateSavingsDescription } from "@/utils/backend/messageUtils";
 
 
@@ -125,4 +125,40 @@ export const handleUpdateSavingsTransaction = async (userId, savingTransaction) 
         updatedBalance: savingsAccount.runningBalance,
     };
 
+}
+
+export const handleDeleteSavingsTransaction = async (userId, savingsTransactionId) => {
+    const existingTransaction = await findSavingsTransactionById(savingsTransactionId);
+    if (!existingTransaction) {
+        throw new ValidationError("Savings transaction not found");
+    }
+    const savingsAccount = await findSavingsById(userId, existingTransaction.savingsId);
+    if (!savingsAccount) {
+        throw new ValidationError("Savings account not found");
+    }
+
+    let updatedBalance = savingsAccount.runningBalance;
+
+    // Reverse transaction effect on savings balance
+    if (existingTransaction.type === "deposit" || existingTransaction.type === "interest") {
+        updatedBalance -= existingTransaction.amount;
+    } else if (existingTransaction.type === "withdrawal" || existingTransaction.type === "loss") {
+        updatedBalance += existingTransaction.amount;
+    }
+
+    // Delete linked transaction if it exists
+    if (existingTransaction.transactionId) {
+        await handleDeleteTransaction(userId, existingTransaction.transactionId);
+    }
+    // Delete the savings transaction
+    await deleteSavingsTransactionById(existingTransaction._id);
+
+    // Update the savings account balance
+    savingsAccount.runningBalance = updatedBalance;
+    await savingsAccount.save();
+
+    return {
+        message: "Transaction deleted successfully",
+        updatedBalance: savingsAccount.runningBalance,
+    };
 }

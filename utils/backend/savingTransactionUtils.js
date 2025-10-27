@@ -68,3 +68,7 @@ export const createSavingsTransaction = async (savingsAccount, linkedTransaction
 export const findSavingsTransactionById = async (transactionId) => {
     return await SavingsTransactionSchema.findOne({ _id: transactionId });
 }
+
+export const deleteSavingsTransactionById = async (transactionId) => {
+    return await SavingsTransactionSchema.findOneAndDelete({ _id: transactionId });
+}
