@@ -10,7 +10,7 @@ import {
   DatePicker,
   Input,
   Space,
-  message
+  message,
 } from "antd";
 import dayjs from "dayjs";
 import { ArrowLeftOutlined, PlusOutlined } from "@ant-design/icons";
@@ -22,6 +22,7 @@ import {
   EditOutlined,
   DeleteOutlined,
   ExclamationCircleOutlined,
+  StopOutlined
 } from "@ant-design/icons";
 import {
   PiArrowDownBold,
@@ -35,6 +36,7 @@ import { Modal, Tooltip } from "antd";
 import { getIconComponent } from "@/utils/getIcons";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useAccount } from "@/context/AccountContext";
+import CloseSavingsAccountModal from "../CloseSavingsAccountModal";
 
 const { confirm } = Modal;
 
@@ -47,7 +49,8 @@ export default function SavingsTransactions() {
   const [transactions, setTransactions] = useState([]);
   const [savingAccount, setSavingAccount] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false); // add transaction modal
+  const [isClosingAccountModalOpen, setIsClosingAccountModalOpen] = useState(false);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
   const [sorter, setSorter] = useState({ field: "date", order: "descend" });
   const [editingTransaction, setEditingTransaction] = useState(null);
@@ -337,16 +340,31 @@ export default function SavingsTransactions() {
       </div>
 
       {/* Account Details */}
+
+
       <Card
         title={
-          (
-            <>
-              <span className="font-bold">Account:</span>{" "}
-              <span className="uppercase">{savingAccount?.accountName}</span>
-            </>
-          ) || "Savings Account"
+          <>
+            <span className="font-bold">Account:</span>{" "}
+            <span className="uppercase">{savingAccount?.accountName}</span>
+          </>
         }
         style={{ marginBottom: "5px", border: "1px solid #d3d3d3" }}
+        extra={
+          savingAccount?.status === "closed" ? (
+            <Tag color="red" className="font-medium">
+              Closed
+            </Tag>
+          ) : (
+            <Button
+              danger
+              icon={<StopOutlined />}
+              onClick={() => setIsClosingAccountModalOpen(true)}
+            >
+              Close Account
+            </Button>
+          )
+        }
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -444,6 +462,17 @@ export default function SavingsTransactions() {
         savingsId={savingAccount?._id}
         savingsAccount={savingAccount}
         editingTransaction={editingTransaction} // Pass it to the modal
+        accounts={accounts}
+        isAccountsLoading={isAccountsLoading}
+      />
+      <CloseSavingsAccountModal
+        visible={isClosingAccountModalOpen}
+        onClose={() => setIsClosingAccountModalOpen(false)}
+        onSuccess={() => {
+          fetchData();
+          setIsClosingAccountModalOpen(false);
+        }}
+        savingsAccount={savingAccount}
         accounts={accounts}
         isAccountsLoading={isAccountsLoading}
       />
