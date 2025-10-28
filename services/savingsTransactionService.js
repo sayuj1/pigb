@@ -14,6 +14,9 @@ export const handleCreateSavingsTransaction = async (userId, savingTransaction) 
     if (!savingsAccount) {
         throw new ValidationError("Savings account not found");
     }
+    if (savingsAccount?.status === "closed") {
+        throw new ValidationError("Cannot add transactions to a closed savings account");
+    }
 
     const { transactionPayload, updatedSavingsBalance } = await prepareSavingsTransactionPayload(userId, savingsAccount, validateSavingsTransactionData);
 
@@ -50,6 +53,10 @@ export const handleUpdateSavingsTransaction = async (userId, savingTransaction) 
     const savingsAccount = await findSavingsById(userId, existingSavingsTransaction.savingsId);
     if (!savingsAccount) {
         throw new ValidationError("Savings account not found");
+    }
+
+    if (savingsAccount?.status === "closed") {
+        throw new ValidationError("Cannot update transaction of a closed savings account");
     }
 
     let savingsBalance = savingsAccount.runningBalance;
@@ -139,6 +146,9 @@ export const handleDeleteSavingsTransaction = async (userId, savingsTransactionI
     const savingsAccount = await findSavingsById(userId, existingTransaction.savingsId);
     if (!savingsAccount) {
         throw new ValidationError("Savings account not found");
+    }
+    if (savingsAccount?.status === "closed") {
+        throw new ValidationError("Cannot delete transactions from a closed savings account");
     }
 
     let updatedBalance = savingsAccount.runningBalance;
