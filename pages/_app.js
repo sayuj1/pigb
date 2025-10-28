@@ -7,6 +7,7 @@ import { AccountProvider } from "@/context/AccountContext";
 const ThemeWrapper = dynamic(() => import("@/components/theme/ThemeWrapper"), {
   ssr: false,
 });
+import { Analytics } from '@vercel/analytics/next'
 
 export default function App({ Component, pageProps }) {
   return (
@@ -17,6 +18,7 @@ export default function App({ Component, pageProps }) {
           <ThemeWrapper>
             <AccountProvider>
               <Component {...pageProps} />
+              <Analytics />
             </AccountProvider>
           </ThemeWrapper>
         </ThemeProvider>
