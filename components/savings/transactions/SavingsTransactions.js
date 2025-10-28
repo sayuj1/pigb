@@ -367,8 +367,25 @@ export default function SavingsTransactions() {
         }
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <strong>Type:</strong> {savingAccount?.savingsType}
+          {/* 🏦 Type + Duration / Open Date */}
+          <div className="flex justify-between md:col-span-2">
+            <div>
+              <strong>Type:</strong> {savingAccount?.savingsType}
+            </div>
+            <div className="text-gray-600 text-sm mt-1">
+              {savingAccount?.status === "closed" ? (
+                <>
+                  <strong>Duration:</strong>{" "}
+                  {dayjs(savingAccount?.createdAt).format("DD MMM YYYY")} –{" "}
+                  {dayjs(savingAccount?.closedAt).format("DD MMM YYYY")}
+                </>
+              ) : (
+                <>
+                  <strong>Account opened on:</strong>{" "}
+                  {dayjs(savingAccount?.createdAt).format("DD MMM YYYY")}
+                </>
+              )}
+            </div>
           </div>
           <div className="flex justify-between md:col-span-2">
             <div>
