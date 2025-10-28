@@ -7,6 +7,7 @@ import {
   Select,
   Button,
   Tag,
+  message
 } from "antd";
 import { useEffect } from "react";
 import dayjs from "dayjs";
@@ -53,7 +54,10 @@ export default function AddSavingsTransactionModal({
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Failed to save transaction");
+      if (!res.ok) {
+        const errorData = await res.json();
+        return message.error(errorData.message || "Failed to add transaction to savings account");
+      }
 
       form.resetFields();
       onSuccess?.();

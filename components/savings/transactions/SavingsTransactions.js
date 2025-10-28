@@ -9,7 +9,8 @@ import {
   Button,
   DatePicker,
   Input,
-  Space
+  Space,
+  message
 } from "antd";
 import dayjs from "dayjs";
 import { ArrowLeftOutlined, PlusOutlined } from "@ant-design/icons";
@@ -148,14 +149,19 @@ export default function SavingsTransactions() {
               method: "DELETE",
             }
           );
-          const data = await res.json();
-          if (res.ok) {
-            fetchData(); // Refresh transactions
-          } else {
-            console.error("Delete failed", data.message);
+          if (!res.ok) {
+            const errorData = await res.json();
+            message.error(errorData.message || "Failed to delete this transaction");
+            // Reject promise so modal loader stops immediately
+            return Promise.reject();
           }
+
+          fetchData(); // Refresh transactions
+
         } catch (error) {
           console.error("Error deleting transaction", error);
+          message.error("Something went wrong while deleting");
+          return Promise.reject();
         }
       },
     });
@@ -240,7 +246,8 @@ export default function SavingsTransactions() {
           deposit: "green",
           withdrawal: "red",
           interest: "blue",
-          loss: "volcano"
+          loss: "volcano",
+          redemption: "purple"
         };
         return <Tag color={colorMap[type] || "default"}>{type}</Tag>;
       },
