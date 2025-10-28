@@ -117,13 +117,13 @@ export default function CloseSavingsAccountModal({
                         if (diff > 0) {
                             return (
                                 <div className="text-green-600 text-sm mb-4">
-                                    Note: Profit of ₹{diff.toFixed(2)} — this will be added as a profit transaction.
+                                    Profit of ₹{diff.toFixed(2)} — this will be added as a profit transaction.
                                 </div>
                             );
                         } else if (diff < 0) {
                             return (
                                 <div className="text-red-600 text-sm mb-4">
-                                    Note: Loss of ₹{Math.abs(diff).toFixed(2)} — this will be recorded as a loss transaction.
+                                    Loss of ₹{Math.abs(diff).toFixed(2)} — this will be recorded as a loss transaction.
                                 </div>
                             );
                         }
@@ -180,6 +180,11 @@ export default function CloseSavingsAccountModal({
                     <DatePicker className="w-full" format="DD-MM-YYYY" />
                 </Form.Item>
             </Form>
+
+            {/* account closure warning */}
+            <div className="mt-4 border border-red-300 bg-red-50 text-red-700 text-sm font-semibold rounded-lg px-2 py-1">
+                ⚠️ Once closed, this account cannot be reopened.
+            </div>
 
 
         </Modal>
