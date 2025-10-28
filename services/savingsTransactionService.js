@@ -20,7 +20,6 @@ export const handleCreateSavingsTransaction = async (userId, savingTransaction) 
 
     const { transactionPayload, updatedSavingsBalance } = await prepareSavingsTransactionPayload(userId, savingsAccount, validateSavingsTransactionData);
 
-
     let linkedTransaction = null;
     if (transactionPayload) {
         transactionPayload.source = "savings";

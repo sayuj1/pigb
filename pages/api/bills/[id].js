@@ -16,7 +16,6 @@ export default async function handler(req, res) {
       // Fetch Transactions for a Particular Bill
       try {
         const { id } = req.query; // Bill ID passed in query parameters
-        console.log("id ", id);
 
         if (!id) {
           return res.status(400).json({ message: "Bill ID is required" });
