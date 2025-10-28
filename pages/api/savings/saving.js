@@ -3,6 +3,7 @@ import Savings from "@/models/SavingsSchema";
 import { authenticate } from "@/utils/backend/authMiddleware";
 import { handleCloseSavingsAccount, handleCreateSavings, handleDeleteSavings, handleUpdateSavings } from "@/services/savingsService";
 import { handleApiError } from "@/lib/errors";
+import { buildQuery } from "@/utils/backend/buildQuery";
 
 export default async function handler(req, res) {
   await connectDB();
@@ -28,15 +29,25 @@ export default async function handler(req, res) {
 
     case "GET":
       try {
-        const savingsAccounts = await Savings.find({ userId });
+        // Build query dynamically
+        const { filters, sort, skip, limit } = buildQuery(
+          req.query,
+          userId,
+          ["accountName", "savingsType"] // searchable fields
+        );
 
-        if (!savingsAccounts || savingsAccounts.length === 0) {
-          return res
-            .status(200)
-            .json({ message: "No savings accounts found for this user" });
-        }
+        // Run parallel queries
+        const [data, total] = await Promise.all([
+          Savings.find(filters).sort(sort).skip(skip).limit(limit),
+          Savings.countDocuments(filters),
+        ]);
 
-        return res.status(200).json(savingsAccounts);
+        res.status(200).json({
+          total,
+          page: Number(req.query.page || 1),
+          totalPages: Math.ceil(total / limit),
+          savingsAccounts: data,
+        });
       } catch (error) {
         console.error("Error fetching savings accounts:", error);
         res.status(500).json({ message: "Server error", error: error.message });
