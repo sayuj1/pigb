@@ -4,6 +4,7 @@ import { ValidationError } from "@/utils/backend/error";
 import { createSavings, deleteAllTransactionsForSavingsAccount, findSavingsById } from "@/utils/backend/savingsUtils";
 import { validateCreateSavings } from "@/validations/savingsValidations";
 import { handleCreateSavingsTransaction } from "./savingsTransactionService";
+import { findAccountById } from "@/utils/backend/accountUtils";
 
 export const handleCreateSavings = async (userId, data) => {
     const validateSavingsData = validateCreateSavings(data);
@@ -81,6 +82,12 @@ export const handleCloseSavingsAccount = async (userId, query, body) => {
         throw new ValidationError("Cannot close a savings account with negative balance");
     }
 
+    const account = await findAccountById(transferAccountId, userId);
+
+    if (!account) {
+        throw new ValidationError("Transfer account not found");
+    }
+
     let redemptionTransaction = null;
 
     // redemption transfer logic
@@ -116,12 +123,22 @@ export const handleCloseSavingsAccount = async (userId, query, body) => {
         redemptionTransaction = await handleCreateSavingsTransaction(userId, {
             savingsId: savingsAccount._id,
             amount: redeemedAmount,
+            accountId: account._id,
             type: "redemption",
             date: accountCloseDate || new Date(),
             description: `Redeemed ₹${redeemedAmount} from ${savingsAccount.accountName}`,
         });
-    } else if (redeemedAmount === 0 && savingsAccount.runningBalance > 0) {
-        throw new ValidationError("Redeemed amount must be greater than zero to close account with non-zero balance");
+    }
+    else if (redeemedAmount === 0 && savingsAccount.runningBalance > 0) {
+        // record a loss
+        const lossAmount = savingsAccount.runningBalance;
+        await handleCreateSavingsTransaction(userId, {
+            savingsId: savingsAccount._id,
+            amount: lossAmount,
+            type: "loss",
+            date: accountCloseDate || new Date(),
+            description: `Loss debited on closing of ${savingsAccount.accountName}`,
+        })
     }
     // close the savings account
     savingsAccount.runningBalance = 0;

@@ -15,7 +15,7 @@ export default async function handler(req, res) {
         case "GET":
             try {
                 const totalSavings = await Savings.aggregate([
-                    { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+                    { $match: { userId: new mongoose.Types.ObjectId(userId), status: "active" } },
                     {
                         $group: {
                             _id: null,

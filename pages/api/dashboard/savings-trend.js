@@ -16,7 +16,7 @@ export default async function handler(req, res) {
   switch (req.method) {
     case "GET":
       try {
-        const savings = await Savings.find({ userId }).select("accountName runningBalance savingsType");
+        const savings = await Savings.find({ userId, status: "active" }).select("accountName runningBalance savingsType");
         // Group savings by savingsType
         const typeMap = new Map();
         let totalAmount = 0;
