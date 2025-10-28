@@ -1,8 +1,10 @@
+import { ValidationError } from "@/utils/backend/error";
+
 export const validateSavingsTransaction = (data) => {
     const errors = [];
 
     // savingsId
-    if (!data.savingsId || !data.savingsId.trim()) {
+    if (!data.savingsId) {
         errors.push("savingsId is required");
     }
 
@@ -17,7 +19,7 @@ export const validateSavingsTransaction = (data) => {
     }
 
     // type
-    const validTypes = ["deposit", "withdrawal", "interest", "loss"];
+    const validTypes = ["deposit", "withdrawal", "interest", "loss", "redemption"];
     if (!data.type || !validTypes.includes(data.type)) {
         errors.push(`type is required and must be one of: ${validTypes.join(", ")}`);
     }

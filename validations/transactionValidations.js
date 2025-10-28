@@ -2,7 +2,7 @@ export const validateCreateTransaction = (data) => {
     const errors = [];
 
     // accountId
-    if (!data.accountId || typeof data.accountId !== "string" || !data.accountId.trim()) {
+    if (!data.accountId) {
         errors.push("accountId is required");
     }
 
@@ -45,7 +45,7 @@ export const validateCreateTransaction = (data) => {
 
     //  Return cleaned/normalized data
     return {
-        accountId: data.accountId.trim(),
+        accountId: data.accountId,
         type: data.type,
         category: data.category.trim(),
         amount: Number(data.amount),

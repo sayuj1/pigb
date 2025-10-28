@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import { Card, Input, Dropdown, Button, Empty, Spin, message } from "antd";
+import { Card, Input, Dropdown, Button, Empty, Spin, message, Tag, Tooltip } from "antd";
 import {
   SearchOutlined,
   FilterOutlined,
   EditOutlined,
   DeleteOutlined,
   PlusOutlined,
+  StopOutlined,
+  MoreOutlined,
+  EyeOutlined
 } from "@ant-design/icons";
 import AddSavingsAccountModal from "./AddSavingsAccountModal";
 import { getCategoryColor } from "@/utils/getCategoryColor";
@@ -15,6 +18,7 @@ import AddSavingsTransactionModal from "./transactions/AddSavingsTransactionModa
 import { useRouter } from "next/router";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useAccount } from "@/context/AccountContext";
+import CloseSavingsAccountModal from "./CloseSavingsAccountModal";
 
 const SORT_OPTIONS = [
   { label: "Default (Newest)", value: "newest" },
@@ -35,6 +39,7 @@ export default function SavingsAccounts() {
   const [deletingAccount, setDeletingAccount] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [addingTransaction, setAddingTransaction] = useState(null);
+  const [closingAccount, setClosingAccount] = useState(null);
 
   const router = useRouter();
   const { accounts, loading: isAccountsLoading, fetchAccounts } = useAccount();
@@ -171,50 +176,105 @@ export default function SavingsAccounts() {
               )} `}
               title={
                 <div className="flex flex-col">
-                  <span className="text-lg font-semibold uppercase">
-                    {item.accountName}
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    {item.savingsType}
-                  </span>
+                  <Tooltip title={item.accountName} placement="topLeft">
+                    <span className="text-lg font-semibold uppercase truncate max-w-[90%]">
+                      {item.accountName}
+                    </span>
+                  </Tooltip>
+
+                  <Tooltip title={item.savingsType} placement="topLeft">
+                    <span className="text-sm text-gray-500 truncate max-w-[90%]">
+                      {item.savingsType}
+                    </span>
+                  </Tooltip>
                 </div>
               }
               extra={
-                <div className="flex gap-2">
-                  <Button
-                    size="small"
-                    icon={<EditOutlined />}
-                    onClick={() => handleEdit(item)}
-                    type="text"
-                  />
-                  <Button
-                    size="small"
-                    danger
-                    icon={<DeleteOutlined />}
-                    type="text"
-                    onClick={() => setDeletingAccount(item)}
-                  />
-                </div>
+                item.status === "closed" ? (
+                  <Tag color="red" className="font-medium">
+                    Closed
+                  </Tag>
+                ) : (
+                  <Dropdown
+                    trigger={["click"]}
+                    menu={{
+                      items: [
+                        {
+                          key: "edit",
+                          label: "Edit",
+                          icon: <EditOutlined />,
+                          onClick: () => handleEdit(item),
+                        },
+                        {
+                          key: "close",
+                          label: "Close",
+                          danger: true,
+                          icon: <StopOutlined />,
+                          onClick: () => setClosingAccount(item),
+                        },
+                        {
+                          key: "delete",
+                          label: "Delete",
+                          icon: <DeleteOutlined />,
+                          danger: true,
+                          onClick: () => setDeletingAccount(item),
+                        },
+                      ],
+                    }}
+                    placement="bottomRight"
+                  >
+                    <Button type="text" icon={<MoreOutlined />} />
+                  </Dropdown>
+                )
               }
-              actions={[
-                <Button
-                  size="small"
-                  icon={<PlusOutlined />}
-                  onClick={() => setAddingTransaction(item)}
-                  type="link"
-                >
-                  Add Transactions
-                </Button>,
-                <Button
-                  size="small"
-                  type="link"
-                  onClick={() =>
-                    router.push(`/savings/${item._id}/transactions`)
-                  }
-                >
-                  View Transactions
-                </Button>,
-              ]}
+              actions={
+                item.status === "closed"
+                  ? [
+                    <Button
+                      key="delete"
+                      size="small"
+                      danger
+                      type="link"
+                      icon={<DeleteOutlined />}
+                      onClick={() => setDeletingAccount(item)}
+                    >
+                      Delete Account
+                    </Button>,
+                    <Button
+                      key="view"
+                      size="small"
+                      type="link"
+                      icon={<EyeOutlined />}
+                      onClick={() =>
+                        router.push(`/savings/${item._id}/transactions`)
+                      }
+                    >
+                      View Transactions
+                    </Button>,
+                  ]
+                  : [
+                    <Button
+                      key="add"
+                      size="small"
+                      icon={<PlusOutlined />}
+                      onClick={() => setAddingTransaction(item)}
+                      type="link"
+                    >
+                      Add Transactions
+                    </Button>,
+                    <Button
+                      key="view"
+                      size="small"
+                      type="link"
+                      icon={<EyeOutlined />}
+                      onClick={() =>
+                        router.push(`/savings/${item._id}/transactions`)
+                      }
+                    >
+                      View Transactions
+                    </Button>,
+                  ]
+              }
             >
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
@@ -223,12 +283,25 @@ export default function SavingsAccounts() {
                     {formatCurrency(item.amount)}
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
+                {item.status !== "closed" && <div className="flex justify-between items-center">
                   <span className="text-gray-500">Current Balance</span>
                   <span className="font-medium text-green-600">
                     {formatCurrency(item.runningBalance)}
                   </span>
-                </div>
+                </div>}
+
+                {item.status === "closed" && item.closedAt && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500">Account Closed On</span>
+                    <span className="font-medium text-red-600">
+                      {new Date(item.closedAt).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
+                )}
               </div>
             </Card>
           ))}
@@ -261,6 +334,14 @@ export default function SavingsAccounts() {
         onSuccess={fetchSavings}
         savingsId={addingTransaction?._id}
         savingsAccount={addingTransaction}
+        accounts={accounts}
+        isAccountsLoading={isAccountsLoading}
+      />
+      <CloseSavingsAccountModal
+        visible={!!closingAccount}
+        onClose={() => setClosingAccount(null)}
+        onSuccess={fetchSavings}
+        savingsAccount={closingAccount}
         accounts={accounts}
         isAccountsLoading={isAccountsLoading}
       />
