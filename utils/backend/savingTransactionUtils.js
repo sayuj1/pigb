@@ -1,5 +1,6 @@
 import SavingsTransactionSchema from "@/models/SavingsTransactionSchema";
 import { generateSavingsDescription } from "./messageUtils";
+import { ValidationError } from "./error";
 
 export const prepareSavingsTransactionPayload = async (userId, savingAccount, savingTransaction) => {
     const { date, amount, type, accountId } = savingTransaction;
@@ -15,10 +16,13 @@ export const prepareSavingsTransactionPayload = async (userId, savingAccount, sa
         accountId: null,
     };
 
-    if (type === "withdrawal") {
+    if (type === "withdrawal" || type === "redemption") {
         if (!accountId) {
-
             throw new ValidationError("Missing accountId for withdrawal");
+        }
+
+        if (savingsBalance < amount) {
+            throw new ValidationError("You cannot withdraw more than the available balance");
         }
 
         savingsBalance -= amount;

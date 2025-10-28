@@ -68,6 +68,10 @@ export const handleUpdateSavingsTransaction = async (userId, savingTransaction) 
         savingsBalance -= validateSavingsTransactionData.amount;
     }
 
+    if (savingsBalance < 0 && existingSavingsTransaction.type === "withdrawal") {
+        throw new ValidationError("You cannot withdraw more than the available balance");
+    }
+
     const generatedDescription = generateSavingsDescription({
         type: validateSavingsTransactionData.type,
         savingsName: savingsAccount.accountName,

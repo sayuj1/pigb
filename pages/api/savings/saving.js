@@ -1,7 +1,7 @@
 import connectDB from "../../../lib/mongodb";
 import Savings from "@/models/SavingsSchema";
 import { authenticate } from "@/utils/backend/authMiddleware";
-import { handleCreateSavings, handleDeleteSavings, handleUpdateSavings } from "@/services/savingsService";
+import { handleCloseSavingsAccount, handleCreateSavings, handleDeleteSavings, handleUpdateSavings } from "@/services/savingsService";
 import { handleApiError } from "@/lib/errors";
 
 export default async function handler(req, res) {
@@ -64,8 +64,18 @@ export default async function handler(req, res) {
         handleApiError(res, error, "Failed to delete savings account");
       }
       break;
+    case "PATCH":
+      try {
+
+        const result = await handleCloseSavingsAccount(userId, req.query, req.body);
+        return res.status(200).json(result);
+
+      } catch (error) {
+        handleApiError(res, error, "Error closing savings account");
+      }
+      break;
     default:
-      res.setHeader("Allow", ["GET", "POST", "DELETE", "PUT"]);
+      res.setHeader("Allow", ["GET", "POST", "DELETE", "PUT", "PATCH"]);
       res.status(405).json({ message: `Method ${req.method} Not Allowed` });
   }
 }
