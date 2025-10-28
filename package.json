@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "postbuild": "next-sitemap",
-    "update-locales": "node scripts/updateUserLocales.js"
+    "update-locales": "node scripts/updateUserLocales.js",
+    "update-savings-account": "node scripts/updateSavingsAccountStatus.js"
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.0",
