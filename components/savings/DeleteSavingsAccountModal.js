@@ -30,6 +30,14 @@ export default function DeleteSavingsAccountModal({
         <div className="border border-gray-500 rounded-md p-4 text-left text-sm space-y-3 max-w-md mx-auto">
           <div className="flex justify-between items-center">
             <span className="text-black-500 dark:text-black-300 font-medium">
+              Account Name:
+            </span>
+            <span className="flex items-center gap-2 font-semibold">
+              {accountName}
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-black-500 dark:text-black-300 font-medium">
               Account Type:
             </span>
             <span className="flex items-center gap-2 font-semibold">
