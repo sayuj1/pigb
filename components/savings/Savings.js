@@ -30,6 +30,7 @@ import CloseSavingsAccountModal from "./CloseSavingsAccountModal";
 import { getCategoryColor } from "@/utils/getCategoryColor";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useAccount } from "@/context/AccountContext";
+import useDebounce from "@/hooks/useDebounce";
 
 // Field type mapping for smart order labels
 const sortFieldTypeMap = {
@@ -55,6 +56,7 @@ export default function SavingsAccounts() {
     endDate: "",
     dateField: "createdAt",
   });
+  const debouncedSearch = useDebounce(filters.search, 500);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState(null);
   const [deletingAccount, setDeletingAccount] = useState(null);
@@ -92,12 +94,12 @@ export default function SavingsAccounts() {
     }
   }, [filters.sortField]);
 
-  // 🔹 Fetch savings dynamically with filters
+  //  Fetch savings dynamically with filters
   const fetchSavings = async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams(
-        Object.entries({ ...filters, page, limit: pageSize }).filter(([_, v]) => v !== "")
+        Object.entries({ ...filters, search: debouncedSearch, page, limit: pageSize }).filter(([_, v]) => v !== "")
       );
 
       const res = await fetch(`/api/savings/saving?${params.toString()}`);
@@ -121,12 +123,12 @@ export default function SavingsAccounts() {
   }, []);
 
   useEffect(() => {
-    setPage(1); // reset to first page whenever filters change
-  }, [filters]);
+    setPage(1); // reset to first page whenever filters or search change
+  }, [debouncedSearch, filters.status, filters.savingsType, filters.sortField, filters.sortOrder]);
 
   useEffect(() => {
     fetchSavings();
-  }, [filters, page, pageSize]);
+  }, [debouncedSearch, filters.status, filters.savingsType, filters.sortField, filters.sortOrder, page, pageSize]);
 
   // Handle pagination change
   const handlePageChange = (newPage, newPageSize) => {
