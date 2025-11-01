@@ -1,7 +1,8 @@
-import { Modal, Form, Input, InputNumber, Select, Spin, Button } from "antd";
+import { Modal, Form, Input, InputNumber, Select, Spin, Button, DatePicker } from "antd";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import * as PiIcons from "react-icons/pi"; // Phosphor Icons
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -18,6 +19,12 @@ export default function AddSavingsAccountModal({
   useEffect(() => {
     if (visible) {
       fetchCategories();
+      // Set default account start date to today
+      form.setFieldsValue({
+        accountStartDate: dayjs(),
+      });
+    } else {
+      form.resetFields();
     }
   }, [visible]);
 
@@ -44,6 +51,12 @@ export default function AddSavingsAccountModal({
       const formattedValues = {
         ...values,
         savingsType: `${selectedCategory.icon} ${selectedCategory.name}`,
+        createdAt: values.accountStartDate
+          ? values.accountStartDate.toISOString()
+          : null,
+        maturityDate: values.maturityDate
+          ? values.maturityDate.toISOString()
+          : null,
       };
       // console.log("value ", formattedValues);
       setSubmitting(true);
@@ -58,13 +71,19 @@ export default function AddSavingsAccountModal({
     }
   };
 
+  const handleReset = () => {
+    form.resetFields();
+    // Reset today's date again manually
+    form.setFieldsValue({ accountStartDate: dayjs() });
+  };
+
   return (
     <Modal
       title="Create Savings Account"
       open={visible}
       onCancel={onClose}
       footer={[
-        <Button key="reset" onClick={() => form.resetFields()} danger>
+        <Button key="reset" onClick={handleReset} danger>
           Reset
         </Button>,
         <Button key="cancel" onClick={onClose}>
@@ -125,6 +144,21 @@ export default function AddSavingsAccountModal({
           rules={[{ required: true, message: "Please enter amount" }]}
         >
           <InputNumber min={0} style={{ width: "100%" }} />
+        </Form.Item>
+        {/*  Account Start Date */}
+        <Form.Item
+          name="accountStartDate"
+          label="Account Start Date"
+          rules={[
+            { required: true, message: "Please select account start date" },
+          ]}
+        >
+          <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
+        </Form.Item>
+
+        {/*  Maturity Date (Optional) */}
+        <Form.Item name="maturityDate" label="Maturity Date (Optional)">
+          <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
         </Form.Item>
       </Form>
     </Modal>

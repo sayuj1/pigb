@@ -1,7 +1,7 @@
-import { Modal, Form, Input, InputNumber } from "antd";
+import { Modal, Form, Input, InputNumber, DatePicker } from "antd";
 import { useEffect, useState } from "react";
 import axios from "axios";
-
+import dayjs from "dayjs";
 
 export default function EditSavingsAccountModal({
   visible,
@@ -18,15 +18,26 @@ export default function EditSavingsAccountModal({
         accountName: initialData.accountName,
         savingsType: initialData.savingsType,
         amount: initialData.amount,
+        accountStartDate: initialData.createdAt ? dayjs(initialData.createdAt) : null,
+        maturityDate: initialData.maturityDate ? dayjs(initialData.maturityDate) : null,
       });
+    } else {
+      form.resetFields();
     }
   }, [visible, initialData]);
 
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
+
       const updatedData = {
         ...values,
+        createdAt: values.accountStartDate
+          ? values.accountStartDate.toISOString()
+          : null,
+        maturityDate: values.maturityDate
+          ? values.maturityDate.toISOString()
+          : null,
       };
 
       setSubmitting(true);
@@ -70,7 +81,24 @@ export default function EditSavingsAccountModal({
           label="Savings Type"
           rules={[{ required: true, message: "Please select type" }]}
         >
-          <Input value={form.getFieldValue("savingsType")} readOnly className="cursor-not-allowed focus:ring-0 focus:outline-none" />
+          <Input
+            readOnly
+            className="cursor-not-allowed focus:ring-0 focus:outline-none"
+          />
+        </Form.Item>
+
+        {/* Account Start Date */}
+        <Form.Item
+          name="accountStartDate"
+          label="Account Start Date"
+          rules={[{ required: true, message: "Please select account start date" }]}
+        >
+          <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
+        </Form.Item>
+
+        {/* Maturity Date (Optional) */}
+        <Form.Item name="maturityDate" label="Maturity Date (Optional)">
+          <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
         </Form.Item>
       </Form>
     </Modal>

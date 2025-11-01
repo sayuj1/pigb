@@ -51,6 +51,8 @@ export const handleUpdateSavings = async (userId, savingsId, saving) => {
     existingSavings.savingsType = validateSavingsData.savingsType;
     existingSavings.accountName = validateSavingsData.accountName;
     existingSavings.runningBalance += difference;
+    existingSavings.createdAt = validateSavingsData.createdAt;
+    existingSavings.maturityDate = validateSavingsData.maturityDate;
 
     await existingSavings.save();
 

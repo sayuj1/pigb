@@ -382,7 +382,7 @@ export default function SavingsTransactions() {
               ) : (
                 <>
                   <strong>Account opened on:</strong>{" "}
-                  {dayjs(savingAccount?.createdAt).format("DD MMM YYYY")}
+                  <span className="text-purple-600">{dayjs(savingAccount?.createdAt).format("DD MMM YYYY")}</span>
                 </>
               )}
             </div>
@@ -400,6 +400,15 @@ export default function SavingsTransactions() {
                 {formatCurrency(savingAccount?.runningBalance)}
               </span>
             </div>
+          </div>
+          <div className="flex justify-between md:col-span-2">
+            <div>
+              <strong>Account Mature Date:</strong>{" "}
+              <span className="text-purple-600">
+                {savingAccount?.maturityDate ? dayjs(savingAccount?.maturityDate).format("DD MMM YYYY") : "N/A"}
+              </span>
+            </div>
+
           </div>
         </div>
       </Card>

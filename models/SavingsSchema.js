@@ -8,6 +8,7 @@ const SavingsSchema = new mongoose.Schema({
   amount: { type: Number, required: true }, // Initial amount of the savings
   runningBalance: { type: Number, default: 0 }, // Running balance, calculated dynamically
   createdAt: { type: Date, default: Date.now }, // Date when the savings account was created
+  maturityDate: { type: Date, default: null }, // Optional maturity date for fixed-term savings
   status: { type: String, enum: ["active", "closed"], default: "active" },
   closedAt: { type: Date, default: null }, // Date when the savings account was closed
 });
