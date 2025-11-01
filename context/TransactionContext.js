@@ -75,6 +75,7 @@ export const TransactionProvider = ({ children }) => {
                 ...(filters.accountId.length && {
                     accountId: filters.accountId.join(","),
                 }),
+                search: debouncedSearch,
             }).toString();
 
             const res = await fetch(`/api/transactions/insights?${query}`);

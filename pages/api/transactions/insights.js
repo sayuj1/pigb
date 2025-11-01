@@ -18,7 +18,7 @@ export default async function handler(req, res) {
 
     try {
 
-        const { startDate, endDate, accountId } = req.query;
+        const { startDate, endDate, accountId, search } = req.query;
 
         const baseQuery = {
             userId,
@@ -33,6 +33,11 @@ export default async function handler(req, res) {
         if (accountId) {
             const ids = accountId.split(",");
             baseQuery.accountId = { $in: ids };
+        }
+        // Text search (description/category)
+        if (search.trim()) {
+            const regex = new RegExp(search.trim(), "i");
+            baseQuery.$or = [{ category: regex }, { description: regex }];
         }
 
         // Fetch all matching transactions (both income and expense)
