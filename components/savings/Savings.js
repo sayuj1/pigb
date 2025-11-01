@@ -10,7 +10,7 @@ import {
   Tag,
   Tooltip,
   Select,
-  DatePicker,
+  Pagination
 } from "antd";
 import {
   SearchOutlined,
@@ -30,9 +30,6 @@ import CloseSavingsAccountModal from "./CloseSavingsAccountModal";
 import { getCategoryColor } from "@/utils/getCategoryColor";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useAccount } from "@/context/AccountContext";
-import dayjs from "dayjs";
-
-const { RangePicker } = DatePicker;
 
 // Field type mapping for smart order labels
 const sortFieldTypeMap = {
@@ -45,6 +42,9 @@ const sortFieldTypeMap = {
 export default function SavingsAccounts() {
   const [savings, setSavings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0); // 🆕 total count for pagination
+  const [page, setPage] = useState(1); // 🆕 current page
+  const [pageSize, setPageSize] = useState(6); // 🆕 items per page
   const [filters, setFilters] = useState({
     search: "",
     status: "active",
@@ -97,7 +97,7 @@ export default function SavingsAccounts() {
     setLoading(true);
     try {
       const params = new URLSearchParams(
-        Object.entries(filters).filter(([_, v]) => v !== "")
+        Object.entries({ ...filters, page, limit: pageSize }).filter(([_, v]) => v !== "")
       );
 
       const res = await fetch(`/api/savings/saving?${params.toString()}`);
@@ -106,6 +106,7 @@ export default function SavingsAccounts() {
       if (!res.ok) throw new Error(data.message || "Failed to load");
 
       setSavings(Array.isArray(data.savingsAccounts) ? data.savingsAccounts : []);
+      setTotal(data.total || 0); // 🆕 store total for pagination
     } catch (error) {
       console.error("Failed to fetch savings accounts:", error);
       message.error("Error fetching savings data");
@@ -120,8 +121,18 @@ export default function SavingsAccounts() {
   }, []);
 
   useEffect(() => {
-    fetchSavings();
+    setPage(1); // reset to first page whenever filters change
   }, [filters]);
+
+  useEffect(() => {
+    fetchSavings();
+  }, [filters, page, pageSize]);
+
+  // Handle pagination change
+  const handlePageChange = (newPage, newPageSize) => {
+    setPage(newPage);
+    setPageSize(newPageSize);
+  };
 
   const handleDelete = async () => {
     try {
@@ -138,18 +149,6 @@ export default function SavingsAccounts() {
     } finally {
       setDeleteLoading(false);
     }
-  };
-
-  const handleDateRangeChange = (dates) => {
-    if (!dates) {
-      setFilters((prev) => ({ ...prev, startDate: "", endDate: "" }));
-      return;
-    }
-    setFilters((prev) => ({
-      ...prev,
-      startDate: dates[0].startOf("day").toISOString(),
-      endDate: dates[1].endOf("day").toISOString(),
-    }));
   };
 
   return (
@@ -235,7 +234,7 @@ export default function SavingsAccounts() {
         </div>
       ) : savings.length === 0 ? (
         <Empty description="No savings accounts found" className="mt-5" />
-      ) : (
+      ) : (<>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-5">
           {savings.map((item) => (
             <Card
@@ -380,6 +379,21 @@ export default function SavingsAccounts() {
             </Card>
           ))}
         </div>
+        {/* 🆕 Pagination Controls */}
+        <div className="flex justify-start mt-6">
+          <Pagination
+            current={page}
+            total={total}
+            pageSize={pageSize}
+            showSizeChanger
+            pageSizeOptions={["6", "9", "12", "24"]}
+            onChange={handlePageChange}
+            showTotal={(t, range) =>
+              `${range[0]}–${range[1]} of ${t} savings accounts`
+            }
+          />
+        </div>
+      </>
       )}
 
       {/* Modals */}
