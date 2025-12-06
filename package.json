@@ -35,7 +35,7 @@
     "lodash": "^4.17.21",
     "moment": "^2.30.1",
     "mongoose": "^8.13.1",
-    "next": "15.2.4",
+    "next": "^15.2.6",
     "next-sitemap": "^4.2.3",
     "pdf2table": "^0.0.2",
     "postcss": "^8.5.3",
