@@ -93,13 +93,39 @@ function AIReports() {
     }, [selectedDate]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
-    const renderContent = (content) => (
-        <div className="prose max-w-none text-gray-700">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {content}
-            </ReactMarkdown>
-        </div>
-    );
+    const renderContent = (version) => {
+        if (version.status === 'generating') {
+            return (
+                <div className="text-center py-20 flex flex-col items-center justify-center">
+                    <Spin size="large" />
+                    <Text className="mt-4 text-gray-500">Generating comprehensive financial analysis...</Text>
+                    <Text type="secondary" className="text-xs mt-2">This may take a few moments.</Text>
+                </div>
+            );
+        }
+
+        if (version.status === 'failed') {
+            return (
+                <div className="py-10">
+                    <Alert
+                        message="Generation Failed"
+                        description={version.content || "An error occurred while generating the report."}
+                        type="error"
+                        showIcon
+                    />
+                </div>
+            );
+        }
+
+        // Default: completed or legacy (no status)
+        return (
+            <div id="report-content" className="prose max-w-none text-gray-700 p-4">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {version.content}
+                </ReactMarkdown>
+            </div>
+        );
+    };
 
     return (
         <>
@@ -186,22 +212,24 @@ function AIReports() {
                                                 <Text type="secondary">
                                                     Generated on {dayjs(ver.createdAt).format("MMM D, YYYY h:mm A")}
                                                 </Text>
-                                                {index !== reportDoc.selectedVersionIndex && (
-                                                    <Button
-                                                        size="small"
-                                                        icon={<CheckCircleOutlined />}
-                                                        onClick={() => setAsMainVersion(index)}
-                                                    >
-                                                        Set as Main Report
-                                                    </Button>
-                                                )}
+                                                <div className="flex gap-2">
+                                                    {index !== reportDoc.selectedVersionIndex && (
+                                                        <Button
+                                                            size="small"
+                                                            icon={<CheckCircleOutlined />}
+                                                            onClick={() => setAsMainVersion(index)}
+                                                        >
+                                                            Set as Main Report
+                                                        </Button>
+                                                    )}
+                                                </div>
                                                 {index === reportDoc.selectedVersionIndex && (
                                                     <Button type="text" size="small" icon={<CheckCircleOutlined />} disabled className="text-green-600">
                                                         Currently Main Report
                                                     </Button>
                                                 )}
                                             </div>
-                                            {renderContent(ver.content)}
+                                            {renderContent(ver)}
                                         </div>
                                     )
                                 }))}

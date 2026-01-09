@@ -90,28 +90,59 @@ export default async function handler(req, res) {
             }
         }
 
-        // Generate Report
-        const reportContent = await generateFinancialReport(
-            transactions,
-            format(startDate, 'yyyy-MM-dd'),
-            format(endDate, 'yyyy-MM-dd')
-        );
+        // Initialize report version with 'generating' status
+        let newVersionIndex;
 
         if (reportDoc) {
-            reportDoc.versions.push({ content: reportContent });
-            reportDoc.selectedVersionIndex = reportDoc.versions.length - 1;
+            reportDoc.versions.push({
+                content: "",
+                status: "generating"
+            });
+            newVersionIndex = reportDoc.versions.length - 1;
+            reportDoc.selectedVersionIndex = newVersionIndex;
             await reportDoc.save();
         } else {
             reportDoc = await Report.create({
                 userId,
                 month: targetMonth,
                 year: targetYear,
-                versions: [{ content: reportContent }],
+                versions: [{
+                    content: "",
+                    status: "generating"
+                }],
                 selectedVersionIndex: 0
             });
+            newVersionIndex = 0;
         }
 
-        res.status(200).json({ report: reportDoc });
+        try {
+            // Generate Report
+            const reportContent = await generateFinancialReport(
+                transactions,
+                format(startDate, 'yyyy-MM-dd'),
+                format(endDate, 'yyyy-MM-dd')
+            );
+
+            // Update with content and completed status
+            // Re-fetch to ensure we have latest version of document if needed, 
+            // but since we are in same request and mongo is consistent for single doc updates usually ok.
+            // But good to be safe if we want to handle concurrent weirdness, though here we likely hold the lock logically.
+            // We can just update the object we have and save.
+
+            reportDoc.versions[newVersionIndex].content = reportContent;
+            reportDoc.versions[newVersionIndex].status = "completed";
+            await reportDoc.save();
+
+            res.status(200).json({ report: reportDoc });
+
+        } catch (error) {
+            // Update status to failed
+            reportDoc.versions[newVersionIndex].status = "failed";
+            reportDoc.versions[newVersionIndex].content = "Report generation failed. Please try again.";
+            await reportDoc.save();
+
+            throw error; // Re-throw to be caught by outer catch for logging/response
+        }
 
     } catch (error) {
         console.error("Report Generation Error:", error);

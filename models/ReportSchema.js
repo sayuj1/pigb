@@ -6,7 +6,12 @@ const ReportSchema = new mongoose.Schema({
     year: { type: Number, required: true }, // e.g., 2024
     versions: [
         {
-            content: { type: String, required: true },
+            content: { type: String },
+            status: {
+                type: String,
+                enum: ["generating", "completed", "failed"],
+                default: "completed"
+            },
             createdAt: { type: Date, default: Date.now },
         },
     ],
