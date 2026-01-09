@@ -49,10 +49,12 @@ export default async function handler(req, res) {
         });
 
         const totalGenerationsThisMonth = allReportsThisMonth.reduce((count, doc) => {
-            const versionsInMonth = doc.versions.filter(v =>
-                v.createdAt >= startOfCurrentMonth && v.createdAt <= endOfCurrentMonth
+            const successfulVersionsInMonth = doc.versions.filter(v =>
+                v.createdAt >= startOfCurrentMonth &&
+                v.createdAt <= endOfCurrentMonth &&
+                v.status === "completed" //  ONLY count successful reports
             );
-            return count + versionsInMonth.length;
+            return count + successfulVersionsInMonth.length;
         }, 0);
 
         if (totalGenerationsThisMonth >= 3) {
@@ -83,7 +85,11 @@ export default async function handler(req, res) {
         let reportDoc = await Report.findOne({ userId, month: targetMonth, year: targetYear });
 
         if (reportDoc) {
-            if (reportDoc.versions.length >= 3) {
+            const successfulVersionsCount = reportDoc.versions.filter(
+                v => v.status === "completed" //  only count successful reports
+            ).length;
+
+            if (successfulVersionsCount >= 3) {
                 return res.status(400).json({
                     message: "Maximum revisions (3) reached for this month. Please use an existing version."
                 });

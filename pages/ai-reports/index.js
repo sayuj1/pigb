@@ -128,6 +128,9 @@ function AIReports() {
         );
     };
 
+    const successfulVersionsCount =
+        reportDoc?.versions?.filter(v => v.status === "completed").length || 0;
+
     return (
         <>
             <Head>
@@ -179,7 +182,7 @@ function AIReports() {
                                 type="primary"
                                 onClick={generateReport}
                                 loading={loading}
-                                disabled={reportDoc?.versions?.length >= 3 || usageStats.used >= usageStats.limit}
+                                disabled={successfulVersionsCount >= 3 || usageStats.used >= usageStats.limit}
                             >
                                 {reportDoc ? "Generate New Version" : "Generate Report"}
                             </Button>
@@ -250,10 +253,10 @@ function AIReports() {
                         </Card>
                     )}
 
-                    {reportDoc && reportDoc.versions.length >= 3 && (
+                    {reportDoc && successfulVersionsCount >= 3 && (
                         <div className="mt-4 text-center">
                             <Text type="secondary">
-                                <HistoryOutlined /> Maximum limit of 3 revisions reached for this month.
+                                <HistoryOutlined /> Maximum limit of 3 successful revisions reached for this month.
                             </Text>
                         </div>
                     )}

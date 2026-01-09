@@ -32,10 +32,12 @@ export default async function handler(req, res) {
             });
 
             const totalGenerationsThisMonth = allReportsThisMonth.reduce((count, doc) => {
-                const versionsInMonth = doc.versions.filter(v =>
-                    v.createdAt >= startOfCurrentMonth && v.createdAt <= endOfCurrentMonth
+                const successfulVersionsInMonth = doc.versions.filter(v =>
+                    v.createdAt >= startOfCurrentMonth &&
+                    v.createdAt <= endOfCurrentMonth &&
+                    v.status === "completed" //  ONLY count successful reports
                 );
-                return count + versionsInMonth.length;
+                return count + successfulVersionsInMonth.length;
             }, 0);
 
             const usageStats = {
