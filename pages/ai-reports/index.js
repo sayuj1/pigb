@@ -9,6 +9,8 @@ import { RobotOutlined, CheckCircleOutlined, HistoryOutlined } from "@ant-design
 import axios from "axios";
 import Head from "next/head";
 import dayjs from "dayjs";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const SidebarLayout = dynamic(() => import("@/components/Layout"), { ssr: false });
 const { Title, Paragraph, Text } = Typography;
@@ -92,15 +94,11 @@ function AIReports() {
 
 
     const renderContent = (content) => (
-        <div
-            className="prose max-w-none text-gray-700"
-            dangerouslySetInnerHTML={{
-                __html: content
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/^- (.*)/gm, '<li>$1</li>')
-                    .replace(/\n\n/g, '<br/><br/>')
-            }}
-        />
+        <div className="prose max-w-none text-gray-700">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {content}
+            </ReactMarkdown>
+        </div>
     );
 
     return (
