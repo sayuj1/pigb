@@ -11,6 +11,7 @@ import {
   PieChartOutlined,
   AppstoreOutlined,
   ShoppingCartOutlined,
+  RobotOutlined,
 } from "@ant-design/icons";
 
 import Navbar from "./Navbar";
@@ -45,6 +46,7 @@ const menuItems = [
     )
   },
   { key: "loans", icon: <CreditCardOutlined />, label: "Manage Loans" },
+  { key: "ai-reports", icon: <RobotOutlined />, label: "AI Reports" },
 ];
 
 export default function SidebarLayout({ children }) {

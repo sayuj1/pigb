@@ -10,6 +10,8 @@ import UpcomingBillsList from "@/components/dashboard/UpcomingBillsList";
 import { useState } from "react";
 import Head from "next/head";
 import { DashboardProvider } from "@/context/DashboardContext";
+
+
 const SidebarLayout = dynamic(() => import("@/components/Layout"), {
   ssr: false,
 });
@@ -30,6 +32,10 @@ function Dashboard() {
       <DashboardProvider>
         <SidebarLayout>
           <div className="p-4 space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-semibold text-gray-800">Overview</h2>
+            </div>
+
             <SummaryCards totalSavings={totalSavings} />
             <ExpensesIncomeChart />
             <CategorySpendingChart />
@@ -47,5 +53,3 @@ function Dashboard() {
 }
 
 export default ProtectedRoute(Dashboard);
-
-// pages/dashboard.jsx or app/dashboard/page.jsx
