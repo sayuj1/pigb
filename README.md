@@ -6,7 +6,7 @@
 ![Made with Next.js](https://img.shields.io/badge/Made%20with-Next.js-black)
 
 
-**Manage your finances with ease — track income, expenses, budgets, savings, loans, and more in one beautiful dashboard.**
+**Manage your finances with ease — track income, expenses, budgets, loans, and get AI-powered reports and insights, all in one beautiful dashboard.**
 
 Pigb is an open-source personal finance management platform built with **Next.js**, **MongoDB**, **Redis**, and **Node APIs**.  
 It helps users organize their financial life with powerful tools, including AI-generated financial reports and insights, such as:
