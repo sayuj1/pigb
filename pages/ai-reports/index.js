@@ -12,6 +12,9 @@ import dayjs from "dayjs";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CgSmartphoneChip } from "react-icons/cg";
+import { DownloadOutlined } from "@ant-design/icons";
+import jsPDF from "jspdf";
+import { domToCanvas } from "modern-screenshot";
 
 const SidebarLayout = dynamic(() => import("@/components/Layout"), { ssr: false });
 const { Title, Paragraph, Text } = Typography;
@@ -24,6 +27,7 @@ function AIReports() {
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState("0");
     const [usageStats, setUsageStats] = useState({ used: 0, limit: 3 });
+    const [isExporting, setIsExporting] = useState(false);
 
     const fetchReport = async () => {
         setLoading(true);
@@ -88,13 +92,71 @@ function AIReports() {
         }
     };
 
+    const downloadPDF = async (index) => {
+        const element = document.getElementById(`report-content-${index}`);
+        if (!element) return;
+
+        setIsExporting(true);
+        try {
+            const pdf = new jsPDF("p", "mm", "a4");
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const margin = 15;
+            const contentWidth = pdfWidth - (2 * margin);
+
+            // Get the container and its children
+            const container = element;
+            const children = container.children;
+
+            let currentY = margin;
+
+            for (let i = 0; i < children.length; i++) {
+                const child = children[i];
+
+                // Skip empty elements
+                if (child.offsetHeight === 0) continue;
+
+                const canvas = await domToCanvas(child, {
+                    scale: 2,
+                    backgroundColor: "#ffffff",
+                    // Ensure styles are inherited correctly
+                    style: {
+                        margin: "0",
+                        padding: "0",
+                    }
+                });
+
+                const imgData = canvas.toDataURL("image/png");
+                const imgProps = pdf.getImageProperties(imgData);
+                const imgHeight = (imgProps.height * contentWidth) / imgProps.width;
+
+                // If this element exceeds the current page, move to the next page
+                if (currentY + imgHeight > pdfHeight - margin) {
+                    pdf.addPage();
+                    currentY = margin;
+                }
+
+                pdf.addImage(imgData, "PNG", margin, currentY, contentWidth, imgHeight);
+                currentY += imgHeight + 4; // Add a small gap between elements
+            }
+
+            const fileName = `AI_Report_${selectedDate.format("MMM_YYYY")}.pdf`;
+            pdf.save(fileName);
+        } catch (err) {
+            console.error("PDF Export Error:", err);
+            setError("Failed to export PDF properly. Some advanced styles might be causing issues.");
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
     // Initial fetch on mount or date change
     useEffect(() => {
         fetchReport();
     }, [selectedDate]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
-    const renderContent = (version) => {
+    const renderContent = (version, index) => {
         if (version.status === 'generating') {
             return (
                 <div className="text-center py-20 flex flex-col items-center justify-center">
@@ -120,7 +182,7 @@ function AIReports() {
 
         // Default: completed or legacy (no status)
         return (
-            <div id="report-content" className="prose max-w-none text-gray-700 p-4">
+            <div id={`report-content-${index}`} className="prose max-w-none text-gray-700 p-4 bg-white">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {version.content}
                 </ReactMarkdown>
@@ -218,7 +280,7 @@ function AIReports() {
                                         <span>
                                             Version {index + 1} &nbsp;
                                             {index === reportDoc.selectedVersionIndex && (
-                                                <Tag color="green" className="ml-2 mr-0">Main</Tag>
+                                                <Tag color="green" className="ml-2 mr-0">✓</Tag>
                                             )}
                                         </span>
                                     ),
@@ -228,24 +290,43 @@ function AIReports() {
                                                 <Text type="secondary">
                                                     Generated on {dayjs(ver.createdAt).format("MMM D, YYYY h:mm A")}
                                                 </Text>
-                                                <div className="flex gap-2">
-                                                    {index !== reportDoc.selectedVersionIndex && (
-                                                        <Button
-                                                            size="small"
-                                                            icon={<CheckCircleOutlined />}
-                                                            onClick={() => setAsMainVersion(index)}
-                                                        >
-                                                            Set as Main Report
-                                                        </Button>
-                                                    )}
-                                                </div>
-                                                {index === reportDoc.selectedVersionIndex && (
-                                                    <Button type="text" size="small" icon={<CheckCircleOutlined />} disabled className="text-green-600">
-                                                        Currently Main Report
+                                                <div className="flex justify-between items-center gap-1">
+                                                    {/* Left side actions */}
+                                                    <div className="flex gap-2">
+                                                        {index !== reportDoc.selectedVersionIndex ? (
+                                                            <Button
+                                                                size="small"
+                                                                icon={<CheckCircleOutlined />}
+                                                                onClick={() => setAsMainVersion(index)}
+                                                            >
+                                                                Set as Main Report
+                                                            </Button>
+                                                        ) : (
+                                                            <Button
+                                                                type="text"
+                                                                size="small"
+                                                                icon={<CheckCircleOutlined />}
+                                                                disabled
+                                                                className="text-green-600"
+                                                            >
+                                                                Currently Main Report
+                                                            </Button>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Right side action */}
+                                                    <Button
+                                                        size="small"
+                                                        icon={<DownloadOutlined />}
+                                                        onClick={() => downloadPDF(index)}
+                                                        loading={isExporting}
+                                                    >
+                                                        Download PDF
                                                     </Button>
-                                                )}
+                                                </div>
+
                                             </div>
-                                            {renderContent(ver)}
+                                            {renderContent(ver, index)}
                                         </div>
                                     )
                                 }))}

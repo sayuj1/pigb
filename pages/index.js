@@ -197,6 +197,7 @@ export default function Home() {
                   "Track report generation status and history",
                   "Regenerate reports anytime with updated transactions",
                   "Revise each AI report up to three times for better accuracy",
+                  "Download reports as PDF for offline viewing",
                 ].map((text, idx) => (
                   <li key={idx} className="flex items-start gap-3">
                     <HiCheckCircle className="text-[#00b894] w-5 h-5 mt-0.5 flex-shrink-0" />
