@@ -174,7 +174,7 @@ function AIReports() {
                                     key: String(index),
                                     label: (
                                         <span>
-                                            Version {index + 1}
+                                            Version {index + 1} &nbsp;
                                             {index === reportDoc.selectedVersionIndex && (
                                                 <Tag color="green" className="ml-2 mr-0">Main</Tag>
                                             )}
