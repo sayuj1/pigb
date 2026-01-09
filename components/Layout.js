@@ -11,8 +11,9 @@ import {
   PieChartOutlined,
   AppstoreOutlined,
   ShoppingCartOutlined,
-  RobotOutlined,
+
 } from "@ant-design/icons";
+import { CgSmartphoneChip } from "react-icons/cg";
 
 import Navbar from "./Navbar";
 import { useTheme } from "@/context/ThemeContext";
@@ -46,7 +47,7 @@ const menuItems = [
     )
   },
   { key: "loans", icon: <CreditCardOutlined />, label: "Manage Loans" },
-  { key: "ai-reports", icon: <RobotOutlined />, label: "AI Reports" },
+  { key: "ai-reports", icon: <CgSmartphoneChip />, label: "AI Reports" },
 ];
 
 export default function SidebarLayout({ children }) {

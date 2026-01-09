@@ -11,6 +11,7 @@ import Head from "next/head";
 import dayjs from "dayjs";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { CgSmartphoneChip } from "react-icons/cg";
 
 const SidebarLayout = dynamic(() => import("@/components/Layout"), { ssr: false });
 const { Title, Paragraph, Text } = Typography;
@@ -137,10 +138,22 @@ function AIReports() {
 
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                         <div>
-                            <Title level={2} style={{ marginBottom: 0 }}>
-                                <RobotOutlined className="mr-2 text-blue-500" />
-                                AI Financial Reports
+                            <Title
+                                level={2}
+                                style={{
+                                    marginBottom: 0,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 10,
+                                }}
+                            >
+                                <CgSmartphoneChip className="text-emerald-500 " />
+                                <span className="bg-gradient-to-r from-emerald-500 to-teal-400 bg-clip-text text-transparent font-semibold">
+                                    AI Financial Reports
+                                </span>
                             </Title>
+
+
                             <Text type="secondary">
                                 Analyze your monthly spending and get actionable insights.
                             </Text>
