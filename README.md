@@ -9,12 +9,13 @@
 **Manage your finances with ease — track income, expenses, budgets, savings, loans, and more in one beautiful dashboard.**
 
 Pigb is an open-source personal finance management platform built with **Next.js**, **MongoDB**, **Redis**, and **Node APIs**.  
-It helps users organize their financial life by providing tools for:
+It helps users organize their financial life with powerful tools, including AI-generated financial reports and insights, such as:
 
 - 💸 Expense & income tracking  
 - 📅 Budget planning  
 - 💰 Savings & goals tracking  
 - 📑 Loan management  
+- 🤖 AI-powered financial reports & smart insights
 - 📊 Smart dashboards & insights  
 - 🧾 PDF import (bank statements)  
 - 🔐 secure auth (Google OAuth + JWT)
@@ -95,6 +96,7 @@ GOOGLE_CLIENT_SECRET=
 GOOGLE_REDIRECT_URI=
 API_BASE_URL=
 REDIS_URL=
+GEMINI_API_KEY=
 ```
 Notes:
 - JWT_SECRET should be a long, random string.
