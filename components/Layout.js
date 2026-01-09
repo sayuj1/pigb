@@ -29,6 +29,14 @@ const { Sider, Content } = Layout;
 
 const menuItems = [
   { key: "dashboard", icon: <DashboardOutlined />, label: "Dashboard" },
+  {
+    key: "ai-reports", icon: <CgSmartphoneChip />, label: (
+      <span>
+        AI Reports{" "}
+        <BetaTag />
+      </span>
+    )
+  },
   { key: "accounts", icon: <BankOutlined />, label: "Accounts" },
   { key: "income-expense", icon: <DollarOutlined />, label: "Income/Expense" },
   // { key: "bills", icon: <SyncOutlined />, label: "Planned Bills" },
@@ -47,7 +55,6 @@ const menuItems = [
     )
   },
   { key: "loans", icon: <CreditCardOutlined />, label: "Manage Loans" },
-  { key: "ai-reports", icon: <CgSmartphoneChip />, label: "AI Reports" },
 ];
 
 export default function SidebarLayout({ children }) {
