@@ -16,6 +16,8 @@ import {
   PiSquaresFourDuotone,
   PiFileArrowUpDuotone,
 } from "react-icons/pi";
+import { CgSmartphoneChip } from "react-icons/cg";
+import { HiCheckCircle } from "react-icons/hi";
 import ROUTES from "@/lib/routes";
 import Head from "next/head";
 
@@ -161,6 +163,89 @@ export default function Home() {
           </div>
         </section>
 
+        {/* 🤖 AI Financial Reports */}
+        <section className="py-24 px-6 bg-gradient-to-br from-[#e0f7f5] to-white relative overflow-hidden">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-14">
+
+            {/* Left Content */}
+            <motion.div
+              className="md:flex-1"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <CgSmartphoneChip className="text-emerald-500 w-10 h-10 " />
+                <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-emerald-500 to-teal-400 bg-clip-text text-transparent">
+                  AI Financial Reports
+                </h2>
+              </div>
+
+              <p className="text-gray-600 text-lg max-w-xl mb-6">
+                Let PigB analyze your transactions and generate intelligent monthly
+                insights — spending patterns, savings health, anomalies, and smart
+                recommendations.
+              </p>
+
+              <ul className="space-y-3 text-gray-700 mb-8">
+                {[
+                  "Monthly and category-wise financial insights",
+                  "Smart spending and savings recommendations",
+                  "AI-written, easy-to-understand financial summary",
+                  "Real-time report generation based on live data",
+                  "Track report generation status and history",
+                  "Regenerate reports anytime with updated transactions",
+                  "Revise each AI report up to three times for better accuracy",
+                ].map((text, idx) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <HiCheckCircle className="text-[#00b894] w-5 h-5 mt-0.5 flex-shrink-0" />
+                    <span>{text}</span>
+                  </li>
+                ))}
+              </ul>
+
+
+
+              {user ? (
+                <Button
+                  type="primary"
+                  size="large"
+                  onClick={() => router.push("/ai-reports")}
+                  className="!bg-[#00b894] hover:!bg-[#00cec9] text-white font-medium shadow-md"
+                >
+                  View AI Report
+                </Button>
+              ) : (
+                <Button
+                  size="large"
+                  onClick={() => router.push(ROUTES.SIGNUP)}
+                  className="!bg-[#00b894] hover:!bg-[#00cec9] !text-white font-medium shadow-md"
+                >
+                  Try AI Reports
+                </Button>
+              )}
+            </motion.div>
+
+            {/* Right Visual */}
+            <motion.div
+              className="md:flex-1 flex justify-center"
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <Image
+                src="/ai-report.svg" // add an illustration or chart-style image
+                alt="AI Financial Insights"
+                width={420}
+                height={320}
+                className="object-contain drop-shadow-xl"
+              />
+            </motion.div>
+          </div>
+        </section>
+
         {/* 💡 Features Section */}
         <section id="features" className="py-20 px-6 bg-white">
           <motion.h2
@@ -250,6 +335,9 @@ export default function Home() {
             ))}
           </div>
         </section>
+
+
+
 
         {/* 💸 Pricing Section */}
         <section id="pricing" className="py-20 px-6 bg-gray-50">

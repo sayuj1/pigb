@@ -1,0 +1,68 @@
+<svg
+  width="500"
+  height="380"
+  viewBox="0 0 500 380"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- Background Card -->
+  <rect
+    x="40"
+    y="30"
+    width="420"
+    height="320"
+    rx="24"
+    fill="url(#bgGradient)"
+  />
+
+  <!-- Header -->
+  <rect x="80" y="70" width="180" height="16" rx="8" fill="#E6FFFA" />
+  <rect x="80" y="100" width="260" height="12" rx="6" fill="#B2F5EA" />
+
+  <!-- Chart Bars -->
+  <rect x="110" y="170" width="32" height="90" rx="8" fill="#00B894" />
+  <rect x="170" y="150" width="32" height="110" rx="8" fill="#00CEC9" />
+  <rect x="230" y="190" width="32" height="70" rx="8" fill="#00B894" />
+  <rect x="290" y="130" width="32" height="130" rx="8" fill="#00CEC9" />
+
+  <!-- AI Chip -->
+  <rect
+    x="320"
+    y="90"
+    width="80"
+    height="40"
+    rx="12"
+    fill="#FFFFFF"
+    opacity="0.95"
+  />
+  <text
+    x="360"
+    y="116"
+    text-anchor="middle"
+    font-size="14"
+    font-weight="700"
+    fill="#00B894"
+    font-family="Arial, Helvetica, sans-serif"
+  >
+    AI
+  </text>
+
+  <!-- Floating Circles -->
+  <circle cx="90" cy="300" r="10" fill="#00CEC9" opacity="0.6" />
+  <circle cx="420" cy="60" r="8" fill="#00B894" opacity="0.6" />
+
+  <!-- Gradients -->
+  <defs>
+    <linearGradient
+      id="bgGradient"
+      x1="40"
+      y1="30"
+      x2="460"
+      y2="350"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stop-color="#E6FFFA" />
+      <stop offset="1" stop-color="#FFFFFF" />
+    </linearGradient>
+  </defs>
+</svg>
