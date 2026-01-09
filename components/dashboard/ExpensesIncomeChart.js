@@ -39,7 +39,7 @@ export default function ExpensesIncomeChart() {
           Monthly Expenses vs Income
         </Title>
       }
-      extra={<Text type="secondary">Last 12 Months</Text>}
+      extra={<Text type="secondary">Last 6 Months</Text>}
       className="shadow-md"
       bodyStyle={{ padding: "1rem" }}
     >

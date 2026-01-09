@@ -35,7 +35,7 @@ export const DashboardProvider = ({ children }) => {
     }).toString();
 
     const incomeExpenseQuery = new URLSearchParams({
-        startDate: dayjs().subtract(11, "month").startOf("month").toISOString(),
+        startDate: dayjs().subtract(5, "month").startOf("month").toISOString(),
         endDate: dayjs().endOf("month").toISOString(),
     }).toString();
 
