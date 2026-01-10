@@ -16,7 +16,17 @@ export const findGoalsByUserId = async (userId, options = {}) => {
         query.category = category;
     }
     if (status && status !== "All") {
-        query.status = status;
+        if (status === "overdue") {
+            query.status = "pending";
+            query.deadline = { $lt: new Date() };
+        } else if (status === "near_deadline") {
+            const sevenDaysFromNow = new Date();
+            sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
+            query.status = "pending";
+            query.deadline = { $gte: new Date(), $lte: sevenDaysFromNow };
+        } else {
+            query.status = status;
+        }
     }
 
     const [goals, total] = await Promise.all([

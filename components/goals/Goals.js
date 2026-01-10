@@ -178,6 +178,8 @@ const Goals = () => {
                                 <Option value="All">All Status</Option>
                                 <Option value="pending">Pending</Option>
                                 <Option value="completed">Completed</Option>
+                                <Option value="near_deadline">Nearing Deadline</Option>
+                                <Option value="overdue">Overdue</Option>
                             </Select>
                         </div>
                     </Col>
