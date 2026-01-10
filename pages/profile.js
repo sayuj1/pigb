@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import dynamic from "next/dynamic";
 import {
     Card,
@@ -26,6 +26,7 @@ import {
 } from "@ant-design/icons";
 import axios from "axios";
 import ProtectedRoute from "@/context/ProtectRoute";
+import AuthContext from "@/context/AuthContext";
 import Head from "next/head";
 import { getAllISOCodes, getAllInfoByISO } from "iso-country-currency";
 
@@ -40,6 +41,7 @@ const countries = getAllISOCodes();
 
 const ProfilePage = () => {
     const [form] = Form.useForm();
+    const { setUser } = useContext(AuthContext);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [userData, setUserData] = useState(null);
@@ -52,6 +54,7 @@ const ProfilePage = () => {
         try {
             const res = await axios.get("/api/user");
             setUserData(res.data);
+            setUser(res.data);
             form.setFieldsValue({
                 name: res.data.name,
                 email: res.data.email,
@@ -92,8 +95,9 @@ const ProfilePage = () => {
                     dateFormat: values.dateFormat,
                 }
             };
-            await axios.put("/api/user", payload);
+            const res = await axios.put("/api/user", payload);
             message.success("Profile updated successfully");
+            setUser(res.data);
             fetchProfile();
         } catch (error) {
             console.error("Error updating profile:", error);
@@ -142,11 +146,25 @@ const ProfilePage = () => {
 
                                     <Divider />
 
-                                    <div className="w-full text-left bg-emerald-50 p-4 rounded-xl">
-                                        <Text className="block text-emerald-800 text-xs uppercase font-bold tracking-wider mb-2">Member Since</Text>
-                                        <Text strong className="text-emerald-900 flex items-center gap-2">
-                                            <CalendarOutlined /> {new Date(userData?.createdAt).toLocaleDateString()}
-                                        </Text>
+                                    <div className="w-full text-left bg-emerald-50 p-4 rounded-xl space-y-3">
+                                        <div>
+                                            <Text className="block text-emerald-800 text-[10px] uppercase font-bold tracking-wider mb-1">Member Since</Text>
+                                            <Text strong className="text-emerald-900 flex items-center gap-2 text-sm">
+                                                <CalendarOutlined /> {new Date(userData?.createdAt).toLocaleDateString()}
+                                            </Text>
+                                        </div>
+                                        {/* <div>
+                                            <Text className="block text-emerald-800 text-[10px] uppercase font-bold tracking-wider mb-1">Login Provider</Text>
+                                            <Text strong className="text-emerald-900 flex items-center gap-2 text-sm capitalize">
+                                                <GlobalOutlined /> {userData?.provider || 'Manual'}
+                                            </Text>
+                                        </div>
+                                        <div>
+                                            <Text className="block text-emerald-800 text-[10px] uppercase font-bold tracking-wider mb-1">Default Currency</Text>
+                                            <Text strong className="text-emerald-900 flex items-center gap-2 text-sm">
+                                                <DollarCircleOutlined /> {userData?.locale?.currency} ({userData?.locale?.symbol})
+                                            </Text>
+                                        </div> */}
                                     </div>
                                 </div>
                             </Card>
@@ -240,6 +258,30 @@ const ProfilePage = () => {
                                             </Form.Item>
                                         </Col>
                                     </Row>
+
+                                    <Divider />
+
+                                    <Title level={5} className="mb-4">Account Security</Title>
+                                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6">
+                                        <Row gutter={16} align="middle">
+                                            <Col xs={24} sm={16}>
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`p-2 rounded-lg ${userData?.provider === 'google' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'}`}>
+                                                        {userData?.provider === 'google' ? <GlobalOutlined /> : <UserOutlined />}
+                                                    </div>
+                                                    <div>
+                                                        <Text strong className="block">Logged in via {userData?.provider === 'google' ? 'Google' : 'Manual Login'}</Text>
+                                                        <Text type="secondary" className="text-xs">Your account is secured with {userData?.provider === 'google' ? 'Google OAuth 2.0' : 'Encrypted Passwords'}</Text>
+                                                    </div>
+                                                </div>
+                                            </Col>
+                                            <Col xs={24} sm={8} className="text-right">
+                                                {userData?.provider === 'manual' && (
+                                                    <Button size="small" className="text-xs rounded-lg">Change Password</Button>
+                                                )}
+                                            </Col>
+                                        </Row>
+                                    </div>
 
                                     <div className="text-right mt-6">
                                         <Button
