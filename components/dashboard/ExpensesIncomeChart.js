@@ -25,6 +25,8 @@ const { Title, Text } = Typography;
 export default function ExpensesIncomeChart() {
   const { incomeExpenseData: data, incomeExpenseLoading } = useDashboard();
 
+  if (!incomeExpenseLoading && data.length === 0) return null;
+
   const dynamicDx = getDynamicDx(data, "income");
   const dynamicDxRight = getSecondaryDynamicDx(data, "expense");
 

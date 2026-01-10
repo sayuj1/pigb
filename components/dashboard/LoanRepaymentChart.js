@@ -51,41 +51,11 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function LoanRepaymentChart() {
-
   const { loans, loansLoading } = useDashboard();
 
+  if (!loansLoading && (!loans || loans.length === 0)) return null;
+
   if (loansLoading) return <ChartSkeleton />;
-
-  if (!loans || loans.length === 0) {
-    return (
-      <div className="bg-white rounded-2xl shadow-md p-10 border border-gray-100">
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">
-          Loan Repayment Progress
-        </h2>
-        <div className=" flex flex-col items-center justify-center h-64 text-center text-gray-400 select-none">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-16 w-16 mb-4 text-gray-300"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={1.5}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M9 17v-2a4 4 0 014-4h4m-4 0V5a2 2 0 10-4 0v4a2 2 0 004 0zM5 20h14a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2z"
-            />
-          </svg>
-
-          <p className="text-sm text-gray-400 max-w-xs">
-            No loan repayment data available yet. Once you add loans and
-            payments, you’ll see progress visualized here.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   const chartData = loans.map((loan) => ({
     name: loan.name,

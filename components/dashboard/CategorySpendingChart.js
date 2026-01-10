@@ -31,6 +31,8 @@ const COLORS = [
 export default function CategorySpendingBarChart() {
   const { categoryChartData: data, currentMonth, categoryLoading } = useDashboard();
 
+  if (!categoryLoading && data.length === 0) return null;
+
   return (
     <Card
       title={

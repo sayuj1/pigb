@@ -9,6 +9,8 @@ const { Title, Text } = Typography;
 export default function GoalProgress() {
     const { goalStats, goalStatsLoading } = useDashboard();
 
+    if (!goalStatsLoading && goalStats.totalGoals === 0) return null;
+
     if (goalStatsLoading) return <BudgetSkeleton />;
 
     const overallPercent = goalStats.totalTargetAmount > 0

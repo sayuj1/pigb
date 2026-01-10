@@ -23,29 +23,11 @@ const COLORS = [
 export default function SavingsAccountsDistributionChart() {
   const { savings, savingsPie, savingsLoading } = useDashboard();
 
+  if (!savingsLoading && savings.length === 0) return null;
+
   if (savingsLoading) {
     //  Show reusable chart skeleton
     return <ChartSkeleton title bars={4} pie />;
-  }
-
-  if (!savings.length) {
-    return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
-          <PiChartBarDuotone className="text-xl text-sky-500" />
-          Savings Account Distribution
-        </h2>
-        <div className="flex flex-col items-center justify-center h-60 text-center text-gray-500 space-y-3">
-          <div className="text-5xl text-sky-400">
-            <PiChartBarDuotone />
-          </div>
-          <h3 className="text-base font-medium">No savings data found</h3>
-          <p className="text-sm text-gray-400">
-            Add savings accounts and transactions to visualize distribution.
-          </p>
-        </div>
-      </div>
-    );
   }
 
   const chartData = savings.map((item, i) => ({

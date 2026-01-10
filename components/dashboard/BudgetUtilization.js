@@ -9,6 +9,8 @@ import dayjs from "dayjs";
 export default function BudgetUtilization() {
   const { budgets, currentMonth, budgetsLoading } = useDashboard();
 
+  if (!budgetsLoading && budgets.length === 0) return null;
+
   const getStrokeColor = (percent) => {
     if (percent < 50) return "#52c41a"; // green
     if (percent < 80) return "#faad14"; // orange
@@ -37,18 +39,7 @@ export default function BudgetUtilization() {
       {budgetsLoading ? (
         <BudgetSkeleton />
       ) : budgets.length === 0 ? (
-        // Empty State
-        <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500 space-y-3">
-          <div className="text-5xl text-green-400">
-            <PiWalletLight className="text-5xl text-green-400" />
-          </div>
-          <Typography.Title level={5} className="!mb-0">
-            No budgets available
-          </Typography.Title>
-          <Typography.Text type="secondary">
-            Start by creating a new budget to track your expenses.
-          </Typography.Text>
-        </div>
+        null
       ) : (
         // Loaded Data
         <div className="space-y-6">
