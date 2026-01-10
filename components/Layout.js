@@ -14,7 +14,7 @@ import {
   AppstoreOutlined,
   ShoppingCartOutlined,
   TrophyOutlined,
-
+  UserOutlined,
 } from "@ant-design/icons";
 import { CgSmartphoneChip } from "react-icons/cg";
 
@@ -35,16 +35,17 @@ const { Sider, Content } = Layout;
 const menuItems = [
   { key: "dashboard", icon: <DashboardOutlined />, label: "Dashboard" },
   {
-    key: "ai-reports", icon: <CgSmartphoneChip />, label: (
+    key: "ai-reports",
+    icon: <CgSmartphoneChip />,
+    label: (
       <span>
-        AI Reports{" "}
-        <BetaTag />
+        AI Reports <BetaTag />
       </span>
-    )
+    ),
+    beta: true
   },
   { key: "accounts", icon: <BankOutlined />, label: "Accounts" },
   { key: "income-expense", icon: <DollarOutlined />, label: "Income/Expense" },
-  // { key: "bills", icon: <SyncOutlined />, label: "Planned Bills" },
   { key: "savings", icon: <WalletOutlined />, label: "Manage Savings" },
   { key: "budget", icon: <PieChartOutlined />, label: "Manage Budget" },
   { key: "category", icon: <AppstoreOutlined />, label: "Manage Category" },
@@ -54,19 +55,22 @@ const menuItems = [
     icon: <FileTextOutlined />,
     label: (
       <span>
-        Import{" "}
-        <BetaTag />
+        Import <BetaTag />
       </span>
-    )
+    ),
+    beta: true
   },
   { key: "loans", icon: <CreditCardOutlined />, label: "Manage Loans" },
   {
-    key: "goals", icon: <TrophyOutlined />, label: (<span>
-      Manage Goals
-      <BetaTag />
-    </span>)
+    key: "goals",
+    icon: <TrophyOutlined />,
+    label: (
+      <span>
+        Manage Goals<BetaTag />
+      </span>
+    ),
+    beta: true
   },
-
 ];
 
 export default function SidebarLayout({ children }) {
@@ -75,6 +79,32 @@ export default function SidebarLayout({ children }) {
   const { user } = useContext(AuthContext);
   const { isDarkMode } = useTheme();
   const { token } = theme.useToken();
+
+  const wrapBetaIcon = (icon) => (
+    <div style={{ position: "relative", display: "inline-block" }}>
+      {icon}
+      {collapsed && (
+        <div
+          style={{
+            position: "absolute",
+            top: 4,
+            right: -4,
+            width: 8,
+            height: 8,
+            backgroundColor: "#722ED1",
+            borderRadius: "50%",
+            border: `1.5px solid ${isDarkMode ? "#001529" : "#fff"}`,
+            zIndex: 10,
+          }}
+        />
+      )}
+    </div>
+  );
+
+  const processedMenuItems = menuItems.map((item) => ({
+    ...item,
+    icon: item.beta ? wrapBetaIcon(item.icon) : item.icon,
+  }));
 
 
 
@@ -127,7 +157,7 @@ export default function SidebarLayout({ children }) {
             mode="inline"
             selectedKeys={[router.pathname.replace("/", "") || ""]}
             onClick={({ key }) => router.push("/" + key)}
-            items={menuItems}
+            items={processedMenuItems}
             className="border-none"
           />
         </div>
