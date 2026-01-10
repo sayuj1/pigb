@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { Divider, Layout, Menu, theme } from "antd";
+import { Divider, Layout, Menu, theme, Avatar, Typography } from "antd";
+
+const { Text } = Typography;
 import {
   DashboardOutlined,
   BankOutlined,
@@ -12,6 +14,7 @@ import {
   AppstoreOutlined,
   ShoppingCartOutlined,
   TrophyOutlined,
+
 } from "@ant-design/icons";
 import { CgSmartphoneChip } from "react-icons/cg";
 
@@ -22,6 +25,8 @@ import Image from "next/image";
 import BetaTag from "./resuable/BetaTag";
 import FloatingAddButton from "./FloatingAddButton";
 import { useRouter } from "next/router";
+import AuthContext from "@/context/AuthContext";
+import { useContext } from "react";
 
 
 
@@ -61,11 +66,13 @@ const menuItems = [
       <BetaTag />
     </span>)
   },
+
 ];
 
 export default function SidebarLayout({ children }) {
   const [collapsed, setCollapsed] = useState(false);
   const router = useRouter();
+  const { user } = useContext(AuthContext);
   const { isDarkMode } = useTheme();
   const { token } = theme.useToken();
 
@@ -114,13 +121,18 @@ export default function SidebarLayout({ children }) {
           <Divider />
         </div>
 
-        <Menu
-          theme={isDarkMode ? "dark" : "light"}
-          mode="inline"
-          selectedKeys={[router.pathname.replace("/", "") || ""]}
-          onClick={({ key }) => router.push("/" + key)}
-          items={menuItems}
-        />
+        <div className="flex-1 overflow-y-auto overflow-x-hidden">
+          <Menu
+            theme={isDarkMode ? "dark" : "light"}
+            mode="inline"
+            selectedKeys={[router.pathname.replace("/", "") || ""]}
+            onClick={({ key }) => router.push("/" + key)}
+            items={menuItems}
+            className="border-none"
+          />
+        </div>
+
+
       </Sider>
 
       {/* Content Area */}

@@ -2,7 +2,7 @@ import { useContext } from "react";
 import AuthContext from "../context/AuthContext";
 import Link from "next/link";
 import { Menu, Button, Dropdown, Avatar, Typography, theme } from "antd";
-import { LogoutOutlined } from "@ant-design/icons";
+import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { useTheme } from "@/context/ThemeContext";
 
 const { Text } = Typography;
@@ -13,6 +13,14 @@ export default function Navbar() {
   const { isDarkMode } = useTheme();
 
   const userMenuItems = [
+    {
+      key: "profile",
+      label: (
+        <Link href="/profile" className="flex items-center px-4 py-2">
+          <UserOutlined className="mr-2" /> Profile
+        </Link>
+      ),
+    },
     {
       key: "logout",
       label: (
