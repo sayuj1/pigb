@@ -6,6 +6,7 @@ import CategorySpendingChart from "@/components/dashboard/CategorySpendingChart"
 import BudgetUtilization from "@/components/dashboard/BudgetUtilization";
 import SavingsTrendChart from "@/components/dashboard/SavingsTrendChart";
 import LoanRepaymentChart from "@/components/dashboard/LoanRepaymentChart";
+import GoalProgress from "@/components/dashboard/GoalProgress";
 import UpcomingBillsList from "@/components/dashboard/UpcomingBillsList";
 import { useState } from "react";
 import Head from "next/head";
@@ -40,6 +41,7 @@ function Dashboard() {
             <ExpensesIncomeChart />
             <CategorySpendingChart />
             <BudgetUtilization />
+            <GoalProgress />
             <SavingsTrendChart setTotalSavings={setTotalSavings} />
             <LoanRepaymentChart />
             {/* <UpcomingBillsList /> */}
