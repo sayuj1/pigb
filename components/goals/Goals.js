@@ -189,7 +189,7 @@ const Goals = () => {
                     <Spin size="large" />
                 </div>
             ) : goals.length === 0 ? (
-                <div className="bg-white p-12 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center">
+                <div className="mt-4 bg-white p-12 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center">
                     <Empty
                         image={Empty.PRESENTED_IMAGE_SIMPLE}
                         description={
