@@ -13,7 +13,8 @@ import {
     Divider,
     message,
     Spin,
-    Space
+    Space,
+    Modal
 } from "antd";
 import {
     UserOutlined,
@@ -22,7 +23,8 @@ import {
     DollarCircleOutlined,
     CalendarOutlined,
     SaveOutlined,
-    ArrowLeftOutlined
+    ArrowLeftOutlined,
+    LockOutlined
 } from "@ant-design/icons";
 import axios from "axios";
 import ProtectedRoute from "@/context/ProtectRoute";
@@ -41,9 +43,12 @@ const countries = getAllISOCodes();
 
 const ProfilePage = () => {
     const [form] = Form.useForm();
+    const [passwordForm] = Form.useForm();
     const { setUser } = useContext(AuthContext);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [passwordLoading, setPasswordLoading] = useState(false);
+    const [passModalVisible, setPassModalVisible] = useState(false);
     const [userData, setUserData] = useState(null);
 
     useEffect(() => {
@@ -104,6 +109,24 @@ const ProfilePage = () => {
             message.error("Failed to update profile");
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handlePasswordChange = async (values) => {
+        setPasswordLoading(true);
+        try {
+            await axios.post("/api/user/change-password", {
+                currentPassword: values.currentPassword,
+                newPassword: values.newPassword
+            });
+            message.success("Password changed successfully");
+            setPassModalVisible(false);
+            passwordForm.resetFields();
+        } catch (error) {
+            console.error("Error changing password:", error);
+            message.error(error.response?.data?.message || "Failed to change password");
+        } finally {
+            setPasswordLoading(false);
         }
     };
 
@@ -277,7 +300,13 @@ const ProfilePage = () => {
                                             </Col>
                                             <Col xs={24} sm={8} className="text-right">
                                                 {userData?.provider === 'manual' && (
-                                                    <Button size="small" className="text-xs rounded-lg">Change Password</Button>
+                                                    <Button
+                                                        size="small"
+                                                        className="text-xs rounded-lg"
+                                                        onClick={() => setPassModalVisible(true)}
+                                                    >
+                                                        Change Password
+                                                    </Button>
                                                 )}
                                             </Col>
                                         </Row>
@@ -299,6 +328,83 @@ const ProfilePage = () => {
                         </Col>
                     </Row>
                 </div>
+
+                <Modal
+                    title={<Title level={4} className="!m-0">Change Password</Title>}
+                    open={passModalVisible}
+                    onCancel={() => {
+                        setPassModalVisible(false);
+                        passwordForm.resetFields();
+                    }}
+                    footer={null}
+                    className="max-w-md"
+                    centered
+                >
+                    <Form
+                        form={passwordForm}
+                        layout="vertical"
+                        onFinish={handlePasswordChange}
+                        className="mt-6"
+                    >
+                        <Form.Item
+                            name="currentPassword"
+                            label="Current Password"
+                            rules={[{ required: true, message: 'Please enter your current password' }]}
+                        >
+                            <Input.Password prefix={<LockOutlined className="text-gray-400" />} className="rounded-lg h-10" />
+                        </Form.Item>
+
+                        <Form.Item
+                            name="newPassword"
+                            label="New Password"
+                            rules={[
+                                { required: true, message: 'Please enter your new password' },
+                                { min: 6, message: 'Password must be at least 6 characters' }
+                            ]}
+                        >
+                            <Input.Password prefix={<LockOutlined className="text-gray-400" />} className="rounded-lg h-10" />
+                        </Form.Item>
+
+                        <Form.Item
+                            name="confirmPassword"
+                            label="Confirm New Password"
+                            dependencies={['newPassword']}
+                            rules={[
+                                { required: true, message: 'Please confirm your new password' },
+                                ({ getFieldValue }) => ({
+                                    validator(_, value) {
+                                        if (!value || getFieldValue('newPassword') === value) {
+                                            return Promise.resolve();
+                                        }
+                                        return Promise.reject(new Error('The two passwords do not match!'));
+                                    },
+                                }),
+                            ]}
+                        >
+                            <Input.Password prefix={<LockOutlined className="text-gray-400" />} className="rounded-lg h-10" />
+                        </Form.Item>
+
+                        <div className="flex gap-3 justify-end mt-8">
+                            <Button
+                                onClick={() => {
+                                    setPassModalVisible(false);
+                                    passwordForm.resetFields();
+                                }}
+                                className="rounded-lg h-10"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                loading={passwordLoading}
+                                className="bg-emerald-600 hover:bg-emerald-700 border-none rounded-lg h-10 px-6"
+                            >
+                                Update Password
+                            </Button>
+                        </div>
+                    </Form>
+                </Modal>
             </SidebarLayout>
         </>
     );
