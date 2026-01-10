@@ -191,29 +191,11 @@ const ProfilePage = () => {
                                     <Row gutter={16}>
                                         <Col xs={24} sm={12}>
                                             <Form.Item
-                                                name="currency"
-                                                label="Currency"
-                                            >
-                                                <Input readOnly className="rounded-lg h-10 bg-gray-50" />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col xs={24} sm={12}>
-                                            <Form.Item
-                                                name="symbol"
-                                                label="Currency Symbol"
-                                            >
-                                                <Input readOnly prefix={<DollarCircleOutlined className="text-gray-400" />} className="rounded-lg h-10 bg-gray-50" />
-                                            </Form.Item>
-                                        </Col>
-                                    </Row>
-
-                                    <Row gutter={16}>
-                                        <Col xs={24} sm={12}>
-                                            <Form.Item
                                                 name="countryCode"
                                                 label="Country"
                                             >
                                                 <Select
+                                                    disabled
                                                     showSearch
                                                     placeholder="Select a country"
                                                     optionFilterProp="children"
@@ -231,11 +213,30 @@ const ProfilePage = () => {
                                                 name="dateFormat"
                                                 label="Date Format"
                                             >
-                                                <Select className="h-10">
+                                                <Select className="h-10" disabled>
                                                     <Option value="d/M/yyyy">Day/Month/Year (d/M/yyyy)</Option>
                                                     <Option value="M/d/yyyy">Month/Day/Year (M/d/yyyy)</Option>
                                                     <Option value="yyyy-MM-dd">ISO (yyyy-MM-dd)</Option>
                                                 </Select>
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+
+                                    <Row gutter={16}>
+                                        <Col xs={24} sm={12}>
+                                            <Form.Item
+                                                name="currency"
+                                                label="Currency"
+                                            >
+                                                <Input readOnly className="rounded-lg h-10 bg-gray-50" />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col xs={24} sm={12}>
+                                            <Form.Item
+                                                name="symbol"
+                                                label="Currency Symbol"
+                                            >
+                                                <Input readOnly prefix={<DollarCircleOutlined className="text-gray-400" />} className="rounded-lg h-10 bg-gray-50" />
                                             </Form.Item>
                                         </Col>
                                     </Row>
