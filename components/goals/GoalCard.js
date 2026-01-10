@@ -88,7 +88,7 @@ const GoalCard = ({ goal, onEdit, onDelete, onRefresh }) => {
             }
 
             await axios.put(`/api/goals/${goal._id}`, updatePayload);
-            message.success(`Goal marked as ${newStatus}!`);
+            message.success(`Goal marked as ${newStatus === 'pending' ? 'on-going' : newStatus}!`);
             onRefresh();
         } catch (error) {
             message.error(`Failed to mark as ${newStatus}`);
@@ -116,7 +116,7 @@ const GoalCard = ({ goal, onEdit, onDelete, onRefresh }) => {
                 styles={{ body: { flex: 1, display: 'flex', flexDirection: 'column', cursor: 'pointer' } }}
                 actions={[
                     isCompleted ? (
-                        <Tooltip title="Mark as Pending" key="pending">
+                        <Tooltip title="Mark as On-going" key="pending">
                             <UndoOutlined
                                 className="text-orange-500"
                                 onClick={(e) => handleStatusUpdate(e, "pending")}

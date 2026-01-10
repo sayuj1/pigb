@@ -23,7 +23,7 @@ const Goals = () => {
     // Filter states
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState("All");
-    const [status, setStatus] = useState("All");
+    const [status, setStatus] = useState("pending");
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(6);
 
@@ -176,7 +176,7 @@ const Goals = () => {
                                 size="large"
                             >
                                 <Option value="All">All Status</Option>
-                                <Option value="pending">Pending</Option>
+                                <Option value="pending">On-going</Option>
                                 <Option value="completed">Completed</Option>
                                 <Option value="near_deadline">Nearing Deadline</Option>
                                 <Option value="overdue">Overdue</Option>
@@ -203,7 +203,7 @@ const Goals = () => {
                     {(search || category !== "All" || status !== "All") && (
                         <Button
                             type="link"
-                            onClick={() => { setSearch(""); setCategory("All"); setStatus("All"); setPage(1); }}
+                            onClick={() => { setSearch(""); setCategory("All"); setStatus("pending"); setPage(1); }}
                             className="mt-2"
                         >
                             Clear all filters

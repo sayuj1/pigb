@@ -27,7 +27,7 @@ export default function GoalProgress() {
             {goalStats.totalGoals === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10 text-center text-gray-500">
                     <TrophyOutlined className="text-5xl text-gray-200 mb-4" />
-                    <Title level={5} className="!mb-1">No Active Goals</Title>
+                    <Title level={5} className="!mb-1">No On-going Goals</Title>
                     <Text type="secondary">Set a financial goal to track your progress here.</Text>
                 </div>
             ) : (
@@ -55,7 +55,7 @@ export default function GoalProgress() {
                             <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <Text type="secondary" className="text-[10px] uppercase font-bold">Active Goals</Text>
+                                        <Text type="secondary" className="text-[10px] uppercase font-bold">On-going Goals</Text>
                                         <Title level={3} className="!mt-1 !mb-0">{goalStats.pendingGoals}</Title>
                                     </div>
                                     <TrophyOutlined className="text-blue-500 text-xl" />
