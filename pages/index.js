@@ -15,6 +15,7 @@ import {
   PiListDashesDuotone,
   PiSquaresFourDuotone,
   PiFileArrowUpDuotone,
+  PiTrophyDuotone,
 } from "react-icons/pi";
 import { CgSmartphoneChip } from "react-icons/cg";
 import { HiCheckCircle } from "react-icons/hi";
@@ -296,6 +297,12 @@ export default function Home() {
                 link: "/savings",
                 desc: "Organize and track your savings goals.",
                 icon: <PiPiggyBankDuotone className="text-[#00b894] w-12 h-12 mb-4" />,
+              },
+              {
+                title: "Financial Goals",
+                link: "/goals",
+                desc: "Set targets, track progress, and get smart saving tips.",
+                icon: <PiTrophyDuotone className="text-[#00b894] w-12 h-12 mb-4" />,
               },
               {
                 title: "Categories",
