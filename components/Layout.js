@@ -11,7 +11,7 @@ import {
   PieChartOutlined,
   AppstoreOutlined,
   ShoppingCartOutlined,
-
+  TrophyOutlined,
 } from "@ant-design/icons";
 import { CgSmartphoneChip } from "react-icons/cg";
 
@@ -55,6 +55,12 @@ const menuItems = [
     )
   },
   { key: "loans", icon: <CreditCardOutlined />, label: "Manage Loans" },
+  {
+    key: "goals", icon: <TrophyOutlined />, label: (<span>
+      Manage Goals
+      <BetaTag />
+    </span>)
+  },
 ];
 
 export default function SidebarLayout({ children }) {
