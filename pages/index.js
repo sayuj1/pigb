@@ -26,7 +26,7 @@ import ParallaxBackground from "@/components/landing/ParallaxBackground";
 import TiltCard from "@/components/landing/TiltCard";
 
 export default function Home() {
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, isAuthenticated } = useContext(AuthContext);
   const { isDarkMode } = useTheme();
   const router = useRouter();
 
@@ -84,6 +84,14 @@ export default function Home() {
                   Logout
                 </Button>
               </div>
+            ) : isAuthenticated ? (
+              <div className="flex items-center gap-4">
+                <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
+                <div className="w-20 h-4 bg-gray-200 animate-pulse rounded hidden sm:inline" />
+                <Button loading disabled type="primary" size="small">
+                  Logout
+                </Button>
+              </div>
             ) : (
               <div className="flex items-center gap-4">
                 <Button
@@ -125,11 +133,12 @@ export default function Home() {
               <p className={`text-lg md:text-2xl max-w-xl mx-auto md:mx-0 mb-10 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
                 The modern way to track income, expenses, budgets, and savings. All in one beautiful, private dashboard.
               </p>
-              {user ? (
+              {user || isAuthenticated ? (
                 <Button
                   type="primary"
                   size="large"
                   onClick={() => router.push(ROUTES.DASHBOARD)}
+                  loading={!user && isAuthenticated}
                   className="!h-14 !px-8 !text-lg !bg-[#00b894] hover:!bg-[#00cec9] font-semibold rounded-xl shadow-lg shadow-[#00b894]/20 transition-all duration-300 hover:-translate-y-1"
                 >
                   View Dashboard
@@ -153,6 +162,7 @@ export default function Home() {
                   </Button>
                 </div>
               )}
+
             </motion.div>
 
             <motion.div

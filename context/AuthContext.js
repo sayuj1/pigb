@@ -8,19 +8,28 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
+    // Preliminary check from localStorage
+    const savedAuth = localStorage.getItem("isAuth") === "true";
+    setIsAuthenticated(savedAuth);
+
     async function fetchUser() {
       try {
         const res = await axios.get("/api/auth/checkAuth", {
           withCredentials: true,
         });
         setUser(res.data.user);
+        setIsAuthenticated(true);
+        localStorage.setItem("isAuth", "true");
       } catch (err) {
         setUser(null);
+        setIsAuthenticated(false);
+        localStorage.removeItem("isAuth");
       } finally {
-        setLoading(false); // <-- Set loading to false after check
+        setLoading(false);
       }
     }
     fetchUser();
@@ -30,7 +39,8 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await axios.post("/api/auth/login", { email, password });
       setUser(res.data.user);
-      // router.push("/dashboard");
+      setIsAuthenticated(true);
+      localStorage.setItem("isAuth", "true");
       router.push(ROUTES.DASHBOARD);
     } catch (error) {
       console.error(error.response.data.message);
@@ -50,6 +60,8 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await axios.post("/api/auth/google", { tokenId });
       setUser(res.data.user);
+      setIsAuthenticated(true);
+      localStorage.setItem("isAuth", "true");
       router.push(ROUTES.HOME);
     } catch (error) {
       console.error(error.response.data.message);
@@ -60,7 +72,8 @@ export const AuthProvider = ({ children }) => {
     try {
       await axios.post("/api/auth/logout");
       setUser(null);
-      // router.push("/");
+      setIsAuthenticated(false);
+      localStorage.removeItem("isAuth");
       router.push(ROUTES.HOME);
     } catch (error) {
       console.error(error);
@@ -68,10 +81,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, googleSignIn, logout, setUser }}>
+    <AuthContext.Provider value={{ user, loading, isAuthenticated, login, signup, googleSignIn, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export default AuthContext;
+
