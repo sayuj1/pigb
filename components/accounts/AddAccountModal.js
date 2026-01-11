@@ -11,11 +11,28 @@ import {
   message,
   DatePicker,
 } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusCircleOutlined } from "@ant-design/icons";
 import ColorPresetSelector from "../CustomColorPicker";
 import CustomIconPicker from "../CustomIconPicker";
+import { PiBankDuotone, PiCreditCardDuotone, PiWalletDuotone, PiCurrencyDollarDuotone, PiHouseDuotone, PiTrendUpDuotone } from "react-icons/pi";
 
 const { Option } = Select;
+
+const ACCOUNT_TYPE_ICONS = {
+  cash: <PiWalletDuotone className="text-xl" />,
+  bank: <PiBankDuotone className="text-xl" />,
+  savings: <PiBankDuotone className="text-xl" />,
+  current: <PiBankDuotone className="text-xl" />,
+  wallet: <PiWalletDuotone className="text-xl" />,
+  credit_card: <PiCreditCardDuotone className="text-xl" />,
+  investment: <PiTrendUpDuotone className="text-xl" />,
+  loan: <PiBankDuotone className="text-xl" />,
+  general: <PiCurrencyDollarDuotone className="text-xl" />,
+  mortgage: <PiHouseDuotone className="text-xl" />,
+  insurance: <PiHouseDuotone className="text-xl" />,
+  bonus: <PiCurrencyDollarDuotone className="text-xl" />,
+  other: <PiCurrencyDollarDuotone className="text-xl" />,
+};
 
 const ACCOUNT_TYPES = [
   "cash",
@@ -88,39 +105,28 @@ export default function AddAccountModal({ onAdd }) {
     <>
       <Button
         type="primary"
-        icon={<PlusOutlined />}
+        icon={<PlusCircleOutlined />}
         onClick={() => setOpen(true)}
+        size="large"
+        className="rounded-full shadow-md hover:shadow-lg transition-all"
       >
-        Add Account
+        <span className="hidden sm:inline">Add Account</span>
       </Button>
       <Modal
-        title="Add Account"
+        title={
+          <div className="flex items-center gap-2 text-blue-600">
+            <PlusCircleOutlined className="text-xl" />
+            <span className="font-semibold text-lg">Add New Account</span>
+          </div>
+        }
         open={open}
         onCancel={() => {
           setOpen(false);
           resetForm();
         }}
-        footer={[
-          <Button key="reset" onClick={resetForm} danger disabled={loading}>
-            Reset
-          </Button>,
-          <Button
-            key="cancel"
-            onClick={() => setOpen(false)}
-            disabled={loading}
-          >
-            Cancel
-          </Button>,
-          <Button
-            key="submit"
-            type="primary"
-            onClick={() => form.submit()}
-            loading={loading}
-          >
-            Create
-          </Button>,
-        ]}
+        footer={null}
         width={700}
+        centered
       >
         <Form
           key={formKey} // Forces the form to reset properly
@@ -132,19 +138,24 @@ export default function AddAccountModal({ onAdd }) {
               setAccountType(changedValues.type);
             }
           }}
+          className="pt-2"
         >
-          <Row gutter={16}>
-            <Col span={12}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {/* Left Column: Basic Details */}
+            <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 h-full">
+              <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                <span className="w-1 h-4 bg-blue-500 rounded-full"></span>
+                Account Details
+              </h4>
+
               <Form.Item
                 name="name"
                 label="Account Name"
                 rules={[{ required: true }]}
               >
-                <Input placeholder="Enter account name" />
+                <Input size="large" placeholder="e.g. Main Savings" className="rounded-lg" />
               </Form.Item>
-            </Col>
 
-            <Col span={12}>
               <Form.Item
                 name="type"
                 label="Account Type"
@@ -153,46 +164,103 @@ export default function AddAccountModal({ onAdd }) {
                 <Select
                   placeholder="Select account type"
                   onChange={(value) => setAccountType(value)}
+                  size="large"
+                  className="rounded-lg"
+                  listHeight={200}
                 >
                   {ACCOUNT_TYPES.map((type) => (
                     <Option key={type} value={type}>
-                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                      <div className="flex items-center gap-2">
+                        {ACCOUNT_TYPE_ICONS[type] || <PiWalletDuotone />}
+                        <span>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
+                      </div>
                     </Option>
                   ))}
                 </Select>
               </Form.Item>
-            </Col>
-          </Row>
 
-          {accountType === "credit card" && (
-            <Row gutter={16}>
-              <Col span={8}>
+              {accountType !== "credit card" && (
                 <Form.Item
-                  name="creditLimit"
-                  label="Credit Limit"
-                  rules={[{ required: true }]}
-                >
-                  <InputNumber
-                    style={{ width: "100%" }}
-                    min={0}
-                    placeholder="5000"
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item
-                  name="creditUsed"
-                  label="Credit Used"
+                  name="balance"
+                  label="Initial Balance"
                   rules={[{ required: true }]}
                 >
                   <InputNumber
                     style={{ width: "100%" }}
                     min={0}
                     placeholder="0.00"
+                    size="large"
+                    prefix="₹"
+                    className="rounded-lg"
+                    formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    parser={value => value.replace(/\$\s?|(,*)/g, '')}
                   />
                 </Form.Item>
-              </Col>
-              <Col span={8}>
+              )}
+              {accountType === "credit card" && (
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Form.Item
+                      name="creditLimit"
+                      label="Credit Limit"
+                      rules={[{ required: true }]}
+                    >
+                      <InputNumber
+                        style={{ width: "100%" }}
+                        min={0}
+                        placeholder="5000"
+                        size="large"
+                        prefix="₹"
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item
+                      name="creditUsed"
+                      label="Credit Used"
+                      rules={[{ required: true }]}
+                    >
+                      <InputNumber
+                        style={{ width: "100%" }}
+                        min={0}
+                        placeholder="0.00"
+                        size="large"
+                        prefix="₹"
+                      />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              )}
+            </div>
+
+            {/* Right Column: Appearance */}
+            <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 h-full">
+              <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                <span className="w-1 h-4 bg-purple-500 rounded-full"></span>
+                Appearance
+              </h4>
+
+              <Form.Item label="Select Icon" className="mb-4">
+                <div className="bg-white p-3 rounded-lg border border-gray-200">
+                  <CustomIconPicker
+                    selectedIcon={icon}
+                    onChange={(selectedIcon) => setIcon(selectedIcon)}
+                    key={formKey} // Force re-render on reset
+                  />
+                </div>
+              </Form.Item>
+
+              <Form.Item label="Icon Color" className="mb-4">
+                <div className="bg-white p-3 rounded-lg border border-gray-200">
+                  <ColorPresetSelector
+                    selectedColor={iconColor}
+                    onChange={(selectedColor) => setIconColor(selectedColor)}
+                    key={formKey} // Force re-render on reset
+                  />
+                </div>
+              </Form.Item>
+
+              {accountType === "credit card" && (
                 <Form.Item
                   name="dueDate"
                   label="Due Date"
@@ -200,51 +268,44 @@ export default function AddAccountModal({ onAdd }) {
                     { required: true, message: "Please select a due date" },
                   ]}
                 >
-                  <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
+                  <DatePicker style={{ width: "100%" }} format="DD MMM, YYYY" size="large" />
                 </Form.Item>
-              </Col>
-            </Row>
-          )}
+              )}
+            </div>
+          </div>
 
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="Select Icon">
-                <CustomIconPicker
-                  selectedIcon={icon}
-                  onChange={(selectedIcon) => setIcon(selectedIcon)}
-                  key={formKey} // Force re-render on reset
-                />
-              </Form.Item>
-            </Col>
-
-            <Col span={12}>
-              <Form.Item label="Icon Color">
-                <ColorPresetSelector
-                  selectedColor={iconColor}
-                  onChange={(selectedColor) => setIconColor(selectedColor)}
-                  key={formKey} // Force re-render on reset
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          {accountType !== "credit card" && (
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item
-                  name="balance"
-                  label="Initial Balance (INR)"
-                  rules={[{ required: true }]}
-                >
-                  <InputNumber
-                    style={{ width: "100%" }}
-                    min={0}
-                    placeholder="0.00"
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-          )}
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+            <Button
+              key="reset"
+              onClick={resetForm}
+              danger
+              disabled={loading}
+              size="large"
+              className="rounded-lg px-6"
+            >
+              Reset
+            </Button>
+            <Button
+              key="cancel"
+              onClick={() => setOpen(false)}
+              disabled={loading}
+              size="large"
+              className="rounded-lg px-6"
+            >
+              Cancel
+            </Button>
+            <Button
+              key="submit"
+              type="primary"
+              onClick={() => form.submit()}
+              loading={loading}
+              size="large"
+              className="rounded-lg px-8 shadow-sm"
+              icon={<PlusCircleOutlined />}
+            >
+              Create Account
+            </Button>
+          </div>
         </Form>
       </Modal>
     </>

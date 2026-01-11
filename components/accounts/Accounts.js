@@ -9,21 +9,22 @@ import {
   Typography,
   Modal,
   message,
-  Divider,
+  Statistic,
+  Empty,
+  Tooltip
 } from "antd";
 import {
   SearchOutlined,
   FilterOutlined,
   EditOutlined,
   DeleteOutlined,
-  ExclamationCircleFilled,
-  FileSearchOutlined,
+  ExclamationCircleOutlined
 } from "@ant-design/icons";
-import { ExclamationCircleOutlined } from "@ant-design/icons";
-import AddAccountModal from "./AddAccountModal";
 import { getIconComponent } from "@/utils/getIcons";
+import AddAccountModal from "./AddAccountModal";
 import EditAccountModal from "./EditAccountModal";
 import { useAccount } from "@/context/AccountContext";
+import { PiBankDuotone, PiWalletDuotone, PiCreditCardDuotone } from "react-icons/pi";
 
 const { Title, Text } = Typography;
 
@@ -111,18 +112,53 @@ export default function Accounts() {
     }
   };
 
+  const totalBalance = accounts.reduce((sum, acc) => sum + (acc.balance || 0), 0);
+  const sortedAccounts = filteredAndSortedAccounts();
+
   return (
-    <div className="p-4 space-y-4">
-      {/* Search & Sorting */}
-      <div className="flex justify-between items-center gap-4 flex-wrap">
-        <div className="flex items-center gap-2 flex-grow">
+    <div className="p-2 space-y-6">
+      {/* Summary Stats Header */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card bordered={false} className="shadow-sm rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white rounded-full shadow-sm text-blue-600">
+              <PiBankDuotone className="text-3xl" />
+            </div>
+            <div>
+              <Text className="text-gray-500 font-medium">Total Balance</Text>
+              <Title level={2} style={{ margin: 0, color: '#1e3a8a' }}>
+                ₹{totalBalance.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+              </Title>
+            </div>
+          </div>
+        </Card>
+        <Card bordered={false} className="shadow-sm rounded-xl bg-gradient-to-r from-violet-50 to-purple-50 border-l-4 border-violet-500">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white rounded-full shadow-sm text-violet-600">
+              <PiCreditCardDuotone className="text-3xl" />
+            </div>
+            <div>
+              <Text className="text-gray-500 font-medium">Active Accounts</Text>
+              <Title level={2} style={{ margin: 0, color: '#4c1d95' }}>
+                {accounts.length}
+              </Title>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Toolbar */}
+      <div className="flex flex-wrap justify-between items-center gap-4 sticky top-0 z-10 bg-gray-50/80 backdrop-blur-md py-2 -mx-2 px-2 rounded-lg">
+        <div className="flex items-center gap-3 flex-grow max-w-2xl">
           <Input
-            placeholder="Search accounts"
-            prefix={<SearchOutlined />}
+            placeholder="Search accounts..."
+            prefix={<SearchOutlined className="text-gray-400" />}
             value={searchTerm}
             onChange={handleSearchChange}
             allowClear
-            className="min-w-[200px] max-w-[250px]"
+            size="large"
+            className="rounded-full shadow-sm border-gray-200 hover:border-blue-400 focus:border-blue-500"
+            style={{ maxWidth: '300px' }}
           />
           <Dropdown
             menu={{
@@ -132,10 +168,11 @@ export default function Accounts() {
               })),
               onClick: handleMenuClick,
             }}
+            placement="bottomLeft"
           >
-            <Button type="default" icon={<FilterOutlined />} >
-              Sort:{" "}
-              {SORT_OPTIONS.find((opt) => opt.value === sortOption)?.label}
+            <Button size="large" className="rounded-full border-gray-200 text-gray-600 hover:text-blue-600 hover:border-blue-400">
+              <FilterOutlined />
+              <span className="hidden sm:inline">Sort: {SORT_OPTIONS.find((opt) => opt.value === sortOption)?.label}</span>
             </Button>
           </Dropdown>
         </div>
@@ -144,86 +181,105 @@ export default function Accounts() {
 
       {/* Loading & Error States */}
       {loading ? (
-        <div className="flex justify-center items-center h-32">
+        <div className="flex justify-center items-center h-48">
           <Spin size="large" />
         </div>
       ) : error ? (
-        <Alert message="Error" description={error} type="error" showIcon />
-      ) : // <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        filteredAndSortedAccounts().length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-gray-500 min-h-[60vh]">
-            <FileSearchOutlined className="text-4xl mb-2 text-gray-400" />
-            <p className="text-base text-center mb-4">No accounts found.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredAndSortedAccounts().map((account) => {
-              const IconComponent = getIconComponent(account.icon);
+        <Alert message="Error" description={error} type="error" showIcon className="rounded-lg" />
+      ) : sortedAccounts.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-200">
+          <PiWalletDuotone className="text-6xl text-gray-300 mb-4" />
+          <Text strong className="text-lg text-gray-500">No accounts found</Text>
+          <Text type="secondary">Create a new account to get started</Text>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {sortedAccounts.map((account) => {
+            const IconComponent = getIconComponent(account.icon);
+            // Dynamic subtle background based on account color opacity
+            const cardBgStyle = {
+              background: `linear-gradient(135deg, white 60%, ${account.color}15 100%)`
+            };
 
-              return (
-                <Card
-                  key={account._id}
-                  className="relative flex items-center gap-4 p-4"
-                  style={{ borderLeft: `6px solid ${account.color}` }}
-                >
-                  <div className="absolute flex gap-2 justify-end w-full pr-8">
+            return (
+              <div
+                key={account._id}
+                className="group relative bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 transform hover:-translate-y-1"
+                style={cardBgStyle}
+              >
+                {/* Action Buttons (Absolute Positioned) */}
+                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <Tooltip title="Edit">
                     <Button
-                      size="small"
+                      type="text"
+                      shape="circle"
                       icon={<EditOutlined />}
-                      onClick={() => setEditAccount(account)}
-                    >
-                      Edit
-                    </Button>
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditAccount(account);
+                      }}
+                      className="text-blue-500 hover:bg-blue-50"
+                    />
+                  </Tooltip>
+                  <Tooltip title="Delete">
                     <Button
-                      size="small"
+                      type="text"
+                      shape="circle"
                       icon={<DeleteOutlined />}
                       danger
-                      onClick={() => setDeleteAccount(account)}
-                    >
-                      Delete
-                    </Button>
-                  </div>
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteAccount(account);
+                      }}
+                      className="hover:bg-red-50"
+                    />
+                  </Tooltip>
+                </div>
 
-                  {/* Icon */}
-                  <div className="flex justify-between items-center">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-4">
                     <div
-                      className="flex items-center justify-center rounded-lg"
+                      className="flex items-center justify-center rounded-xl shadow-inner"
                       style={{
-                        width: 50,
-                        height: 50,
+                        width: 56,
+                        height: 56,
                         backgroundColor: `${account.color}20`,
-                        borderRadius: "8px",
+                        color: account.color
                       }}
                     >
-                      <IconComponent size={32} color={account.color} />
+                      <IconComponent size={32} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-800 m-0 leading-tight">{account.name}</h3>
+                      <span className="text-xs uppercase tracking-wider font-semibold opacity-60 flex items-center gap-1 mt-1">
+                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: account.color }}></span>
+                        {account.type}
+                      </span>
+                      <Text className="text-xs text-gray-400 mt-1 block">
+                        Opened: {new Date(account.createdAt).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </Text>
                     </div>
                   </div>
+                </div>
 
-                  {/* Details */}
-                  <div className="flex-1 mt-1">
-                    <Title level={5} className="mb-0">
-                      {account.name}
-                    </Title>
-                    <Text type="secondary" className="mt-0">
-                      {account.type}
-                    </Text>
+                <div className="pt-2 border-t border-gray-50 mt-2">
+                  <Text className="text-gray-400 text-xs font-medium uppercase tracking-widest">Current Balance</Text>
+                  <div className="flex items-baseline gap-1 mt-1">
+                    <span className="text-xl text-gray-500 font-medium">₹</span>
+                    <span className="text-3xl font-bold text-gray-800 tracking-tight">
+                      {account.balance.toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
                   </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
-                  {/* Balance */}
-                  <Title level={5} style={{ margin: 0 }}>
-                    ₹
-                    {account.balance.toLocaleString("en-IN", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </Title>
-                </Card>
-              );
-            })}
-          </div>
-        )
-        // </div>
-      }
       {editAccount && (
         <EditAccountModal
           account={editAccount}
@@ -231,70 +287,57 @@ export default function Accounts() {
           onClose={() => setEditAccount(null)}
         />
       )}
+
       {/* Delete Confirmation Modal */}
       <Modal
         title={
-          <div className="flex gap-1">
-            <ExclamationCircleOutlined style={{ color: "red" }} />
-            <span className="text-red-500">
-              Are you sure you want to delete this account?
-            </span>
+          <div className="flex items-center gap-3 text-red-600">
+            <ExclamationCircleOutlined className="text-xl" />
+            <span>Delete Account</span>
           </div>
         }
         open={!!deleteAccount}
         onCancel={() => setDeleteAccount(null)}
         onOk={handleDelete}
         confirmLoading={confirmLoading}
-        okText="Yes, Delete"
-        okType="danger"
-        cancelText="No"
+        okText="Delete Account"
+        okButtonProps={{ danger: true, size: "large", icon: <DeleteOutlined /> }}
+        cancelButtonProps={{ size: "large" }}
+        centered
+        width={400}
       >
         {deleteAccount && (
-          <div className="flex items-center gap-4">
-            {/* Account Icon */}
-            <div
-              className="flex items-center justify-center rounded-lg"
-              style={{
-                width: 50,
-                height: 50,
-                backgroundColor: `${deleteAccount.color}20`,
-                borderRadius: "8px",
-              }}
-            >
-              {/* <ExclamationCircleFilled style={{ fontSize: 32, color: deleteAccount.color }} /> */}
-              {/* <IconCom size={32} color={deleteAccount.color} /> */}
-              {/* <DeleteIconComponent size={32} icon={deleteAccount.color} /> */}
-              {/** Render the icon component correctly **/}
-              {getIconComponent(deleteAccount.icon) && (
-                <span>
-                  {getIconComponent(deleteAccount.icon)({
-                    size: 32,
-                    color: deleteAccount.color,
-                  })}
-                </span>
-              )}
-
-              {/* <IconComponent size={32} color={deleteAccount.color} /> */}
+          <div className="py-4">
+            <div className="bg-red-50 p-4 rounded-lg mb-4 border border-red-100 text-red-700 text-sm">
+              Currently deleting <strong>{deleteAccount.name}</strong>. This will permanently remove the account and its transaction history.
             </div>
 
-            {/* Account Details */}
-            <div>
-              <p>
-                <strong>Name:</strong> {deleteAccount.name}
-              </p>
-              <p>
-                <strong>Type:</strong>{" "}
-                {deleteAccount.type.charAt(0).toUpperCase() +
-                  deleteAccount.type.slice(1)}
-              </p>
-              <p>
-                <strong>Balance:</strong> ₹
-                {deleteAccount.balance.toLocaleString()}
-              </p>
+            <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <div
+                className="flex items-center justify-center rounded-lg"
+                style={{
+                  width: 40,
+                  height: 40,
+                  backgroundColor: `${deleteAccount.color}20`,
+                  color: deleteAccount.color
+                }}
+              >
+                {getIconComponent(deleteAccount.icon) && (
+                  <span>
+                    {getIconComponent(deleteAccount.icon)({
+                      size: 24,
+                      color: deleteAccount.color,
+                    })}
+                  </span>
+                )}
+              </div>
+              <div>
+                <div className="font-bold text-gray-800">{deleteAccount.name}</div>
+                <div className="text-gray-500 text-xs font-mono">₹{deleteAccount.balance.toLocaleString()}</div>
+              </div>
             </div>
           </div>
         )}
-        <p className="mt-4 text-red-500">⚠️ This action cannot be undone.</p>
       </Modal>
     </div>
   );
