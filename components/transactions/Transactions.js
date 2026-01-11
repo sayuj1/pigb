@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Table,
   Input,
@@ -7,11 +7,26 @@ import {
   Popover,
   message,
   DatePicker,
-  Select
+  Select,
+  Tag,
+  Typography,
+  Card,
+  Row,
+  Col,
+  Empty,
+  Tooltip as AntTooltip,
 } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  ArrowUpOutlined,
+  ArrowDownOutlined,
+  InfoCircleOutlined,
+} from "@ant-design/icons";
 import AddTransactionModal from "./AddTransactionModal";
-import { PiPlus, PiMinus } from "react-icons/pi";
+import { PiPlus, PiMinus, PiWalletDuotone, PiArrowCircleUpDuotone, PiArrowCircleDownDuotone, PiTrendUpDuotone, PiTrendDownDuotone, PiBankDuotone, PiChartPieSliceDuotone } from "react-icons/pi";
 import { getIconComponent } from "@/utils/getIcons";
 import EditTransactionModal from "./EditTransactionModal";
 import DeleteTransactionModal from "./DeleteTransacationModal";
@@ -19,10 +34,11 @@ import dayjs from "dayjs";
 import rangePresets from "@/utils/rangePresets";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useTransactions } from "@/context/TransactionContext";
+import { motion, AnimatePresence } from "framer-motion";
+import { useTheme } from "@/context/ThemeContext";
 
 const { RangePicker } = DatePicker;
-
-const { Search } = Input;
+const { Text, Title } = Typography;
 
 export default function Transactions() {
   const {
@@ -39,6 +55,8 @@ export default function Transactions() {
     fetchTransactions,
     fetchInsights,
   } = useTransactions();
+
+  const { isDarkMode } = useTheme();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -82,302 +100,349 @@ export default function Transactions() {
   };
 
   return (
-    <>
-
-      {/* Quick Insights */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-white">
-        {/* Summary Card */}
-        <div className="p-4 bg-gradient-to-br from-white via-teal-50 to-blue-100 rounded-xl shadow w-full md:col-span-1">
-          <h2 className="text-lg font-bold text-gray-800 tracking-wide mb-3">
-            Summary ({dayjs(filters.startDate).format("DD-MMM-YYYY")} to {dayjs(filters.endDate).format("DD-MMM-YYYY")})
-          </h2>
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-600 font-medium">Total Income</span>
-            <span className="text-green-700 font-semibold">{formatCurrency(insights?.totalIncome)}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-gray-600 font-medium">Total Expense</span>
-            <span className="text-red-600 font-semibold">{formatCurrency(insights?.totalExpense)}</span>
-          </div>
-        </div>
-        {/* Account Expense Card */}
-        <div className="p-4 bg-gradient-to-br from-white via-indigo-50 to-purple-100 rounded-lg shadow">
-          <h2 className="text-lg font-bold text-gray-800 tracking-wide mb-3">Accounts Expenses</h2>
-          {insights.expenseByAccounts.length === 0 ? (
-            <div className="flex items-center gap-3 text-gray-600 bg-purple-50 px-4 py-3 rounded-md">
-              <svg
-                className="w-5 h-5 text-purple-400"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={1.5}
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M20 13V5a2 2 0 00-2-2H6a2 2 0 00-2 2v8m16 0v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6m16 0h-4.586a1 1 0 00-.707.293l-1.414 1.414a1 1 0 01-.707.293H9.414a1 1 0 01-.707-.293L7.293 13.293A1 1 0 006.586 13H2"
-                />
-              </svg>
-              <p className="text-sm italic">No account expenses recorded yet.</p>
-            </div>
-          ) : (
-            <ul className="mt-1 space-y-1 text-sm text-gray-700">
-              {insights.expenseByAccounts.map((acc) => (
-                <li key={acc.accountId} className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    {getIconComponent(acc.icon)({ size: 20, color: acc.color })}
-                    <span className="font-semibold text-gray-800">{acc.accountName}</span>
+    <div className="gap-2 flex flex-col">
+      {/* Summary Cards Row */}
+      <Row gutter={[16, 16]}>
+        {/* Combined Income & Expense Card */}
+        <Col xs={24} md={8} style={{ display: 'flex' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0 }}
+            style={{ width: '100%', display: 'flex', flexDirection: 'column' }}
+          >
+            <Card className="shadow-sm flex-1" bodyStyle={{ padding: '16px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <div className="flex items-center gap-2 mb-2">
+                <PiWalletDuotone className="text-xl text-teal-500" />
+                <Text strong className="text-sm">Summary</Text>
+                <Text type="secondary" className="text-sm">
+                  ({dayjs(filters.startDate).format("DD MMM, YYYY")} - {dayjs(filters.endDate).format("DD MMM, YYYY")})
+                </Text>
+              </div>
+              <div className="space-y-2 flex-1">
+                <div className="flex items-center justify-between p-2 bg-emerald-50 rounded-lg">
+                  <div className="flex items-center gap-1.5">
+                    <PiTrendUpDuotone className="text-base text-emerald-500" />
+                    <span className="font-medium text-gray-700 text-xs">Income</span>
                   </div>
-                  <span className="text-red-600 font-semibold">{formatCurrency(acc.total)}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-        {/* Top 3 Categories Expenses */}
-        <div className="p-4 bg-gradient-to-br from-white via-rose-50 to-yellow-100 rounded-lg shadow">
-          <h2 className="text-lg font-bold text-gray-800 tracking-wide mb-3">
-            Top 3 Categories (Most Spent)
-          </h2>
+                  <span className="text-emerald-600 font-bold text-sm">{formatCurrency(insights?.totalIncome || 0)}</span>
+                </div>
+                <div className="flex items-center justify-between p-2 bg-rose-50 rounded-lg">
+                  <div className="flex items-center gap-1.5">
+                    <PiTrendDownDuotone className="text-base text-rose-500" />
+                    <span className="font-medium text-gray-700 text-xs">Expenses</span>
+                  </div>
+                  <span className="text-rose-600 font-bold text-sm">{formatCurrency(insights?.totalExpense || 0)}</span>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        </Col>
 
-          {insights.topCategories.length === 0 ? (
-            <div className="flex items-center gap-3 text-gray-600 bg-rose-50 px-4 py-3 rounded-md">
-              <svg
-                className="w-5 h-5 text-rose-400"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={1.5}
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M20 13V5a2 2 0 00-2-2H6a2 2 0 00-2 2v8m16 0v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6m16 0h-4.586a1 1 0 00-.707.293l-1.414 1.414a1 1 0 01-.707.293H9.414a1 1 0 01-.707-.293L7.293 13.293A1 1 0 006.586 13H2"
-                />
-              </svg>
-              <p className="text-sm italic">No category expenses available.</p>
-            </div>
-          ) : (
-            <ul className="mt-1 space-y-1 text-sm text-gray-700">
-              {insights.topCategories.map((cat) => (
-                <li key={cat.category} className="flex justify-between items-center px-3 ">
-                  <span className="font-medium text-gray-800">{cat.category}</span>
-                  <span className="text-red-600 font-semibold">{formatCurrency(cat.total)}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        {/* Accounts Expenses */}
+        <Col xs={24} md={8} style={{ display: 'flex' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            style={{ width: '100%', display: 'flex', flexDirection: 'column' }}
+          >
+            <Card className="shadow-sm flex-1" bodyStyle={{ padding: '16px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <div className="flex items-center gap-2 mb-2">
+                <PiBankDuotone className="text-xl text-indigo-500" />
+                <Text strong className="text-sm">Accounts Expenses</Text>
+              </div>
+              <div className="flex-1">
+                {insights.expenseByAccounts && insights.expenseByAccounts.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-4 text-gray-400">
+                    <PiBankDuotone className="text-3xl mb-1 opacity-30" />
+                    <Text type="secondary" className="text-xs">No expenses yet</Text>
+                  </div>
+                ) : (
+                  <div className="space-y-0">
+                    {insights.expenseByAccounts && insights.expenseByAccounts.slice(0, 3).map((acc) => (
+                      <div key={acc.accountId} className="flex items-center justify-between p-1.5 hover:bg-gray-50 rounded-lg transition-colors">
+                        <div className="flex items-center gap-1.5">
+                          {getIconComponent(acc.icon)({ size: 16, color: acc.color })}
+                          <span className="font-medium text-gray-700 text-xs truncate">{acc.accountName}</span>
+                        </div>
+                        <span className="text-rose-600 font-bold text-xs">{formatCurrency(acc.total)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </Card>
+          </motion.div>
+        </Col>
 
-      </div>
+        {/* Top 3 Categories */}
+        <Col xs={24} md={8} style={{ display: 'flex' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            style={{ width: '100%', display: 'flex', flexDirection: 'column' }}
+          >
+            <Card className="shadow-sm flex-1" bodyStyle={{ padding: '16px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <div className="flex items-center gap-2 mb-2">
+                <PiChartPieSliceDuotone className="text-xl text-amber-500" />
+                <Text strong className="text-sm">Top 3 Categories (Most Spent)</Text>
+              </div>
+              <div className="flex-1">
+                {insights.topCategories && insights.topCategories.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-4 text-gray-400">
+                    <PiChartPieSliceDuotone className="text-3xl mb-1 opacity-30" />
+                    <Text type="secondary" className="text-xs">No expenses yet</Text>
+                  </div>
+                ) : (
+                  <div className="space-y-0">
+                    {insights.topCategories && insights.topCategories.map((cat) => (
+                      <div key={cat.category} className="flex items-center justify-between p-1.5 hover:bg-gray-50 rounded-lg transition-colors">
+                        <span className="font-medium text-gray-700 text-xs truncate">{cat.category}</span>
+                        <span className="text-rose-600 font-bold text-xs">{formatCurrency(cat.total)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </Card>
+          </motion.div>
+        </Col>
+      </Row>
 
-      {/* Filters & Search */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-4 bg-white">
-        <Input
-          placeholder="Search by description or category"
-          allowClear
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          style={{ width: 300 }}
-        />
+      {/* Filters Section */}
+      <Card className="shadow-sm border-gray-100" bodyStyle={{ padding: '16px' }}>
+        <div className="flex flex-col gap-3">
+          {/* First Row: Search and Add Transaction Button */}
+          <div className="flex flex-wrap items-center gap-3">
+            <Input
+              prefix={<SearchOutlined className="text-gray-400" />}
+              placeholder="Search transactions..."
+              allowClear
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="flex-1 min-w-[200px]"
+            />
 
-        <RangePicker
-          format="DD-MM-YYYY"
-          presets={rangePresets}
-          value={[dayjs(filters.startDate), dayjs(filters.endDate)]}
-          onChange={(dates) => {
-            if (!dates) {
-              // Reset to current month
-              const startOfMonth = dayjs().startOf("month").toISOString();
-              const endOfMonth = dayjs().endOf("month").toISOString();
-              setFilters((prev) => ({
-                ...prev,
-                startDate: startOfMonth,
-                endDate: endOfMonth,
-              }));
-              setPagination((prev) => ({ ...prev, current: 1 }));
-              return;
-            }
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => setModalVisible(true)}
+              className="shadow-sm"
+            >
+              Add Transaction
+            </Button>
+          </div>
 
-            // Custom date range
-            setFilters((prev) => ({
-              ...prev,
-              startDate: dates[0].startOf("day").toISOString(),
-              endDate: dates[1].endOf("day").toISOString(),
-            }));
-            setPagination((prev) => ({ ...prev, current: 1 }));
-          }}
-        />
-
-        <Select
-          mode="multiple"
-          placeholder="Filter by Account"
-          allowClear
-          style={{ minWidth: 250, maxWidth: 400 }}
-          value={filters.accountId}
-          onChange={(value) => {
-            setFilters((prev) => ({ ...prev, accountId: value }));
-            setPagination((prev) => ({ ...prev, current: 1 }));
-          }}
-          options={accountOptions.map((acc) => ({
-            label: <Space>
-              {getIconComponent(acc.icon)({
-                size: 20,
-                color: acc.color,
-              })}
-              <span className="font-semibold">{acc?.name || "N/A"}</span>
-            </Space>,
-            value: acc._id,
-          }))}
-        />
-
-        {/* <InputNumber
-          placeholder="Min Amount"
-          onChange={(value) => handleFilterChange("minAmount", value)}
-          style={{ width: 120 }}
-        />
-        <InputNumber
-          placeholder="Max Amount"
-          onChange={(value) => handleFilterChange("maxAmount", value)}
-          style={{ width: 120 }}
-        /> */}
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setModalVisible(true)}
-        >
-          Add Income/Expense
-        </Button>
-      </div>
-
-
-
-      {/* {{ isFiltersAffixed }} */}
-      {/* Transactions Table */}
-      <Table
-        columns={[
-          {
-            title: "Type",
-            dataIndex: "type",
-            filters: [
-              { text: "Income", value: "income" },
-              { text: "Expense", value: "expense" },
-            ],
-            filteredValue: filters.type ? [filters.type] : null,
-            filterMultiple: false, // 👈 ONLY ONE SELECTION ALLOWED
-            onFilter: (value) => value === filters.type,
-            render: (type) => (
-              <span
-                className={
-                  type === "income" ? "text-green-500" : "text-red-500"
+          {/* Second Row: Date Range, Account Filter, and Type Filter */}
+          <div className="flex flex-wrap items-center gap-3">
+            <RangePicker
+              format="DD-MM-YYYY"
+              presets={rangePresets}
+              value={[dayjs(filters.startDate), dayjs(filters.endDate)]}
+              onChange={(dates) => {
+                if (!dates) {
+                  const startOfMonth = dayjs().startOf("month").toISOString();
+                  const endOfMonth = dayjs().endOf("month").toISOString();
+                  setFilters((prev) => ({
+                    ...prev,
+                    startDate: startOfMonth,
+                    endDate: endOfMonth,
+                  }));
+                  setPagination((prev) => ({ ...prev, current: 1 }));
+                  return;
                 }
-              >
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </span>
-            ),
-          },
-          { title: "Category", dataIndex: "category" },
-          { title: "Description", dataIndex: "description" },
-          {
-            title: "Amount (₹)",
-            dataIndex: "amount",
-            sorter: true,
-            render: (amount, record) => {
-              const isIncome = record.type === "income";
-              return (
-                <span
-                  className={isIncome ? "text-green-500" : "text-red-500"}
-                  style={{ display: "flex", alignItems: "center", gap: 4 }}
+                setFilters((prev) => ({
+                  ...prev,
+                  startDate: dates[0].startOf("day").toISOString(),
+                  endDate: dates[1].endOf("day").toISOString(),
+                }));
+                setPagination((prev) => ({ ...prev, current: 1 }));
+              }}
+              className="w-full md:w-auto"
+            />
+
+            <Select
+              mode="multiple"
+              placeholder="Filter by accounts"
+              allowClear
+              className="flex-1 min-w-[200px]"
+              value={filters.accountId}
+              onChange={(value) => {
+                setFilters((prev) => ({ ...prev, accountId: value }));
+                setPagination((prev) => ({ ...prev, current: 1 }));
+              }}
+              options={accountOptions.map((acc) => ({
+                label: (
+                  <Space>
+                    {getIconComponent(acc.icon)({ size: 16, color: acc.color })}
+                    <span>{acc?.name || "N/A"}</span>
+                  </Space>
+                ),
+                value: acc._id,
+              }))}
+            />
+
+            {/* Type Filter Tag Style */}
+            <div className="flex gap-2 p-1 bg-gray-50 rounded-lg border border-gray-100">
+              {['all', 'income', 'expense'].map((t) => (
+                <Button
+                  key={t}
+                  size="small"
+                  type={filters.type === (t === 'all' ? "" : t) ? "primary" : "text"}
+                  onClick={() => {
+                    setFilters(prev => ({ ...prev, type: t === 'all' ? "" : t }));
+                    setPagination(prev => ({ ...prev, current: 1 }));
+                  }}
+                  className="capitalize text-xs font-semibold"
                 >
-                  {isIncome ? <PiPlus /> : <PiMinus />}
-                  {/* {isIncome ? `₹${amount.toFixed(2)}` : `₹${amount.toFixed(2)}`} */}
-                  {formatCurrency(amount)}
-                </span>
-              );
+                  {t}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Main Table Content */}
+      <Card className="shadow-sm overflow-hidden" bodyStyle={{ padding: 0, }}>
+        <Table
+          columns={[
+            {
+              title: "Category",
+              dataIndex: "category",
+              key: "category",
+              render: (cat) => {
+                const [icon, ...name] = cat.split(" ");
+                return (
+                  <Space>
+                    <span className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-lg border border-gray-100">
+                      {icon}
+                    </span>
+                    <span className="font-medium text-gray-700">{name.join(" ")}</span>
+                  </Space>
+                );
+              },
             },
-          },
-          {
-            title: "Account",
-            dataIndex: "accountId",
-            render: (account) => (
-              <Space>
-                {getIconComponent(account.icon)({
-                  size: 20,
-                  color: account.color,
-                })}
-                <span className="font-semibold">{account?.name || "N/A"}</span>
-              </Space>
+            {
+              title: "Description",
+              dataIndex: "description",
+              key: "description",
+              render: (text) => (
+                <div className="text-gray-500 italic">
+                  {text || "No description"}
+                </div>
+              ),
+            },
+            {
+              title: "Account",
+              dataIndex: "accountId",
+              key: "accountId",
+              render: (acc) => (
+                <div className="inline-flex items-center gap-2 px-2 py-1 bg-gray-50 rounded-lg border border-gray-100">
+                  {getIconComponent(acc.icon)({ size: 16, color: acc.color })}
+                  <span className="text-xs font-bold text-gray-600">{acc?.name}</span>
+                </div>
+              ),
+            },
+            {
+              title: "Amount",
+              dataIndex: "amount",
+              key: "amount",
+              sorter: true,
+              align: 'right',
+              render: (amount, record) => {
+                const isIncome = record.type === "income";
+                return (
+                  <div className={`font-bold tabular-nums ${isIncome ? "text-emerald-600" : "text-rose-600"}`}>
+                    <span className="text-[10px] mr-1 opacity-70 uppercase tracking-tighter">
+                      {isIncome ? "+" : "-"}
+                    </span>
+                    {formatCurrency(amount)}
+                  </div>
+                );
+              },
+            },
+            {
+              title: "Date",
+              dataIndex: "date",
+              key: "date",
+              sorter: true,
+              render: (date) => (
+                <div className="text-gray-500 font-medium whitespace-nowrap">
+                  {dayjs(date).format("DD MMM, YYYY")}
+                </div>
+              ),
+            },
+            {
+              title: "Actions",
+              key: "actions",
+              align: 'right',
+              render: (_, record) => {
+                const isReadOnlySource = ["savings", "bills"].includes(record.source);
+                const popoverContent = (
+                  <Space direction="vertical" size={0}>
+                    <Text strong size="small">Automated Transaction</Text>
+                    <Text type="secondary" size="small">
+                      This was created via {record.source === "savings" ? "Savings" : "Planned Bills"}.
+                      Manage it from its respective section.
+                    </Text>
+                  </Space>
+                );
+
+                return (
+                  <Space>
+                    {isReadOnlySource ? (
+                      <Popover content={popoverContent} placement="left">
+                        <InfoCircleOutlined className="text-blue-400 cursor-help" />
+                      </Popover>
+                    ) : (
+                      <>
+                        <AntTooltip title="Edit">
+                          <Button
+                            type="text"
+                            icon={<EditOutlined className="text-blue-500" />}
+                            onClick={() => {
+                              setSelectedTransaction(record);
+                              setEditModalVisible(true);
+                            }}
+                          />
+                        </AntTooltip>
+                        <AntTooltip title="Delete">
+                          <Button
+                            type="text"
+                            icon={<DeleteOutlined className="text-red-500" />}
+                            onClick={() => setDeleteTransaction(record)}
+                          />
+                        </AntTooltip>
+                      </>
+                    )}
+                  </Space>
+                );
+              },
+            },
+          ]}
+          dataSource={transactions}
+          rowKey="_id"
+          loading={loading}
+          pagination={{ ...pagination, showSizeChanger: true }}
+          onChange={handleTableChange}
+          locale={{
+            emptyText: (
+              <div className="flex flex-col items-center justify-center py-12">
+                <PiWalletDuotone className="text-7xl mb-3 opacity-20 text-gray-400" />
+                <Text type="secondary" className="text-sm">
+                  No transactions available for this period
+                </Text>
+              </div>
             ),
-          },
-          {
-            title: "Date",
-            dataIndex: "date",
-            sorter: true,
-            render: (date) =>
-              new Date(date).toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              }),
-          },
-          {
-            title: "Actions",
-            key: "actions",
-            render: (_, record) => {
-              const isReadOnlySource = ["savings", "bills"].includes(record.source);
+          }}
+          className="custom-transactions-table"
+        />
+      </Card>
 
-              const message = (
-                <span>
-                  Please make changes from{" "}
-                  <b>{record.source === "savings" ? "Savings" : "Planned Bills"}</b> section
-                </span>
-              );
-
-
-              const actionButtons = (
-                <Space>
-                  <Button
-                    type="link"
-                    icon={<EditOutlined />}
-                    onClick={() => {
-                      setSelectedTransaction(record);
-                      setEditModalVisible(true);
-                    }}
-                    disabled={isReadOnlySource}
-                  />
-                  <Button
-                    type="link"
-                    icon={<DeleteOutlined />}
-                    danger
-                    onClick={() => setDeleteTransaction(record)}
-                    disabled={isReadOnlySource}
-                  />
-                </Space>
-              );
-
-              return isReadOnlySource ? (
-                <Popover content={message} placement="leftTop">
-                  <div className="cursor-not-allowed">{actionButtons}</div>
-                </Popover>
-              ) : (
-                actionButtons
-              );
-            },
-          }
-
-        ]}
-        dataSource={transactions}
-        rowKey="_id"
-        loading={loading}
-        pagination={{
-          ...pagination,
-          showSizeChanger: true,
-          pageSizeOptions: ["10", "20", "50", "100"],
-        }}
-        onChange={handleTableChange}
-      />
-
-      {/* Add Income/Expense Modal */}
+      {/* Modals */}
       <AddTransactionModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -395,7 +460,6 @@ export default function Transactions() {
           fetchInsights();
         }}
       />
-      {/* Delete Confirmation Modal */}
       <DeleteTransactionModal
         transaction={deleteTransaction}
         open={!!deleteTransaction}
@@ -403,6 +467,25 @@ export default function Transactions() {
         onCancel={() => setDeleteTransaction(null)}
         onConfirm={handleDelete}
       />
-    </>
+
+      <style jsx global>{`
+        .custom-transactions-table .ant-table-thead > tr > th {
+          background: ${isDarkMode ? '#001529' : '#f9fafb'};
+          color: ${isDarkMode ? '#b5b5b5' : '#6b7280'};
+          font-weight: 600;
+          text-transform: uppercase;
+          font-size: 11px;
+          letter-spacing: 0.05em;
+          padding: 16px;
+          border-bottom: 1px solid ${isDarkMode ? '#333' : '#f3f4f6'};
+        }
+        .custom-transactions-table .ant-table-tbody > tr > td {
+          padding: 16px;
+        }
+        .custom-transactions-table .ant-table-tbody > tr:hover > td {
+          background: ${isDarkMode ? '#001a33' : '#fdfdfd'} !important;
+        }
+      `}</style>
+    </div>
   );
 }
