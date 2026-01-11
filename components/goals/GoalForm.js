@@ -66,7 +66,7 @@ const GoalForm = ({ visible, onCancel, onFinish, initialValues, loading }) => {
                         label="Target Amount (₹)"
                         rules={[{ required: true, message: "Required" }]}
                     >
-                        <InputNumber className="w-full" min={1} placeholder="10000" />
+                        <InputNumber style={{ width: '100%' }} min={1} placeholder="10000" />
                     </Form.Item>
 
                     <Form.Item
@@ -74,7 +74,7 @@ const GoalForm = ({ visible, onCancel, onFinish, initialValues, loading }) => {
                         label="Current Amount (₹)"
                         initialValue={0}
                     >
-                        <InputNumber className="w-full" min={0} placeholder="0" />
+                        <InputNumber style={{ width: '100%' }} min={0} placeholder="0" />
                     </Form.Item>
                 </div>
 

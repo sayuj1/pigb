@@ -41,7 +41,7 @@ const AddMoneyModal = ({ goalId, visible, onCancel, onSuccess }) => {
                     label="Amount (₹)"
                     rules={[{ required: true, message: "Please enter amount" }]}
                 >
-                    <InputNumber className="w-full" min={1} placeholder="Enter amount" />
+                    <InputNumber style={{ width: '100%' }} min={1} placeholder="Enter amount" />
                 </Form.Item>
                 <Form.Item name="description" label="Description (Optional)">
                     <Input placeholder="e.g., Monthly contribution" />
