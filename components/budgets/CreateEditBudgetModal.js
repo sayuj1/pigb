@@ -20,6 +20,7 @@ const CreateEditBudgetModal = ({
   const [form] = Form.useForm();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const fetchCategories = async () => {
     try {
@@ -80,6 +81,7 @@ const CreateEditBudgetModal = ({
         : "/api/budgets/budget";
 
       try {
+        setSubmitting(true);
         const res = await fetch(url, {
           method: isEditing ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
@@ -97,6 +99,8 @@ const CreateEditBudgetModal = ({
         }
       } catch (err) {
         message.error("Something went wrong! Please try again");
+      } finally {
+        setSubmitting(false);
       }
     });
   };
@@ -106,63 +110,83 @@ const CreateEditBudgetModal = ({
       title={editingBudget ? "Edit Budget" : "Add Budget"}
       open={visible}
       onOk={handleOk}
+      confirmLoading={submitting}
       okText={editingBudget ? "Update Budget" : "Add Budget"}
       onCancel={() => {
         form.resetFields();
         onClose();
       }}
+      centered
+      width={600}
+      okButtonProps={{ size: "large" }}
+      cancelButtonProps={{ size: "large" }}
     >
-      <Form layout="vertical" form={form}>
-        <Form.Item
-          name="budgetName"
-          label="Budget Name"
-          rules={[{ required: true }]}
-        >
-          <Input placeholder="e.g., Groceries" />
-        </Form.Item>
-
-        <Form.Item
-          name="category"
-          label="Category"
-          rules={[{ required: true }]}
-        >
-          <Select
-            showSearch
-            placeholder="Select a category"
-            loading={loading}
-            optionFilterProp="label"
-            filterOption={(input, option) =>
-              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
-            }
+      <Form layout="vertical" form={form} className="mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Form.Item
+            name="budgetName"
+            label="Budget Name"
+            rules={[{ required: true }]}
           >
-            {categories.map((cat) => (
-              <Select.Option key={cat._id} value={cat._id} label={cat.name}>
-                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  {cat.icon} {cat.name}
-                </span>
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
+            <Input placeholder="e.g., Groceries" size="large" />
+          </Form.Item>
 
-        <Form.Item
-          name="limitAmount"
-          label="Limit Amount"
-          rules={[{ required: true }]}
-        >
-          <InputNumber min={0} style={{ width: "100%" }} prefix="₹" />
-        </Form.Item>
+          <Form.Item
+            name="category"
+            label="Category"
+            rules={[{ required: true }]}
+          >
+            <Select
+              showSearch
+              placeholder="Select a category"
+              loading={loading}
+              optionFilterProp="label"
+              filterOption={(input, option) =>
+                (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+              }
+              size="large"
+            >
+              {categories.map((cat) => (
+                <Select.Option key={cat._id} value={cat._id} label={cat.name}>
+                  <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    {cat.icon} {cat.name}
+                  </span>
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </div>
 
-        <Form.Item
-          name="dateRange"
-          label="Date Range"
-          rules={[{ required: true, message: "Please select a date range" }]}
-        >
-          <DatePicker.RangePicker
-            style={{ width: "100%" }}
-            format="DD-MM-YYYY"
-          />
-        </Form.Item>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Form.Item
+            name="limitAmount"
+            label="Limit Amount"
+            rules={[{ required: true }]}
+          >
+            <InputNumber
+              min={0}
+              style={{ width: "100%" }}
+              prefix="₹"
+              size="large"
+              formatter={(value) =>
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              }
+              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="dateRange"
+            label="Date Range"
+            rules={[{ required: true, message: "Please select a date range" }]}
+          >
+            <DatePicker.RangePicker
+              style={{ width: "100%" }}
+              format="DD-MM-YYYY"
+              size="large"
+            />
+          </Form.Item>
+        </div>
       </Form>
     </Modal>
   );
