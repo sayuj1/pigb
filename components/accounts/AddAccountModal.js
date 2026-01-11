@@ -211,6 +211,10 @@ export default function AddAccountModal({ onAdd }) {
                         placeholder="5000"
                         size="large"
                         prefix="₹"
+                        formatter={(value) =>
+                          `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        }
+                        parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
                       />
                     </Form.Item>
                   </Col>
@@ -226,6 +230,10 @@ export default function AddAccountModal({ onAdd }) {
                         placeholder="0.00"
                         size="large"
                         prefix="₹"
+                        formatter={(value) =>
+                          `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        }
+                        parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
                       />
                     </Form.Item>
                   </Col>

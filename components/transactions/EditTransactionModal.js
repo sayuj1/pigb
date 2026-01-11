@@ -124,8 +124,8 @@ export default function EditTransactionModal({
               <div
                 onClick={() => form.setFieldsValue({ type: 'income' })}
                 className={`cursor-pointer rounded-xl p-3 border-2 transition-all duration-200 ${typeSelector === 'income'
-                    ? 'border-emerald-500 bg-emerald-50 shadow-md'
-                    : 'border-gray-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/50'
+                  ? 'border-emerald-500 bg-emerald-50 shadow-md'
+                  : 'border-gray-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/50'
                   }`}
               >
                 <div className="flex flex-col items-center gap-2">
@@ -138,8 +138,8 @@ export default function EditTransactionModal({
               <div
                 onClick={() => form.setFieldsValue({ type: 'expense' })}
                 className={`cursor-pointer rounded-xl p-3 border-2 transition-all duration-200 ${typeSelector === 'expense'
-                    ? 'border-rose-500 bg-rose-50 shadow-md'
-                    : 'border-gray-200 bg-white hover:border-rose-300 hover:bg-rose-50/50'
+                  ? 'border-rose-500 bg-rose-50 shadow-md'
+                  : 'border-gray-200 bg-white hover:border-rose-300 hover:bg-rose-50/50'
                   }`}
               >
                 <div className="flex flex-col items-center gap-2">
@@ -252,6 +252,10 @@ export default function EditTransactionModal({
                   precision={2}
                   size="large"
                   prefix="₹"
+                  formatter={(value) =>
+                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
+                  parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
                 />
               </Form.Item>
 

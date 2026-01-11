@@ -180,7 +180,16 @@ export default function EditAccountModal({ account, onUpdate, onClose }) {
                     label="Credit Limit"
                     rules={[{ required: true }]}
                   >
-                    <InputNumber style={{ width: "100%" }} min={0} size="large" prefix="₹" />
+                    <InputNumber
+                      style={{ width: "100%" }}
+                      min={0}
+                      size="large"
+                      prefix="₹"
+                      formatter={(value) =>
+                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                      }
+                      parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                    />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
@@ -189,7 +198,16 @@ export default function EditAccountModal({ account, onUpdate, onClose }) {
                     label="Credit Used"
                     rules={[{ required: true }]}
                   >
-                    <InputNumber style={{ width: "100%" }} min={0} size="large" prefix="₹" />
+                    <InputNumber
+                      style={{ width: "100%" }}
+                      min={0}
+                      size="large"
+                      prefix="₹"
+                      formatter={(value) =>
+                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                      }
+                      parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                    />
                   </Form.Item>
                 </Col>
               </Row>

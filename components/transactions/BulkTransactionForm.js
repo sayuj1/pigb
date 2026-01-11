@@ -23,8 +23,8 @@ const TransactionTypeSelector = ({ value, onChange }) => (
     <div
       onClick={() => onChange("income")}
       className={`cursor-pointer rounded-lg p-2 border transition-all duration-200 flex items-center justify-center gap-2 ${value === "income"
-          ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm"
-          : "border-gray-200 bg-white text-gray-600 hover:border-emerald-300 hover:bg-emerald-50/50"
+        ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm"
+        : "border-gray-200 bg-white text-gray-600 hover:border-emerald-300 hover:bg-emerald-50/50"
         }`}
     >
       <PiArrowCircleUpFill
@@ -36,8 +36,8 @@ const TransactionTypeSelector = ({ value, onChange }) => (
     <div
       onClick={() => onChange("expense")}
       className={`cursor-pointer rounded-lg p-2 border transition-all duration-200 flex items-center justify-center gap-2 ${value === "expense"
-          ? "border-rose-500 bg-rose-50 text-rose-700 shadow-sm"
-          : "border-gray-200 bg-white text-gray-600 hover:border-rose-300 hover:bg-rose-50/50"
+        ? "border-rose-500 bg-rose-50 text-rose-700 shadow-sm"
+        : "border-gray-200 bg-white text-gray-600 hover:border-rose-300 hover:bg-rose-50/50"
         }`}
     >
       <PiArrowCircleDownFill
@@ -255,6 +255,10 @@ export default function BulkTransactionForm({
                           prefix="₹"
                           min={0}
                           precision={2}
+                          formatter={(value) =>
+                            `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                          }
+                          parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
                         />
                       </Form.Item>
                     </Col>
