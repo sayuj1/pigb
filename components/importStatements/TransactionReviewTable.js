@@ -202,75 +202,73 @@ export default function TransactionReviewTable({ data, onChange, categories, err
     ];
 
     return (
-        <>
-            <Space style={{ marginBottom: 16 }}>
-                <Button
-                    danger
-                    disabled={!selectedRowKeys.length}
-                    onClick={() => setShowConfirmDelete(true)}
-                >
-                    Delete Selected
-                </Button>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-4 bg-gray-50 border-b border-gray-100 flex flex-wrap gap-3 items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <span className="text-gray-500 font-medium text-sm">Bulk Actions ({selectedRowKeys.length} selected):</span>
+                    <Select
+                        key={bulkCategory.key}
+                        value={bulkCategory.value}
+                        placeholder="Assign Category"
+                        style={{ width: 180 }}
+                        size="small"
+                        onChange={(cat) => {
+                            const updated = [...data];
+                            selectedRowKeys.forEach((i) => {
+                                updated[i].category = cat;
+                            });
+                            onChange(updated);
+                            validateAll();
+                            message.success(cat ? `Assigned "${cat}" to selected` : `Category removed for selected`);
+                        }}
+                        disabled={!selectedRowKeys.length}
+                        allowClear
+                    >
+                        {categories.map((cat) => (
+                            <Option key={cat._id} value={cat.name}>
+                                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    {cat.icon} {cat.name}
+                                </span>
+                            </Option>
+                        ))}
+                    </Select>
 
-                <Select
-                    key={bulkCategory.key} // force re-render
-                    value={bulkCategory.value}
-                    placeholder="Assign category"
-                    style={{ width: 200 }}
-                    onChange={(cat) => {
-                        const updated = [...data];
-                        selectedRowKeys.forEach((i) => {
-                            updated[i].category = cat;
-                        });
-                        onChange(updated);
-                        validateAll();
-                        if (cat)
-                            message.success(`Assigned category "${cat}" to selected rows`);
-                        else if (!cat && selectedRowKeys.length > 0)
-                            message.success(`Category removed for selected rows`);
-                    }}
-                    disabled={!selectedRowKeys.length}
-                    allowClear
-                >
-                    {categories.map((cat) => (
-                        <Option key={cat._id} value={cat.name}>
-                            <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                {cat.icon} {cat.name}
-                            </span>
-                        </Option>
-                    ))}
-                </Select>
+                    <DatePicker
+                        key={bulkDate.key}
+                        value={bulkDate.value}
+                        placeholder="Set Date"
+                        size="small"
+                        style={{ width: 140 }}
+                        onChange={(_, dateStr) => {
+                            const updated = [...data];
+                            selectedRowKeys.forEach((i) => updated[i].date = dateStr);
+                            onChange(updated);
+                            validateAll();
+                            message.success(dateStr ? `Date updated to ${dateStr}` : "Date removed");
+                        }}
+                        disabled={!selectedRowKeys.length}
+                    />
+                </div>
 
-                <DatePicker
-                    key={bulkDate.key} // force re-render
-                    value={bulkDate.value}
-                    placeholder="Change date"
-                    // value={bulkDate}
-                    onChange={(date, dateStr) => {
-                        const updated = [...data];
-                        selectedRowKeys.forEach((i) => {
-                            updated[i].date = dateStr;
-                        });
-                        onChange(updated);
-                        validateAll();
-                        // setBulkDate(undefined);
-                        if (dateStr)
-                            message.success(`Updated date to ${dateStr} for selected rows`);
-                        else if (!dateStr && selectedRowKeys.length > 0)
-                            message.success("Removed date for selected rows");
-
-
-                    }}
-                    disabled={!selectedRowKeys.length}
-                />
-
-                <Button
-                    onClick={() => setSelectedRowKeys([])}
-                    disabled={!selectedRowKeys.length}
-                >
-                    Deselect All
-                </Button>
-            </Space>
+                <div className="flex gap-2">
+                    <Button
+                        danger
+                        size="small"
+                        disabled={!selectedRowKeys.length}
+                        onClick={() => setShowConfirmDelete(true)}
+                        icon={<CloseOutlined />}
+                    >
+                        Delete
+                    </Button>
+                    <Button
+                        size="small"
+                        onClick={() => setSelectedRowKeys([])}
+                        disabled={!selectedRowKeys.length}
+                    >
+                        Deselect
+                    </Button>
+                </div>
+            </div>
 
             <Table
                 columns={columns}
@@ -312,7 +310,8 @@ export default function TransactionReviewTable({ data, onChange, categories, err
             >
                 Are you sure you want to remove the selected transactions?
             </Modal>
-        </>
-
+        </div>
     );
 }
+
+
