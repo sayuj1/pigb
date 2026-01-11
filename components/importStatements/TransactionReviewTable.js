@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Table, Input, DatePicker, Select, Typography, Popover, Space, Button, message, Modal } from 'antd';
+import { Table, Input, DatePicker, Select, Typography, Popover, Space, Button, message, Modal, Alert } from 'antd';
 import dayjs from 'dayjs';
-import { CloseOutlined } from '@ant-design/icons'; // Import icon
+import { CloseOutlined, ExclamationCircleOutlined } from '@ant-design/icons'; // Import icon
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -283,7 +283,12 @@ export default function TransactionReviewTable({ data, onChange, categories, err
             />
             <Modal
                 open={showConfirmDelete}
-                title="Confirm Delete"
+                title={
+                    <div className="flex items-center gap-2 text-red-600">
+                        <ExclamationCircleOutlined className="text-xl" />
+                        <span>Delete Transactions</span>
+                    </div>
+                }
                 onOk={() => {
                     const updated = data.filter((_, i) => !selectedRowKeys.includes(i));
                     const updatedErrors = { ...errors };
@@ -301,14 +306,30 @@ export default function TransactionReviewTable({ data, onChange, categories, err
                     setErrors(reindexedErrors);
                     setSelectedRowKeys([]);
                     setShowConfirmDelete(false);
-                    message.success("Deleted selected rows");
+                    message.success("Deleted selected transactions");
                 }}
                 onCancel={() => setShowConfirmDelete(false)}
                 okText="Yes, Delete"
                 cancelText="Cancel"
-                okButtonProps={{ danger: true }}
+                okButtonProps={{ danger: true, size: 'large' }}
+                cancelButtonProps={{ size: 'large' }}
+                destroyOnClose
             >
-                Are you sure you want to remove the selected transactions?
+                <div className="py-4">
+                    <Alert
+                        message="Warning"
+                        description={`You are about to permanently delete ${selectedRowKeys.length} selected transaction(s). This action cannot be undone.`}
+                        type="error"
+                        showIcon
+                        className="mb-4 bg-red-50 border-red-100"
+                    />
+                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 text-gray-600 text-sm">
+                        <ul className="list-disc pl-4 space-y-1">
+                            <li>Removed transactions will not be imported.</li>
+                            <li>You can re-upload the file if you need them back.</li>
+                        </ul>
+                    </div>
+                </div>
             </Modal>
         </div>
     );
